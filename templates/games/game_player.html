@@ -1,0 +1,932 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dream House Builder 3D | Playable Real-World Game</title>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- 3D Three.js & Confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0B0F19;
+      color: #FFFFFF;
+      user-select: none;
+    }
+
+    /* ── FULLSCREEN 3D VIEWPORT ── */
+    #house-3d-fullscreen-viewport {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      cursor: crosshair;
+    }
+
+    /* ── FLOATING TOP HUD ── */
+    .game-top-hud {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    .hud-left-card {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .hud-logo-icon {
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #6366F1, #3B82F6);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+    }
+    .hud-game-title {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+    .hud-level-pill {
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid #818CF8;
+      color: #C7D2FE;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+    }
+
+    /* Active Mission Objective Bar */
+    .hud-mission-objective {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(251, 191, 36, 0.4);
+      border-radius: 100px;
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #FDE047;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+
+    .hud-right-stats {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hud-stat-chip {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hud-stat-chip.score { color: #FBBF24; }
+    .hud-stat-chip.timer { color: #38BDF8; }
+
+    .btn-hud-exit {
+      background: #EF4444;
+      border: 2px solid #F87171;
+      color: #FFFFFF !important;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 0.88rem;
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-hud-exit:hover {
+      background: #DC2626;
+      border-color: #EF4444;
+      color: #FFFFFF !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.5);
+    }
+
+    /* ── PROXIMITY INTERACTION PROMPT ── */
+    #interaction-hud-prompt {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      backdrop-filter: blur(16px);
+      border-radius: 100px;
+      padding: 12px 28px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #interaction-hud-prompt.interaction-prompt-active {
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #F59E0B;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+      animation: pulseGrow 1.5s infinite ease-in-out;
+    }
+    #interaction-hud-prompt.interaction-prompt-completed {
+      background: rgba(16, 185, 129, 0.9);
+      border: 2px solid #34D399;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+      cursor: default;
+    }
+    #interaction-hud-prompt.interaction-prompt-locked {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      color: #94A3B8;
+      cursor: not-allowed;
+    }
+    .key-badge {
+      background: #F59E0B;
+      color: #0F172A;
+      font-size: 0.9rem;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    @keyframes pulseGrow {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* ── MOVEMENT CONTROLS HELP OVERLAY ── */
+    .controls-help-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #94A3B8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── IN-WORLD TOAST BANNER ── */
+    .in-world-toast-banner {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 80;
+      border-radius: 16px;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 900;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .in-world-toast-banner.success {
+      background: rgba(16, 185, 129, 0.95);
+      border: 2px solid #34D399;
+      color: #FFFFFF;
+    }
+    .in-world-toast-banner.warning {
+      background: rgba(239, 68, 68, 0.95);
+      border: 2px solid #F87171;
+      color: #FFFFFF;
+    }
+    @keyframes popIn {
+      0% { transform: translateX(-50%) scale(0.85); opacity: 0; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    /* ── IN-WORLD DIALOGUE & DEED MODAL ── */
+    .dialogue-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(11, 15, 25, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .rpg-dialogue-window {
+      background: #1E1B4B;
+      border: 2px solid #6366F1;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(99, 102, 241, 0.4);
+      border-radius: 24px;
+      max-width: 680px;
+      width: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: popInModal 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popInModal {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .npc-header-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+    .npc-avatar-box {
+      font-size: 2rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: #312E81;
+      border: 1.5px solid #818CF8;
+      display: grid;
+      place-items: center;
+    }
+    .npc-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+    .npc-badge {
+      background: #F59E0B;
+      color: #0F172A;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+    .npc-tagline {
+      font-size: 0.78rem;
+      color: #A5B4FC;
+      font-weight: 700;
+    }
+    .btn-close-dialogue {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .npc-speech-bubble {
+      background: rgba(49, 46, 129, 0.6);
+      border-left: 4px solid #F59E0B;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #E2E8F0;
+    }
+    .npc-speech-bubble strong {
+      color: #FDE047;
+    }
+
+    /* Land Deed Paper inside RPG */
+    .land-deed-paper {
+      background: #FFFBEB;
+      border: 2px solid #FDE68A;
+      border-radius: 18px;
+      padding: 18px;
+      color: #451A03;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .deed-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .deed-paper-title {
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #92400E;
+      text-transform: uppercase;
+    }
+    .deed-stamp-area {
+      border: 2px dashed #DC2626;
+      color: #DC2626;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transform: rotate(4deg);
+      background: rgba(220, 38, 38, 0.05);
+    }
+    .deed-stamp-area.stamped {
+      border: 3px solid #16A34A;
+      color: #16A34A;
+      background: rgba(22, 163, 74, 0.15);
+      font-size: 0.88rem;
+      transform: rotate(-6deg);
+      box-shadow: 0 0 16px rgba(22, 163, 74, 0.3);
+    }
+    .deed-amount-display {
+      background: #FEF3C7;
+      border: 1.5px solid #FCD34D;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin: 8px 0 12px;
+      text-align: center;
+    }
+    .deed-num-highlight {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #92400E;
+      letter-spacing: 1.5px;
+    }
+    .btn-voice-listen-gold {
+      background: #FDE68A;
+      border: 1px solid #F59E0B;
+      color: #92400E;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+    }
+
+    .deed-offers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .deed-offers-grid { grid-template-columns: 1fr; }
+    }
+    .deed-offer-card {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .deed-offer-card:hover {
+      border-color: #6366F1;
+      background: #F5F3FF;
+      transform: translateY(-2px);
+    }
+    .deed-offer-card.selected {
+      border-color: #6366F1;
+      background: #4F46E5;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+    }
+    .deed-opt-title {
+      font-weight: 900;
+      font-size: 0.96rem;
+      color: #0F172A;
+      transition: color 0.2s ease;
+    }
+    .deed-opt-subtitle {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748B;
+      transition: color 0.2s ease;
+    }
+    .deed-offer-card.selected .deed-opt-title {
+      color: #FFFFFF !important;
+    }
+    .deed-offer-card.selected .deed-opt-subtitle {
+      color: #E0E7FF !important;
+    }
+    .offer-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #94A3B8;
+      flex-shrink: 0;
+      background: #F8FAFC;
+    }
+    .deed-offer-card.selected .offer-radio {
+      border-color: #FFFFFF;
+      background: #FDE047;
+    }
+    .btn-voice-mini {
+      background: #EEF2FF;
+      border: 1px solid #C7D2FE;
+      color: #4F46E5;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .deed-offer-card.selected .btn-voice-mini {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.4);
+      color: #FFFFFF;
+    }
+
+    .dialogue-action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .btn-dialogue-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #CBD5E1;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .btn-dialogue-confirm {
+      background: linear-gradient(135deg, #10B981, #059669);
+      border: none;
+      color: #FFFFFF;
+      font-weight: 900;
+      font-size: 0.95rem;
+      padding: 12px 24px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-dialogue-confirm:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-2px);
+    }
+
+    /* ── LEVEL 2 CSS (CHUTES & DIGIT BLOCKS) ── */
+    .foundation-chute-rack {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1.5px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 18px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .chute-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #94A3B8;
+      margin-bottom: 12px;
+    }
+    .btn-clear-slots {
+      background: none;
+      border: none;
+      color: #F87171;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .chutes-grid {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .chute-slot {
+      width: 52px;
+      height: 64px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .chute-slot.filled {
+      border-color: #38BDF8;
+      background: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    }
+    .chute-lbl {
+      font-size: 0.6rem;
+      font-weight: 900;
+      color: #94A3B8;
+      text-transform: uppercase;
+    }
+    .chute-digit {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+    .chute-comma {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #38BDF8;
+      line-height: 1;
+    }
+    .live-chute-readout {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #CBD5E1;
+    }
+    .live-chute-readout strong {
+      color: #FDE047;
+      font-size: 1.15rem;
+    }
+    .digit-blocks-depot {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 12px 0 16px;
+    }
+    .digit-block-draggable {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .digit-block-draggable:hover {
+      border-color: #38BDF8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+    }
+    .digit-block-draggable.used {
+      opacity: 0.25;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    /* ── LEVEL 3 CSS (LASER SCANNER) ── */
+    .laser-scanner-console {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+    .pv-matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .pv-col {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    .pv-col:last-child { border-right: none; }
+    .pv-col-lbl {
+      padding: 6px 2px;
+      font-size: 0.62rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #FFFFFF;
+    }
+    .pv-col.lakhs .pv-col-lbl { background: #4F46E5; }
+    .pv-col.tth .pv-col-lbl { background: #0284C7; }
+    .pv-col.th .pv-col-lbl { background: #0EA5E9; }
+    .pv-col.h .pv-col-lbl { background: #16A34A; }
+    .pv-col.t .pv-col-lbl { background: #EAB308; color: #713F12; }
+    .pv-col.o .pv-col-lbl { background: #F97316; }
+    .pv-col-val {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 8px 4px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+    .pv-col.active-laser {
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+    }
+    .pv-col.active-laser .pv-col-val {
+      background: rgba(251, 191, 36, 0.3);
+      color: #FDE047;
+    }
+    .laser-beam-indicator {
+      font-size: 0.55rem;
+      font-weight: 900;
+      color: #FDE047;
+      background: #854D0E;
+      padding: 2px;
+      letter-spacing: 0.5px;
+    }
+    .scanner-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0 16px;
+    }
+    @media (max-width: 600px) {
+      .scanner-options-grid { grid-template-columns: 1fr; }
+    }
+    .scanner-card-opt {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #F8FAFC;
+      transition: all 0.2s ease;
+    }
+    .scanner-card-opt:hover {
+      border-color: #38BDF8;
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .scanner-card-opt.selected {
+      border-color: #38BDF8;
+      background: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+
+    /* ── LEVEL 4 CSS (MARKET SCALE) ── */
+    .market-scale-arena {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .quote-pan {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+      text-align: center;
+      flex: 1;
+    }
+    .quote-pan-tag {
+      font-size: 0.68rem;
+      font-weight: 900;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+    }
+    .quote-material-name {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 2px 0;
+    }
+    .quote-price-tag {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #FDE047;
+    }
+    .scale-fulcrum-pivot {
+      width: 50px;
+      height: 50px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 2px dashed #F59E0B;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #FDE047;
+    }
+    .scale-symbol-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+    .scale-token-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #E2E8F0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .scale-token-btn:hover, .scale-token-btn.selected {
+      border-color: #F59E0B;
+      background: #F59E0B;
+      color: #0F172A;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+    }
+
+    /* ── LEVEL 5 CSS (CHIEF ARCHITECT AUDIT) ── */
+    .architect-audit-sheet {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .audit-breakdown-table {
+      padding: 12px 16px;
+    }
+    .audit-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #CBD5E1;
+    }
+    .audit-total-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0 4px;
+      font-size: 1rem;
+      font-weight: 900;
+      color: #FFFFFF;
+      border-top: 1.5px solid rgba(255, 255, 255, 0.15);
+      margin-top: 4px;
+    }
+    .audit-decisions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+    .audit-decision-tile {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #F8FAFC;
+      transition: all 0.2s ease;
+    }
+    .audit-decision-tile:hover {
+      border-color: #10B981;
+      background: rgba(16, 185, 129, 0.2);
+    }
+    .audit-decision-tile.selected {
+      border-color: #10B981;
+      background: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── 1. FLOATING TOP HUD ── -->
+  <div class="game-top-hud">
+    <div class="hud-left-card">
+      <div class="hud-logo-icon">🏠</div>
+      <div>
+        <div class="hud-game-title">{{ game.title }} 3D</div>
+      </div>
+      <span class="hud-level-pill" id="hud-level-pill">Level 1: Buy Land</span>
+    </div>
+
+    <!-- Active Objective in World -->
+    <div class="hud-mission-objective" id="hud-mission-objective">
+      <i class="bi bi-geo-alt-fill"></i>
+      <span id="hud-objective-text">Walk to Land Broker Mr. Sharma &amp; Buy the Plot [E]</span>
+    </div>
+
+    <div class="hud-right-stats">
+      <div class="hud-stat-chip score">
+        <i class="bi bi-trophy-fill"></i>
+        <span>SCORE: <strong id="hud-score" style="color:#FFFFFF;">0</strong></span>
+      </div>
+      <div class="hud-stat-chip timer">
+        <i class="bi bi-clock-history"></i>
+        <span id="hud-timer">0s</span>
+      </div>
+      <a href="{% url 'common:concept' game.concept.id|default:1 %}" class="btn-hud-exit">
+        <i class="bi bi-x-lg"></i> Exit
+      </a>
+    </div>
+  </div>
+
+  <!-- ── 2. FULLSCREEN 3D GAME WORLD CANVAS ── -->
+  <div id="house-3d-fullscreen-viewport"></div>
+
+  <!-- ── 3. PROXIMITY INTERACTION PROMPT ── -->
+  <div id="interaction-hud-prompt" onclick="if(window.player && window.player.world3D) window.player.world3D.talkToBroker()">
+    <span class="key-badge">E</span> Talk to <strong>Mr. Sharma (Land Broker)</strong>
+  </div>
+
+  <!-- ── 4. CONTROLS HELP OVERLAY ── -->
+  <div class="controls-help-overlay">
+    <span>⌨️ <strong>WASD / Arrow Keys</strong> to Walk</span>
+    <span>•</span>
+    <span>🖱️ <strong>Click Ground</strong> to Move</span>
+    <span>•</span>
+    <span>💬 <strong>[E]</strong> to Interact</span>
+  </div>
+
+  <!-- ── 5. IN-WORLD TOAST NOTIFICATION ── -->
+  <div id="in-world-toast" class="in-world-toast-banner"></div>
+
+  <!-- ── 6. IN-WORLD DIALOGUE ROOT ── -->
+  <div id="in-world-dialogue-root" style="display:none;"></div>
+
+  <!-- Scripts -->
+  <script src="{% static 'games/js/game-api.js' %}"></script>
+  <script src="{% static 'games/js/components/game-audio.js' %}"></script>
+  <script src="{% static 'games/js/components/game-character.js' %}"></script>
+  <script src="{% static 'games/js/components/in-world-dialogue.js' %}"></script>
+  <script src="{% static 'games/js/components/house-3d-world.js' %}"></script>
+  <script src="{% static 'games/js/game-player.js' %}"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    window.player = new GamePlayer({
+      gameSlug: '{{ game.slug }}',
+      gameType: '{{ game.game_type }}'
+    });
+    window.player.init();
+  });
+  </script>
+</body>
+</html>

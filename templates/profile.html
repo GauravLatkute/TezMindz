@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}My Profile — Tezz-Mindz{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .profile-hero {
+    background: #fff; border: 1.5px solid #ede9fe; border-radius: 20px;
+    padding: 32px; margin-bottom: 24px; text-align: center;
+  }
+  .profile-big-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;
+    display: grid; place-items: center; font-size: 2rem; font-weight: 900;
+    margin: 0 auto 16px;
+  }
+  .profile-hero h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .profile-hero p { font-size: 0.9rem; color: #64748b; font-weight: 600; margin: 0; }
+
+  .profile-stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;
+  }
+  @media (max-width: 900px) { .profile-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .profile-stat-box {
+    background: #fff; border: 1px solid #ede9fe; border-radius: 16px; padding: 20px; text-align: center;
+  }
+  .p-stat-val { font-size: 1.6rem; font-weight: 900; color: #1e1b4b; margin-bottom: 4px; }
+  .p-stat-lbl { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+  .unlocked-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if profile %}
+<div class="profile-hero">
+  <div class="profile-big-avatar">{{ profile.user.first_name|default:profile.user.username|first|upper }}</div>
+  <h1>{{ profile.user.first_name|default:profile.user.username }}</h1>
+  <p>{{ profile.student_class.class_label }} ({{ profile.student_class.stage }}) · @{{ profile.user.username }}</p>
+  <div style="margin-top:14px;">
+    <span class="stat-chip green"><i class="bi bi-shield-check"></i> Active Student</span>
+    <span class="stat-chip"><i class="bi bi-envelope"></i> {{ profile.user.email }}</span>
+  </div>
+</div>
+
+<div class="profile-stats-grid">
+  <div class="profile-stat-box">
+    <div class="p-stat-val" style="color:#4f46e5;">{{ profile.xp }}</div>
+    <div class="p-stat-lbl">Total XP</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="p-stat-val" style="color:#10b981;">Level {{ profile.current_level }}</div>
+    <div class="p-stat-lbl">Current Level</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="p-stat-val" style="color:#f59e0b;">🔥 {{ profile.streak }}</div>
+    <div class="p-stat-lbl">Day Streak</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="p-stat-val" style="color:#d97706;">🪙 {{ profile.coins }}</div>
+    <div class="p-stat-lbl">Coins</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Earned Badges & Achievements -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-title">Unlocked Badges ({{ earned_badges.count }})</div>
+  <div class="unlocked-list">
+    {% for eb in earned_badges %}
+    <span class="badge-pill" style="background:#fef3c7;color:#b45309;padding:6px 14px;font-size:0.82rem;">
+      {{ eb.badge.icon }} {{ eb.badge.name }}
+    </span>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:0.85rem;margin:0;">No badges earned yet. Complete activities to earn badges!</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-title">Completed Achievements ({{ earned_achievements.count }})</div>
+  <div class="unlocked-list">
+    {% for ea in earned_achievements %}
+    <span class="badge-pill" style="background:#dcfce7;color:#15803d;padding:6px 14px;font-size:0.82rem;">
+      {{ ea.achievement.icon }} {{ ea.achievement.name }}
+    </span>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:0.85rem;margin:0;">No achievements unlocked yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div style="display:flex;justify-content:flex-end;">
+  <a class="btn-outline" href="/logout/" style="color:#ef4444;border-color:#fca5a5;">
+    <i class="bi bi-box-arrow-right"></i> Log Out
+  </a>
+</div>
+{% endblock %}

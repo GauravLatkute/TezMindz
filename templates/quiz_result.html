@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Mission Results — Tezz-Mindz{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block m_nav_subjects %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .victory-result-card {
+    max-width: 680px;
+    margin: 20px auto;
+    background: #FFFFFF;
+    border-radius: 32px;
+    border: 2px solid #EEF2F6;
+    padding: 42px 36px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(79, 70, 229, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .celebration-trophy-sphere {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border: 4px solid #FACC15;
+    display: grid;
+    place-items: center;
+    font-size: 3.2rem;
+    margin: 0 auto 18px;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    animation: tm-bounce-soft 2s infinite ease-in-out;
+  }
+  .victory-result-card h1 {
+    font-size: 1.95rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .victory-result-card p {
+    font-size: 0.95rem;
+    color: #64748B;
+    margin: 0 0 28px;
+  }
+
+  .metrics-score-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 540px) {
+    .metrics-score-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .metric-score-box {
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 16px 10px;
+  }
+  .metric-score-box .val {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #0F172A;
+  }
+  .metric-score-box .lbl {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .unlock-celebration-toast {
+    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    border: 2px solid #A7F3D0;
+    border-radius: 22px;
+    padding: 20px 24px;
+    margin-bottom: 30px;
+    color: #065F46;
+  }
+  .unlock-celebration-toast strong {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 900;
+  }
+
+  .victory-actions-stack {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>
+<!-- Confetti Library for Kids Celebration -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="victory-result-card">
+  {% if attempt.passed %}
+    <div class="celebration-trophy-sphere">🏆</div>
+    <h1>🎉 MISSION MASTERED!</h1>
+    <p>Outstanding work! You have conquered <strong>{{ attempt.quiz.concept.name }}</strong>!</p>
+
+    {% if next_concept %}
+    <div class="unlock-celebration-toast">
+      <strong>🌟 Mission {{ next_concept.order }} Unlocked!</strong>
+      <span>You can now start your next adventure: <strong>{{ next_concept.name }}</strong>!</span>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="celebration-trophy-sphere">💪</div>
+    <h1>Good Effort!</h1>
+    <p>You scored {{ attempt.score }}/{{ attempt.total_marks }} ({{ attempt.percentage }}%). Let's review the lesson and try again to achieve Mastery!</p>
+  {% endif %}
+
+  <!-- Metrics Grid -->
+  <div class="metrics-score-grid">
+    <div class="metric-score-box">
+      <div class="val" style="color:{% if attempt.passed %}#059669{% else %}#DC2626{% endif %};">{{ attempt.percentage }}%</div>
+      <div class="lbl">Accuracy</div>
+    </div>
+    <div class="metric-score-box">
+      <div class="val">{{ attempt.score }}/{{ attempt.total_marks }}</div>
+      <div class="lbl">Score</div>
+    </div>
+    <div class="metric-score-box">
+      <div class="val" style="color:#5B50EB;">+{{ attempt.xp_earned }}</div>
+      <div class="lbl">XP Earned</div>
+    </div>
+    <div class="metric-score-box">
+      <div class="val">{{ attempt.time_taken }}s</div>
+      <div class="lbl">Time Taken</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="victory-actions-stack">
+    {% if next_concept and attempt.passed %}
+      <a class="btn-primary" href="/concept/{{ next_concept.id }}/" style="padding:16px 32px;font-size:1rem;background:linear-gradient(135deg,#10B981,#059669);">
+        🚀 Start Mission {{ next_concept.order }}: {{ next_concept.name }} →
+      </a>
+    {% endif %}
+    <a class="btn-outline" href="/chapter/{{ attempt.quiz.concept.chapter.id }}/" style="padding:14px 24px;">
+      🗺️ Back to Adventure Map
+    </a>
+    <a class="btn-outline" href="/dashboard/" style="padding:14px 24px;">
+      🏠 Home
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  {% if attempt.passed %}
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
+      }, 400);
+    }
+  });
+  {% endif %}
+</script>
+{% endblock %}

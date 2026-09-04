@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block title %}{{ chapter.name }} — Adventure Map — Tezz-Mindz{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block m_nav_subjects %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── CHAPTER ADVENTURE HERO ── */
+  .chapter-adventure-header {
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+    border-radius: 28px;
+    padding: 32px 36px;
+    margin-bottom: 32px;
+    color: #FFFFFF;
+    box-shadow: 0 16px 40px rgba(49, 46, 129, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+  .chapter-adventure-header::after {
+    content: "🗺️";
+    position: absolute;
+    right: 28px;
+    bottom: 8px;
+    font-size: 6.5rem;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .ch-hero-titles h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .ch-hero-titles p {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 12px;
+    font-weight: 500;
+  }
+
+  /* ── ADVENTURE MAP TRAIL CONTAINER ── */
+  .adventure-map-container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    padding: 20px 0 60px;
+  }
+
+  /* Connecting Central Path Line */
+  .map-connecting-line {
+    position: absolute;
+    top: 50px;
+    bottom: 60px;
+    left: 42px;
+    width: 6px;
+    background: repeating-linear-gradient(to bottom, #C4B5FD 0, #C4B5FD 12px, transparent 12px, transparent 24px);
+    z-index: 1;
+  }
+  @media (max-width: 600px) {
+    .map-connecting-line { left: 32px; }
+  }
+
+  /* Start & Finish Milestones */
+  .map-milestone-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 100px;
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #0F172A;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Step Topic Node Card */
+  .adventure-step-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Milestone Circle */
+  .step-node-sphere {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  @media (max-width: 600px) {
+    .step-node-sphere { width: 50px; height: 50px; font-size: 1.3rem; }
+  }
+
+  /* Status Sphere Variants */
+  .step-node-sphere.mastered {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
+    border: 4px solid #D1FAE5;
+  }
+  .step-node-sphere.active-mission {
+    background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    color: #FFFFFF;
+    border: 4px solid #DDD6FE;
+    animation: tm-pulse-glow 2s infinite;
+  }
+  .step-node-sphere.available {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: #FFFFFF;
+    border: 4px solid #DBEAFE;
+  }
+  .step-node-sphere.locked {
+    background: #F1F5F9;
+    color: #94A3B8;
+    border: 4px solid #E2E8F0;
+  }
+
+  /* Topic Card Box */
+  .step-card-content {
+    flex: 1;
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 22px;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.02);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    flex-wrap: wrap;
+  }
+  .adventure-step-node:hover .step-card-content:not(.locked-card) {
+    transform: translateX(6px);
+    border-color: #A78BFA;
+    box-shadow: 0 12px 32px rgba(79, 70, 229, 0.08);
+  }
+  .step-card-content.locked-card {
+    background: #F8FAFC;
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+  .step-card-content.mastered-card {
+    border-color: #A7F3D0;
+    background: #FCFDFD;
+  }
+
+  .step-info-col h3 {
+    font-size: 1.18rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .step-info-col p {
+    font-size: 0.84rem;
+    color: #64748B;
+    margin: 0 0 10px;
+    line-height: 1.4;
+  }
+  .step-badges-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .step-action-col {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<div style="font-size:0.84rem;color:#64748B;font-weight:700;margin-bottom:18px;">
+  <a href="/dashboard/" style="color:#5B50EB;text-decoration:none;">Home</a>
+  <span style="margin:0 6px;">›</span>
+  <a href="/learn/" style="color:#5B50EB;text-decoration:none;">{{ student_class.class_label }}</a>
+  <span style="margin:0 6px;">›</span>
+  <a href="/subject/{{ chapter.class_subject.id }}/" style="color:#5B50EB;text-decoration:none;">{{ chapter.class_subject.subject.title }}</a>
+  <span style="margin:0 6px;">›</span>
+  <span>{{ chapter.name }}</span>
+</div>
+
+<!-- 🌍 CHAPTER ADVENTURE HERO -->
+<div class="chapter-adventure-header">
+  <div class="ch-hero-titles">
+    <span class="hero-glass-pill" style="margin-bottom:8px;display:inline-block;">Chapter {{ chapter.order }} • {{ chapter.class_subject.subject.title }}</span>
+    <h1>🌍 {{ chapter.name }}</h1>
+    <p>Your Number Adventure Map — Master each mission in order to reach the Chapter Finale! 🏆</p>
+  </div>
+  <div class="dash-level-pill-badge" style="background:#FFFFFF;color:#4F46E5;">
+    <i class="bi bi-compass-fill"></i>
+    <span>{{ concepts.count }} Missions</span>
+  </div>
+</div>
+
+<!-- ── VISUAL ADVENTURE MAP CONTAINER ── -->
+<div class="adventure-map-container">
+  <!-- Dotted Trail Line -->
+  <div class="map-connecting-line"></div>
+
+  <!-- Milestone: START -->
+  <div class="map-milestone-banner">
+    <span style="font-size:1.3rem;">🚩</span>
+    <span>START OF YOUR ADVENTURE</span>
+  </div>
+
+  <!-- 10 Stepped Adventure Nodes -->
+  {% for concept in concepts %}
+  <div class="adventure-step-node">
+
+    <!-- Stepped Milestone Sphere -->
+    {% if concept.progress.is_mastered %}
+      <div class="step-node-sphere mastered" title="Topic Mastered!">
+        ✓
+      </div>
+    {% elif concept.progress.is_unlocked %}
+      {% if forloop.first or not concept.progress.learn_completed %}
+        <div class="step-node-sphere active-mission" title="Active Mission!">
+          ⭐
+        </div>
+      {% else %}
+        <div class="step-node-sphere available" title="Mission Unlocked">
+          🚀
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="step-node-sphere locked" title="Locked Mission">
+        🔒
+      </div>
+    {% endif %}
+
+    <!-- Topic Card Box -->
+    {% if concept.progress.is_unlocked %}
+    <a class="step-card-content {% if concept.progress.is_mastered %}mastered-card{% endif %}" href="/concept/{{ concept.id }}/">
+      <div class="step-info-col">
+        <h3>Mission {{ concept.order }}: {{ concept.name }}</h3>
+        <p>{{ concept.description|truncatewords:18 }}</p>
+        <div class="step-badges-row">
+          <span class="badge-pill purple">{{ concept.get_difficulty_display }}</span>
+          {% if concept.progress.is_mastered %}
+            <span class="badge-pill" style="background:#ECFDF5;color:#047857;"><i class="bi bi-trophy-fill"></i> Mastered (100%)</span>
+          {% elif concept.progress.quiz_unlocked %}
+            <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;"><i class="bi bi-patch-question-fill"></i> Quiz Ready</span>
+          {% elif concept.progress.game_unlocked %}
+            <span class="badge-pill" style="background:#FEF3C7;color:#D97706;"><i class="bi bi-controller"></i> Game Ready</span>
+          {% else %}
+            <span class="badge-pill purple"><i class="bi bi-book"></i> Learn Active</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="step-action-col">
+        <div class="btn-primary" style="padding:10px 22px;font-size:0.88rem;">
+          {% if concept.progress.is_mastered %}
+            Review Mission <i class="bi bi-arrow-right"></i>
+          {% else %}
+            Start Mission 🚀
+          {% endif %}
+        </div>
+      </div>
+    </a>
+    {% else %}
+    <div class="step-card-content locked-card">
+      <div class="step-info-col">
+        <h3 style="color:#64748B;">Mission {{ concept.order }}: {{ concept.name }}</h3>
+        <p style="color:#94A3B8;">Locked. Complete Mission {{ concept.order|add:"-1" }} to unlock this adventure.</p>
+        <div class="step-badges-row">
+          <span class="badge-pill" style="background:#E2E8F0;color:#64748B;"><i class="bi bi-lock-fill"></i> Locked</span>
+        </div>
+      </div>
+      <div class="step-action-col">
+        <button class="btn-primary" disabled style="opacity:0.4;background:#94A3B8;cursor:not-allowed;padding:10px 20px;">
+          <i class="bi bi-lock-fill"></i> Locked
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+
+  <!-- Milestone: CHAPTER FINALE -->
+  <div class="map-milestone-banner" style="margin-top:20px;background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border-color:#FDE68A;">
+    <span style="font-size:1.4rem;">🏆</span>
+    <span style="color:#92400E;">CHAPTER 1 GRAND FINALE — OLYMPIAD TROPHY</span>
+  </div>
+</div>
+{% endblock %}

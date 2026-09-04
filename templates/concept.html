@@ -1,0 +1,923 @@
+{% extends "base.html" %}
+{% block title %}{{ concept.name }} — Mission Hub — Tezz-Mindz{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block m_nav_subjects %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── TOPIC MISSION HERO ── */
+  .topic-mission-hero {
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+    border-radius: 28px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    color: #FFFFFF;
+    box-shadow: 0 16px 40px rgba(49, 46, 129, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+  .topic-mission-hero::after {
+    content: "{% if chapter.class_subject.subject.icon_type == 'math' %}🔢{% elif chapter.class_subject.subject.icon_type == 'science' %}🧪{% else %}📖{% endif %}";
+    position: absolute;
+    right: 28px;
+    bottom: 4px;
+    font-size: 6.5rem;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .mission-hero-titles h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    margin: 0 0 6px;
+    letter-spacing: -0.025em;
+  }
+  .mission-hero-titles p {
+    font-size: 0.94rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 14px;
+    font-weight: 500;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+
+  /* 3-Step Sequence Meter */
+  .mission-steps-meter {
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 20px;
+    padding: 14px 22px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.02);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .step-pill-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .meter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+  .meter-pill.done { background: #ECFDF5; color: #047857; border: 1.5px solid #A7F3D0; }
+  .meter-pill.current { background: #EDE9FE; color: #5B50EB; border: 1.5px solid #DDD6FE; animation: tm-pulse-glow 2s infinite; }
+  .meter-pill.locked { background: #F1F5F9; color: #94A3B8; border: 1.5px solid #E2E8F0; }
+
+  /* ── 3 BIG MISSION CARDS ── */
+  .missions-stack-container {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .mission-action-card {
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 26px;
+    padding: 26px 30px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.03);
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .mission-action-card.active-mission {
+    border-color: #5B50EB;
+    box-shadow: 0 12px 32px rgba(91, 80, 235, 0.1);
+  }
+  .mission-action-card.locked-card {
+    background: #F8FAFC;
+    opacity: 0.7;
+  }
+
+  .mission-card-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .mission-card-title-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .mission-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .mission-icon-box.learn { background: #EDE9FE; color: #5B50EB; border: 1.5px solid #DDD6FE; }
+  .mission-icon-box.game { background: #FEF3C7; color: #D97706; border: 1.5px solid #FDE68A; }
+  .mission-icon-box.quiz { background: #EFF6FF; color: #2563EB; border: 1.5px solid #BFDBFE; }
+  .mission-icon-box.locked { background: #E2E8F0; color: #94A3B8; }
+
+  .mission-card-title-box h2 {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 2px;
+  }
+  .mission-card-title-box span {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #64748B;
+  }
+
+  .accordion-toggle-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #5B50EB;
+    background: #F5F3FF;
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid #DDD6FE;
+  }
+  .accordion-chevron {
+    transition: transform 0.25s ease;
+  }
+  .accordion-chevron.expanded {
+    transform: rotate(180deg);
+  }
+
+  .learn-collapsible-wrapper {
+    display: none;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1.5px solid #F1F5F9;
+  }
+  .learn-collapsible-wrapper.open {
+    display: block;
+  }
+
+  /* ── 🧑‍🏫 AI LITTLE TEACHER COMPANION ── */
+  .ai-teacher-companion-card {
+    background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%);
+    border: 2px solid #E9D5FF;
+    border-radius: 22px;
+    padding: 22px 26px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.08);
+  }
+  .teacher-avatar-sphere {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.3);
+    flex-shrink: 0;
+    animation: tm-bounce-soft 2.5s infinite ease-in-out;
+  }
+  @keyframes tm-bounce-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .teacher-dialogue-bubble {
+    flex: 1;
+  }
+  .teacher-bubble-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .teacher-name-badge {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: #7C3AED;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-voice-read {
+    background: #FFFFFF;
+    border: 1.5px solid #C084FC;
+    color: #7C3AED;
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .btn-voice-read:hover {
+    background: #7C3AED;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+  }
+  .teacher-dialogue-text {
+    font-size: 0.96rem;
+    line-height: 1.6;
+    color: #334155;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* ── INTERACTIVE VISUAL LEARNING THEATERS ── */
+  .interactive-theater-shell {
+    background: #0F172A;
+    border: 2px solid #1E293B;
+    border-radius: 24px;
+    padding: 24px;
+    color: #FFFFFF;
+    margin-bottom: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+  .theater-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .theater-top-bar h3 {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #F8FAFC;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Math Train Visualizer */
+  .railway-scenic-track {
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px dashed #334155;
+    border-radius: 20px;
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    overflow-x: auto;
+    margin-bottom: 18px;
+  }
+  .train-coach-unit {
+    background: #FFFFFF;
+    color: #0F172A;
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 120px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    border: 2.5px solid transparent;
+  }
+  .train-coach-unit.lakhs { border-color: #A855F7; }
+  .train-coach-unit.thousands { border-color: #10B981; }
+  .train-coach-unit.ones { border-color: #3B82F6; }
+
+  /* Science Photosynthesis Reactor */
+  .photosynthesis-reactor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto repeat(2, 1fr);
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 768px) {
+    .photosynthesis-reactor-grid { display: flex; flex-direction: column; }
+  }
+  .reactor-cell {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 16px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .reactor-cell:hover {
+    border-color: #10B981;
+    transform: translateY(-2px);
+    background: rgba(16, 185, 129, 0.15);
+  }
+  .reactor-icon { font-size: 2rem; margin-bottom: 4px; }
+  .reactor-name { font-size: 0.85rem; font-weight: 800; color: #F8FAFC; }
+  .reactor-formula { font-size: 0.72rem; color: #94A3B8; font-weight: 700; }
+  .reactor-arrow { font-size: 1.8rem; font-weight: 900; color: #10B981; text-align: center; }
+
+  /* English Grammar Tokenizer */
+  .grammar-tokenizer-arena {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .grammar-tokens-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 14px 0;
+  }
+  .grammar-word-chip {
+    background: #FFFFFF;
+    color: #0F172A;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .grammar-pos-tag {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+  .grammar-pos-tag.noun { background: #EFF6FF; color: #2563EB; }
+  .grammar-pos-tag.verb { background: #FEF2F2; color: #DC2626; }
+  .grammar-pos-tag.adj { background: #ECFDF5; color: #059669; }
+  .grammar-pos-tag.pro { background: #FAF5FF; color: #7C3AED; }
+
+  /* Structured Markdown Text Reader */
+  .markdown-lesson-sheet {
+    background: #FFFFFF;
+    color: #0F172A;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1.5px solid #E2E8F0;
+    line-height: 1.7;
+    font-size: 0.96rem;
+  }
+  .markdown-lesson-sheet h1, .markdown-lesson-sheet h2, .markdown-lesson-sheet h3 {
+    color: #1E1B4B;
+    margin-top: 0;
+  }
+
+  /* Quick Check */
+  .dynamic-quick-check-card {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 2px solid #FDE68A;
+    border-radius: 22px;
+    padding: 22px 26px;
+    margin-bottom: 24px;
+  }
+  .dynamic-quick-check-card h4 {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #92400E;
+    margin: 0 0 8px;
+  }
+  .quick-opts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+  }
+  @media (max-width: 600px) {
+    .quick-opts-grid { grid-template-columns: 1fr; }
+  }
+  .quick-check-btn {
+    background: #FFFFFF;
+    border: 2px solid #FCD34D;
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-size: 0.94rem;
+    font-weight: 800;
+    color: #78350F;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+  }
+  .quick-check-btn:hover {
+    background: #FEF3C7;
+    transform: translateY(-2px);
+  }
+  .quick-check-btn.correct {
+    background: #10B981 !important;
+    border-color: #10B981 !important;
+    color: #FFFFFF !important;
+  }
+  .quick-check-btn.wrong {
+    background: #EF4444 !important;
+    border-color: #EF4444 !important;
+    color: #FFFFFF !important;
+  }
+
+  .btn-unlock-learn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 18px;
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.28);
+    transition: transform 0.18s ease;
+  }
+  .btn-unlock-learn-action:hover {
+    transform: translateY(-3px) scale(1.02);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<!-- Breadcrumb -->
+<div style="font-size:0.86rem;color:#64748B;font-weight:700;margin-bottom:18px;">
+  <a href="/dashboard/" style="color:#5B50EB;text-decoration:none;">Home</a>
+  <span style="margin:0 6px;">›</span>
+  <a href="/subject/{{ chapter.class_subject.id }}/" style="color:#5B50EB;text-decoration:none;">{{ chapter.class_subject.subject.title }}</a>
+  <span style="margin:0 6px;">›</span>
+  <a href="/chapter/{{ chapter.id }}/" style="color:#5B50EB;text-decoration:none;">{{ chapter.name }}</a>
+  <span style="margin:0 6px;">›</span>
+  <span>Topic 0{{ concept.order }}: {{ concept.name }}</span>
+</div>
+
+<!-- 🚀 TOPIC MISSION HERO -->
+<div class="topic-mission-hero">
+  <div class="mission-hero-titles">
+    <div class="badge-pill" style="background:rgba(255,255,255,0.2);color:#FFFFFF;margin-bottom:10px;display:inline-block;padding:5px 14px;">
+      ⭐ TOPIC 0{{ concept.order }} • {{ chapter.name }}
+    </div>
+    <h1>{{ concept.name }}</h1>
+    <p>{{ concept.description }}</p>
+  </div>
+  <div class="hud-stat-chip" style="background:#FFFFFF;color:#4F46E5;padding:10px 20px;font-size:0.95rem;font-weight:900;">
+    <span style="font-size:1.3rem;">🏆</span>
+    <span>Mastery: <strong>{{ topic_progress.mastery_percentage|floatformat:0 }}%</strong></span>
+  </div>
+</div>
+
+<!-- 3-Step Sequence Meter -->
+<div class="mission-steps-meter">
+  <div class="step-pill-group">
+    {% if topic_progress.learn_completed %}
+      <div class="meter-pill done"><i class="bi bi-check-circle-fill"></i> 1. Learn Complete</div>
+    {% else %}
+      <div class="meter-pill current"><i class="bi bi-play-circle-fill"></i> 1. Learn Active</div>
+    {% endif %}
+
+    <i class="bi bi-chevron-right" style="color:#94A3B8;"></i>
+
+    {% if topic_progress.game_completed %}
+      <div class="meter-pill done"><i class="bi bi-check-circle-fill"></i> 2. Game Complete</div>
+    {% elif topic_progress.game_unlocked %}
+      <div class="meter-pill current"><i class="bi bi-controller"></i> 2. Game Ready</div>
+    {% else %}
+      <div class="meter-pill locked"><i class="bi bi-lock-fill"></i> 2. Game Locked</div>
+    {% endif %}
+
+    <i class="bi bi-chevron-right" style="color:#94A3B8;"></i>
+
+    {% if topic_progress.quiz_completed %}
+      <div class="meter-pill done"><i class="bi bi-trophy-fill"></i> 3. Quiz Mastered</div>
+    {% elif topic_progress.quiz_unlocked %}
+      <div class="meter-pill current"><i class="bi bi-patch-question-fill"></i> 3. Quiz Ready</div>
+    {% else %}
+      <div class="meter-pill locked"><i class="bi bi-lock-fill"></i> 3. Quiz Locked</div>
+    {% endif %}
+  </div>
+
+  <div style="font-size:0.86rem;font-weight:800;color:#64748B;">
+    Mission Step {% if topic_progress.quiz_completed %}3 of 3 (Complete!){% elif topic_progress.game_completed %}3 of 3{% elif topic_progress.learn_completed %}2 of 3{% else %}1 of 3{% endif %}
+  </div>
+</div>
+
+<!-- ── 3 BIG MISSION CARDS ── -->
+<div class="missions-stack-container">
+
+  <!-- ── 1. LEARN MISSION ── -->
+  <div class="mission-action-card {% if not topic_progress.learn_completed %}active-mission{% endif %}">
+    <div class="mission-card-top-row" onclick="toggleLearnAccordion()">
+      <div class="mission-card-title-box">
+        <div class="mission-icon-box learn">📚</div>
+        <div>
+          <h2>Step 1: Learn Mission — {{ concept.name }}</h2>
+          <span>Visual Animation • Real-World Context • AI Little Teacher</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;">
+        {% if topic_progress.learn_completed %}
+          <span class="badge-pill" style="background:#ECFDF5;color:#047857;padding:6px 14px;"><i class="bi bi-check-circle-fill"></i> Completed (+15 XP)</span>
+        {% else %}
+          <span class="badge-pill purple" style="padding:6px 14px;">Active Mission (+15 XP)</span>
+        {% endif %}
+
+        <div class="accordion-toggle-tag">
+          <span id="accordion-label-text">{% if topic_progress.learn_completed %}View Lesson{% else %}Hide Lesson{% endif %}</span>
+          <i class="bi bi-chevron-down accordion-chevron {% if not topic_progress.learn_completed %}expanded{% endif %}" id="learn-chevron-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLLAPSIBLE LEARN THEATER ── -->
+    <div class="learn-collapsible-wrapper {% if not topic_progress.learn_completed %}open{% endif %}" id="learn-body-section">
+
+      <!-- 🧑‍🏫 AI LITTLE TEACHER COMPANION -->
+      <div class="ai-teacher-companion-card">
+        <div class="teacher-avatar-sphere">👩‍🏫</div>
+        <div class="teacher-dialogue-bubble">
+          <div class="teacher-bubble-header">
+            <div class="teacher-name-badge">
+              <i class="bi bi-stars"></i> Little Teacher TezBuddy
+            </div>
+            <button type="button" class="btn-voice-read" onclick="speakTeacherExplanation()">
+              <i class="bi bi-volume-up-fill"></i> Listen to Teacher
+            </button>
+          </div>
+          <p class="teacher-dialogue-text" id="teacher-speech-script">
+            "👋 Hello explorer! In <strong>{{ concept.name }}</strong>, we are discovering how {{ concept.description|lower }} In real life: <em>{{ concept.real_world_example|default:'Explore this concept with fun examples!' }}</em> Check out the interactive module and lesson below!"
+          </p>
+        </div>
+      </div>
+
+      <!-- 🌟 DYNAMIC SUBJECT VISUAL THEATER -->
+      {% if chapter.class_subject.subject.icon_type == 'math' and 'Large Numbers' in concept.name or 'Reading' in concept.name or 'Place Value' in concept.name %}
+        <!-- Mathematics Number Express Theater -->
+        <div class="interactive-theater-shell">
+          <div class="theater-top-bar">
+            <h3>🚂 Indian Railways Number Express (Periods &amp; Place Value)</h3>
+            <span style="font-size:0.8rem;color:#94A3B8;font-weight:700;">Live Place Value Coaches</span>
+          </div>
+
+          <div class="railway-scenic-track">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <span style="font-size:2.6rem;">🚂</span>
+              <span style="font-size:0.7rem;font-weight:900;color:#FACC15;">ENGINE</span>
+            </div>
+
+            <div class="train-coach-unit lakhs">
+              <span style="font-size:0.68rem;font-weight:900;color:#7C3AED;">Lakhs (L)</span>
+              <div id="disp-lakhs" style="font-size:1.6rem;font-weight:900;color:#7C3AED;">2</div>
+              <small style="font-size:0.65rem;color:#64748B;">2 Digits</small>
+            </div>
+
+            <div style="font-size:1.8rem;font-weight:900;color:#10B981;">,</div>
+
+            <div class="train-coach-unit thousands">
+              <span style="font-size:0.68rem;font-weight:900;color:#059669;">Thousands (Th)</span>
+              <div id="disp-thousands" style="font-size:1.6rem;font-weight:900;color:#059669;">50</div>
+              <small style="font-size:0.65rem;color:#64748B;">2 Digits</small>
+            </div>
+
+            <div style="font-size:1.8rem;font-weight:900;color:#10B981;">,</div>
+
+            <div class="train-coach-unit ones">
+              <span style="font-size:0.68rem;font-weight:900;color:#2563EB;">Ones Period</span>
+              <div id="disp-ones" style="font-size:1.6rem;font-weight:900;color:#2563EB;">000</div>
+              <small style="font-size:0.65rem;color:#64748B;">3 Digits (H, T, O)</small>
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:1.1rem;font-weight:900;color:#FDE68A;" id="train-read-word">
+            🗣️ Read as: "Two Lakh Fifty Thousand" (Land Registration Price)
+          </div>
+        </div>
+
+      {% elif chapter.class_subject.subject.icon_type == 'science' %}
+        <!-- Science Photosynthesis Reactor -->
+        <div class="interactive-theater-shell">
+          <div class="theater-top-bar">
+            <h3>🍃 Interactive Photosynthesis Bio-Reactor</h3>
+            <span style="font-size:0.8rem;color:#94A3B8;font-weight:700;">Energy Flow in Chloroplast</span>
+          </div>
+
+          <div class="photosynthesis-reactor-grid">
+            <div class="reactor-cell" onclick="alert('☀️ Sunlight is absorbed by Chlorophyll to power the reaction!')">
+              <div class="reactor-icon">☀️</div>
+              <div class="reactor-name">Sunlight</div>
+              <div class="reactor-formula">Light Energy</div>
+            </div>
+            <div class="reactor-cell" onclick="alert('💧 Water is absorbed by roots and sent up via Xylem!')">
+              <div class="reactor-icon">💧</div>
+              <div class="reactor-name">Water</div>
+              <div class="reactor-formula">H₂O</div>
+            </div>
+            <div class="reactor-cell" onclick="alert('💨 Carbon Dioxide enters through leaf Stomata!')">
+              <div class="reactor-icon">💨</div>
+              <div class="reactor-name">Carbon Dioxide</div>
+              <div class="reactor-formula">CO₂</div>
+            </div>
+            <div class="reactor-arrow">➔</div>
+            <div class="reactor-cell" onclick="alert('🍯 Glucose is plant food distributed via Phloem!')">
+              <div class="reactor-icon">🍯</div>
+              <div class="reactor-name">Glucose</div>
+              <div class="reactor-formula">C₆H₁₂O₆ (Food)</div>
+            </div>
+            <div class="reactor-cell" onclick="alert('🌬️ Oxygen is released into the air for humans and animals to breathe!')">
+              <div class="reactor-icon">🌬️</div>
+              <div class="reactor-name">Oxygen</div>
+              <div class="reactor-formula">O₂ (Released)</div>
+            </div>
+          </div>
+        </div>
+
+      {% elif chapter.class_subject.subject.icon_type == 'english' %}
+        <!-- English Grammar Tokenizer -->
+        <div class="interactive-theater-shell">
+          <div class="theater-top-bar">
+            <h3>📖 Sentence Builder &amp; Parts of Speech Tokenizer</h3>
+            <span style="font-size:0.8rem;color:#94A3B8;font-weight:700;">Grammar Anatomy</span>
+          </div>
+
+          <div class="grammar-tokenizer-arena">
+            <div style="font-size:0.85rem;color:#94A3B8;text-align:center;margin-bottom:8px;">Live Analyzed Sentence:</div>
+            <div class="grammar-tokens-row">
+              <div class="grammar-word-chip"><span>Aarav</span><span class="grammar-pos-tag noun">Proper Noun</span></div>
+              <div class="grammar-word-chip"><span>reads</span><span class="grammar-pos-tag verb">Action Verb</span></div>
+              <div class="grammar-word-chip"><span>an interesting</span><span class="grammar-pos-tag adj">Adjective</span></div>
+              <div class="grammar-word-chip"><span>book</span><span class="grammar-pos-tag noun">Common Noun</span></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- 📖 REAL LESSON CONTENT FROM DATABASE -->
+      {% for lesson in lessons %}
+      <div class="markdown-lesson-sheet">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:800;color:#6366F1;margin-bottom:12px;text-transform:uppercase;">
+          <i class="bi bi-bookmark-fill"></i> Lesson 0{{ lesson.order }}: {{ lesson.title }}
+        </div>
+        <div style="line-height:1.75;">
+          {{ lesson.content_markdown|linebreaks }}
+        </div>
+      </div>
+      {% empty %}
+      <div class="markdown-lesson-sheet">
+        <p>{{ concept.description }}</p>
+        {% if concept.real_world_example %}
+          <div style="background:#F8FAFC;border-left:4px solid #4F46E5;padding:12px 16px;border-radius:8px;margin-top:14px;">
+            <strong>💡 Real-World Example:</strong> {{ concept.real_world_example }}
+          </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <!-- ⭐ DYNAMIC QUICK MISSION CHECK -->
+      <div class="dynamic-quick-check-card">
+        <h4><i class="bi bi-patch-question-fill"></i> Quick Mission Check for {{ concept.name }}:</h4>
+        <p style="margin:0;font-size:0.96rem;font-weight:800;color:#78350F;" id="qcheck-question-text">
+          {% if quick_question %}
+            {{ quick_question.question_text }}
+          {% else %}
+            What is the key principle of <strong>{{ concept.name }}</strong>?
+          {% endif %}
+        </p>
+
+        <div class="quick-opts-grid" id="qcheck-options-container">
+          {% if quick_question %}
+            {% for opt in quick_question.options.all %}
+              <button type="button" class="quick-check-btn" onclick="validateQuickCheck(this, {{ opt.is_correct|yesno:'true,false' }})">
+                {{ opt.option_text }}
+              </button>
+            {% endfor %}
+          {% else %}
+            <button type="button" class="quick-check-btn" onclick="validateQuickCheck(this, true)">{{ concept.description|truncatewords:6 }}</button>
+            <button type="button" class="quick-check-btn" onclick="validateQuickCheck(this, false)">Unrelated Option A</button>
+            <button type="button" class="quick-check-btn" onclick="validateQuickCheck(this, false)">Unrelated Option B</button>
+            <button type="button" class="quick-check-btn" onclick="validateQuickCheck(this, false)">Unrelated Option C</button>
+          {% endif %}
+        </div>
+
+        <div id="quick-check-feedback" style="margin-top:14px;font-weight:800;font-size:0.95rem;display:none;"></div>
+      </div>
+
+      <!-- Complete Action Button -->
+      <div style="display:flex;justify-content:flex-end;">
+        {% if topic_progress.learn_completed %}
+          <div class="badge-pill" style="background:#ECFDF5;color:#047857;padding:12px 24px;font-size:0.95rem;">
+            <i class="bi bi-check-lg"></i> Learn Complete • Game Unlocked!
+          </div>
+        {% else %}
+          <button type="button" class="btn-unlock-learn-action" id="btn-complete-learn-mission" onclick="submitLearnComplete({{ concept.id }})">
+            I Understand! Complete Learn &amp; Unlock Game 🚀
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. PLAY GAME MISSION ── -->
+  <div class="mission-action-card {% if topic_progress.game_unlocked and not topic_progress.game_completed %}active-mission{% elif not topic_progress.game_unlocked %}locked-card{% endif %}">
+    <div class="mission-card-top-row" style="cursor:default;">
+      <div class="mission-card-title-box">
+        <div class="mission-icon-box {% if topic_progress.game_unlocked %}game{% else %}locked{% endif %}">🎮</div>
+        <div>
+          <h2>Step 2: Educational Game Challenge</h2>
+          <span>{% if concept.id == 1 or concept.order == 1 and chapter.order == 1 %}Dream House Builder 3D (Interactive Construction){% else %}{{ first_game.title|default:"Topic Challenge Game" }}{% endif %}</span>
+        </div>
+      </div>
+      {% if topic_progress.game_completed %}
+        <span class="badge-pill" style="background:#ECFDF5;color:#047857;padding:6px 16px;"><i class="bi bi-check-circle-fill"></i> Completed (+50 XP • +15 Coins)</span>
+      {% elif topic_progress.game_unlocked %}
+        <span class="badge-pill" style="background:#FEF3C7;color:#D97706;padding:6px 16px;"><i class="bi bi-unlock-fill"></i> Unlocked (+50 XP • +15 Coins)</span>
+      {% else %}
+        <span class="badge-pill" style="background:#E2E8F0;color:#64748B;padding:6px 16px;"><i class="bi bi-lock-fill"></i> Locked</span>
+      {% endif %}
+    </div>
+
+    {% if topic_progress.game_unlocked %}
+    <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <p style="margin:0;font-size:0.92rem;color:#475569;font-weight:600;">
+        Play the educational challenge to earn bonus XP and unlock the mastery quiz!
+      </p>
+      {% if concept.id == 1 or concept.order == 1 and chapter.order == 1 and chapter.class_subject.subject.icon_type == 'math' %}
+        <a class="btn-primary" href="{% url 'games:dream_house_builder' %}" style="background:linear-gradient(135deg,#5B50EB,#3B82F6);padding:12px 24px;">
+          Launch 3D Game Arena <i class="bi bi-arrow-right"></i>
+        </a>
+      {% else %}
+        <a class="btn-primary" href="/game/{{ first_game.id|default:1 }}/play/" style="padding:12px 24px;">
+          Launch Game Challenge <i class="bi bi-arrow-right"></i>
+        </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── 3. QUIZ MISSION ── -->
+  <div class="mission-action-card {% if topic_progress.quiz_unlocked and not topic_progress.quiz_completed %}active-mission{% elif not topic_progress.quiz_unlocked %}locked-card{% endif %}">
+    <div class="mission-card-top-row" style="cursor:default;">
+      <div class="mission-card-title-box">
+        <div class="mission-icon-box {% if topic_progress.quiz_unlocked %}quiz{% else %}locked{% endif %}">🏆</div>
+        <div>
+          <h2>Step 3: Topic Mastery Quiz</h2>
+          <span>{{ first_quiz.title|default:"Topic Assessment" }} (Passing: 60%)</span>
+        </div>
+      </div>
+      {% if topic_progress.quiz_completed %}
+        <span class="badge-pill" style="background:#ECFDF5;color:#047857;padding:6px 16px;"><i class="bi bi-trophy-fill"></i> Mastered (+30 XP)</span>
+      {% elif topic_progress.quiz_unlocked %}
+        <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;padding:6px 16px;"><i class="bi bi-patch-question-fill"></i> Ready (+30 XP)</span>
+      {% else %}
+        <span class="badge-pill" style="background:#E2E8F0;color:#64748B;padding:6px 16px;"><i class="bi bi-lock-fill"></i> Locked</span>
+      {% endif %}
+    </div>
+
+    {% if topic_progress.quiz_unlocked %}
+    <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <p style="margin:0;font-size:0.92rem;color:#475569;font-weight:600;">
+        Answer {{ first_quiz.questions.count|default:4 }} Olympiad questions to unlock the next topic on your map!
+      </p>
+      <a class="btn-primary" href="/quiz/{{ first_quiz.id|default:1 }}/" style="background:linear-gradient(135deg,#2563EB,#1D4ED8);padding:12px 24px;">
+        Start Mastery Quiz <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+  function toggleLearnAccordion() {
+    const sec = document.getElementById('learn-body-section');
+    const icon = document.getElementById('learn-chevron-icon');
+    const lbl = document.getElementById('accordion-label-text');
+    if (!sec) return;
+
+    if (sec.classList.contains('open')) {
+      sec.classList.remove('open');
+      if (icon) icon.classList.remove('expanded');
+      if (lbl) lbl.textContent = "View Lesson";
+    } else {
+      sec.classList.add('open');
+      if (icon) icon.classList.add('expanded');
+      if (lbl) lbl.textContent = "Hide Lesson";
+    }
+  }
+
+  function speakTeacherExplanation() {
+    const text = document.getElementById('teacher-speech-script')?.textContent || "";
+    if ('speechSynthesis' in window && text) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    }
+  }
+
+  function validateQuickCheck(btn, isCorrect) {
+    const feedback = document.getElementById('quick-check-feedback');
+    document.querySelectorAll('.quick-check-btn').forEach(b => {
+      b.classList.remove('correct', 'wrong');
+      b.disabled = true;
+    });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#047857';
+        feedback.innerHTML = '🎉 Excellent! That is 100% correct! Unlocking Educational Game (+15 XP)... 🚀';
+      }
+      // Auto-complete learn and unlock game!
+      setTimeout(() => {
+        submitLearnComplete({{ concept.id }});
+      }, 600);
+    } else {
+      btn.classList.add('wrong');
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#B91C1C';
+        feedback.innerHTML = '💪 Good try! Review the lesson above and try again.';
+      }
+      setTimeout(() => {
+        document.querySelectorAll('.quick-check-btn').forEach(b => b.disabled = false);
+      }, 1200);
+    }
+  }
+
+  async function submitLearnComplete(conceptId) {
+    const btn = document.getElementById('btn-complete-learn-mission');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Unlocking Game...';
+    }
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+
+    try {
+      const res = await fetch('/api/learn/complete/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ concept_id: conceptId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(data.message || "Failed to complete lesson.");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = 'Complete Learn &amp; Unlock Game 🚀';
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'Complete Learn &amp; Unlock Game 🚀';
+      }
+    }
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}

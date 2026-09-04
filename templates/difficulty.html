@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Choose difficulty — TezMindz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  </head>
+  <body class="app" data-page="difficulty">
+    <aside class="sidebar" id="sidebar"></aside>
+    <header class="topbar">
+      <a class="logo" href="/concept/1/">← Concept</a>
+    </header>
+    <main class="content">
+      <h1>Choose your challenge</h1>
+      <p class="muted" style="margin: 6px 0 18px">Recommended for you based on your Fractions practice.</p>
+      <div class="diff-grid">
+        <a class="card diff" href="/game/{{ game.id }}/play/?d=easy">
+          <div>
+            <strong>Easy</strong>
+            <p class="muted small">Learn the basics</p>
+          </div>
+          <span class="chip">🟢</span>
+        </a>
+        <a class="card diff rec" href="/game/{{ game.id }}/play/?d=medium">
+          <div>
+            <strong>Medium</strong>
+            <p class="muted small">Test your understanding</p>
+            <span class="chip" style="margin-top: 8px">Recommended</span>
+          </div>
+          <span class="chip">🟡</span>
+        </a>
+        <a class="card diff" href="/game/{{ game.id }}/play/?d=hard">
+          <div>
+            <strong>Hard</strong>
+            <p class="muted small">Olympiad challenge</p>
+          </div>
+          <span class="chip">🔴</span>
+        </a>
+      </div>
+    </main>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+    <script>
+      {% if user_data_js %}
+      window.USER_DATA = {{ user_data_js|safe }};
+      {% endif %}
+    </script>
+    <script src="/static/js/store.js"></script>
+    <script>
+      TM.requireAuth();
+    </script>
+    <script src="/static/js/nav.js"></script>
+  </body>
+</html>

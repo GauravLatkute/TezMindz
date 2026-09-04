@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Game Mission Completed — Tezz-Mindz{% endblock %}
+{% block nav_games %}active{% endblock %}
+{% block m_nav_games %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .game-result-victory-card {
+    max-width: 680px;
+    margin: 24px auto;
+    background: #FFFFFF;
+    border-radius: 32px;
+    border: 2px solid #EEF2F6;
+    padding: 42px 36px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(79, 70, 229, 0.1);
+  }
+  .game-trophy-sphere {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border: 4px solid #FACC15;
+    display: grid;
+    place-items: center;
+    font-size: 3rem;
+    margin: 0 auto 16px;
+    animation: tm-bounce-soft 2s infinite ease-in-out;
+  }
+  .game-result-victory-card h1 {
+    font-size: 1.9rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 6px;
+  }
+  .game-result-victory-card p {
+    font-size: 0.95rem;
+    color: #64748B;
+    margin: 0 0 28px;
+  }
+
+  .game-perf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 520px) {
+    .game-perf-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .game-perf-metric {
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 16px 10px;
+  }
+  .game-perf-metric .val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #0F172A;
+  }
+  .game-perf-metric .lbl {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .reward-callout-strip {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 2px solid #FDE68A;
+    border-radius: 20px;
+    padding: 18px 24px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #92400E;
+    flex-wrap: wrap;
+  }
+</style>
+<!-- Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="game-result-victory-card">
+  <div class="game-trophy-sphere">🎮 🏆</div>
+  <h1>GAME MISSION COMPLETE!</h1>
+  <p>{{ session.game.title }} • <strong>Brain Quiz Mission Unlocked!</strong></p>
+
+  <div class="game-perf-grid">
+    <div class="game-perf-metric">
+      <div class="val" style="color:#5B50EB;">{{ session.score }}</div>
+      <div class="lbl">Score</div>
+    </div>
+    <div class="game-perf-metric">
+      <div class="val" style="color:#059669;">{{ session.accuracy|floatformat:0 }}%</div>
+      <div class="lbl">Accuracy</div>
+    </div>
+    <div class="game-perf-metric">
+      <div class="val">{{ session.time_spent }}s</div>
+      <div class="lbl">Time</div>
+    </div>
+    <div class="game-perf-metric">
+      <div class="val">{{ session.hints_used }} / 3</div>
+      <div class="lbl">Hints Used</div>
+    </div>
+  </div>
+
+  <div class="reward-callout-strip">
+    <span>⚡ +{{ session.xp_earned }} XP Earned</span>
+    <span>🪙 +{{ session.coins_earned }} Coins Earned</span>
+  </div>
+
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    {% if next_quiz %}
+      <a class="btn-primary" href="/quiz/{{ next_quiz.id }}/" style="padding:16px 32px;font-size:1rem;background:linear-gradient(135deg,#2563EB,#4F46E5);">
+        Proceed to Brain Quiz Mission 🧠 →
+      </a>
+    {% endif %}
+    <a class="btn-outline" href="/concept/{{ session.game.concept.id }}/" style="padding:14px 24px;">
+      Mission Hub
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 70,
+        spread: 65,
+        origin: { y: 0.6 }
+      });
+    }
+  });
+</script>
+{% endblock %}

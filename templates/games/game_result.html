@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dream House Complete! 3D | Tezz-Mindz{% endblock %}
+
+{% block extra_head %}
+<!-- Three.js + OrbitControls + Confetti -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+.victory-result-card {
+  max-width: 860px;
+  margin: 24px auto 40px;
+  background: #FFFFFF;
+  border: 2px solid #EEF2F6;
+  border-radius: 28px;
+  padding: 36px 32px;
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.victory-trophy-badge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  border: 3px solid #FDE68A;
+  font-size: 2.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  animation: tm-bounce-soft 2s infinite ease-in-out;
+}
+.result-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+@media (max-width: 640px) {
+  .result-stats-grid { grid-template-columns: 1fr 1fr; }
+}
+.res-stat-box {
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 18px;
+  padding: 14px 10px;
+}
+.res-stat-val {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0F172A;
+}
+.res-stat-lbl {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.rewards-won-banner {
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  border: 2px solid #C7D2FE;
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.res-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.result-3d-wrapper {
+  width: 100%;
+  height: 320px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: radial-gradient(circle, #E0F2FE 0%, #BAE6FD 100%);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.06);
+  margin: 16px auto;
+  position: relative;
+}
+#result-3d-viewport {
+  width: 100%;
+  height: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="victory-result-card">
+
+    <div class="victory-trophy-badge">🏆</div>
+
+    <h1 style="font-size:2rem;font-weight:900;color:#0F172A;margin-bottom:6px;">
+      🏡 DREAM VILLA ROYALE COMPLETE!
+    </h1>
+    <p style="font-size:1rem;font-weight:700;color:#64748B;">
+      Outstanding architectural mathematics! You have mastered the Indian Numbering System and built your 3D Dream House!
+    </p>
+
+    <!-- 3D Interactive House Display -->
+    <div class="result-3d-wrapper">
+      <div id="result-3d-viewport"></div>
+      <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.85);backdrop-filter:blur(6px);padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:800;color:#475569;">
+        <i class="bi bi-arrows-move"></i> Drag to rotate in 3D
+      </div>
+    </div>
+
+    <!-- Performance Stats Grid -->
+    <div class="result-stats-grid">
+      <div class="res-stat-box">
+        <div class="res-stat-val" style="color:#5B50EB;">{{ session.score }}</div>
+        <div class="res-stat-lbl">Final Score</div>
+      </div>
+      <div class="res-stat-box">
+        <div class="res-stat-val" style="color:#10B981;">{{ session.accuracy|floatformat:0 }}%</div>
+        <div class="res-stat-lbl">Accuracy</div>
+      </div>
+      <div class="res-stat-box">
+        <div class="res-stat-val" style="color:#F59E0B;">{{ correct_count }}/{{ total_attempts }}</div>
+        <div class="res-stat-lbl">Stages Solved</div>
+      </div>
+      <div class="res-stat-box">
+        <div class="res-stat-val" style="color:#0284C7;">{{ session.time_spent }}s</div>
+        <div class="res-stat-lbl">Time Taken</div>
+      </div>
+    </div>
+
+    <!-- Rewards Awarded Banner -->
+    <div class="rewards-won-banner">
+      <div class="res-reward-pill" style="color:#5B50EB;">
+        <i class="bi bi-star-fill" style="color:#F59E0B;"></i>
+        <span>+{{ session.xp_earned|default:"50" }} XP Earned</span>
+      </div>
+      <div class="res-reward-pill" style="color:#B45309;">
+        <i class="bi bi-coin" style="color:#F59E0B;"></i>
+        <span>+{{ session.coins_earned|default:"15" }} Coins Awarded</span>
+      </div>
+      <div class="res-reward-pill" style="color:#065F46;">
+        <span>🎖️ Master Architect Badge</span>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="{% url 'games:dream_house_builder' %}" class="btn btn-outline-primary" style="font-weight:900;padding:12px 24px;border-radius:14px;">
+        <i class="bi bi-arrow-repeat"></i> Play Again in 3D
+      </a>
+      <a href="{% url 'common:concept' game.concept.id|default:1 %}" class="btn btn-primary" style="font-weight:900;padding:12px 28px;border-radius:14px;background:#5B50EB;border-color:#5B50EB;">
+        Back to Topic Hub <i class="bi bi-arrow-right-circle-fill"></i>
+      </a>
+      <a href="{% url 'common:dashboard' %}" class="btn btn-light" style="font-weight:800;padding:12px 24px;border-radius:14px;border:1.5px solid #E2E8F0;">
+        Student Dashboard
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'games/js/components/house-3d-world.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.House3DWorld) {
+    var world = new House3DWorld('result-3d-viewport');
+    world.setStage(5, true);
+    world.toggleAutoOrbit();
+  }
+
+  if (window.confetti) {
+    window.confetti({
+      particleCount: 150,
+      spread: 90,
+      origin: { y: 0.5 }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Achievements — Tezz-Mindz{% endblock %}
+{% block nav_achievements %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .ach-header { margin-bottom: 24px; }
+  .ach-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .ach-header p { font-size: 0.9rem; color: #64748b; font-weight: 600; margin: 0; }
+
+  .ach-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;
+  }
+  .ach-card {
+    background: #fff; border: 1.5px solid #ede9fe; border-radius: 18px; padding: 22px;
+    display: flex; gap: 16px; align-items: flex-start; transition: all 0.2s;
+  }
+  .ach-card.unlocked { border-color: #bbf7d0; background: linear-gradient(180deg, #f9fdfa, #fff); box-shadow: 0 6px 20px rgba(16,185,129,0.06); }
+  .ach-card.locked { opacity: 0.6; filter: grayscale(0.7); }
+  .ach-icon {
+    width: 52px; height: 52px; border-radius: 14px; background: #f0eeff;
+    display: grid; place-items: center; font-size: 1.8rem; flex-shrink: 0;
+  }
+  .ach-card.unlocked .ach-icon { background: #dcfce7; }
+  .ach-name { font-size: 1rem; font-weight: 800; color: #1e1b4b; margin-bottom: 4px; }
+  .ach-desc { font-size: 0.8rem; color: #64748b; line-height: 1.35; margin: 0 0 10px; }
+  .ach-reward { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 700; color: #4f46e5; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ach-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1>Platform Achievements 🏅</h1>
+      <p>Accomplish milestones to earn bonus XP and Coins.</p>
+    </div>
+    <span class="stat-chip green"><i class="bi bi-trophy-fill"></i> {{ earned_count }} of {{ total_count }} Unlocked</span>
+  </div>
+</div>
+
+<div class="ach-grid">
+  {% for ach in achievements %}
+  <div class="ach-card {% if ach.is_earned %}unlocked{% else %}locked{% endif %}">
+    <div class="ach-icon">{{ ach.icon }}</div>
+    <div style="flex:1;">
+      <div class="ach-name">{{ ach.name }}</div>
+      <p class="ach-desc">{{ ach.description }}</p>
+      <div class="ach-reward">
+        <span>+{{ ach.xp_reward }} XP</span>
+        {% if ach.coin_reward %}<span>· +{{ ach.coin_reward }} Coins</span>{% endif %}
+        {% if ach.is_earned %}
+        <span style="margin-left:auto;color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Done</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p style="color:#94a3b8;">No achievements added yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

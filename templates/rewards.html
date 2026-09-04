@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Rewards &amp; Badges — Tezz-Mindz{% endblock %}
+{% block nav_rewards %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .rewards-header { margin-bottom: 24px; }
+  .rewards-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .rewards-header p { font-size: 0.9rem; color: #64748b; font-weight: 600; margin: 0; }
+
+  .badge-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;
+  }
+  .badge-card {
+    background: #fff; border: 1.5px solid #ede9fe; border-radius: 18px; padding: 22px; text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .badge-card.unlocked { border-color: #fde68a; background: linear-gradient(180deg, #fffdfa, #fff); box-shadow: 0 6px 20px rgba(245,158,11,0.08); }
+  .badge-card.locked { opacity: 0.55; filter: grayscale(0.8); }
+  .badge-icon { font-size: 2.8rem; margin-bottom: 8px; }
+  .badge-name { font-size: 1rem; font-weight: 800; color: #1e1b4b; margin-bottom: 4px; }
+  .badge-desc { font-size: 0.78rem; color: #64748b; line-height: 1.3; margin: 0; }
+
+  .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .history-grid { grid-template-columns: 1fr; } }
+  .tx-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-reason { font-size: 0.85rem; font-weight: 600; color: #334155; }
+  .tx-pts { font-size: 0.85rem; font-weight: 800; }
+  .tx-pts.xp { color: #4f46e5; }
+  .tx-pts.coins { color: #d97706; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rewards-header">
+  <h1>Badges &amp; Trophy Cabinet 🏆</h1>
+  <p>Unlock badges and collect XP and Coins by completing learning milestones.</p>
+</div>
+
+<!-- Badge Grid -->
+<div class="section-header">
+  <h2 class="section-title">Milestone Badges</h2>
+</div>
+
+<div class="badge-grid">
+  {% for badge in badges %}
+  <div class="badge-card {% if badge.is_earned %}unlocked{% else %}locked{% endif %}">
+    <div class="badge-icon">{{ badge.icon }}</div>
+    <div class="badge-name">{{ badge.name }}</div>
+    <p class="badge-desc">{{ badge.description }}</p>
+    {% if badge.is_earned %}
+    <span class="badge-pill" style="background:#dcfce7;color:#16a34a;margin-top:10px;"><i class="bi bi-check-circle-fill"></i> Unlocked</span>
+    {% else %}
+    <span class="badge-pill" style="background:#f1f5f9;color:#64748b;margin-top:10px;"><i class="bi bi-lock-fill"></i> Locked</span>
+    {% endif %}
+  </div>
+  {% empty %}
+  <p style="color:#94a3b8;">No badges configured yet.</p>
+  {% endfor %}
+</div>
+
+<!-- Transaction History -->
+<div class="section-header">
+  <h2 class="section-title">Rewards History</h2>
+</div>
+
+<div class="history-grid">
+  <div class="card">
+    <div class="card-title">Recent XP Transactions</div>
+    {% for tx in xp_history %}
+    <div class="tx-item">
+      <div class="tx-reason">{{ tx.reason }}</div>
+      <div class="tx-pts xp">+{{ tx.points }} XP</div>
+    </div>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:0.85rem;text-align:center;padding:16px 0;">No XP transactions yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recent Coin Transactions</div>
+    {% for tx in coin_history %}
+    <div class="tx-item">
+      <div class="tx-reason">{{ tx.reason }}</div>
+      <div class="tx-pts coins">+{{ tx.coins }} Coins</div>
+    </div>
+    {% empty %}
+    <p style="color:#94a3b8;font-size:0.85rem;text-align:center;padding:16px 0;">No Coin transactions yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

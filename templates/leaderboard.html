@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard — Tezz-Mindz{% endblock %}
+{% block nav_leaderboard %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .lb-header { margin-bottom: 24px; }
+  .lb-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .lb-header p { font-size: 0.9rem; color: #64748b; font-weight: 600; margin: 0; }
+
+  .podium-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; align-items: flex-end;
+  }
+  .podium-card {
+    background: #fff; border: 1.5px solid #ede9fe; border-radius: 20px;
+    padding: 24px 16px; text-align: center; position: relative;
+    box-shadow: 0 6px 20px rgba(79,70,229,0.06);
+  }
+  .podium-card.first { order: 2; border-color: #fde68a; background: linear-gradient(180deg, #fffbeb, #fff); padding-top: 36px; }
+  .podium-card.second { order: 1; border-color: #e2e8f0; }
+  .podium-card.third { order: 3; border-color: #ffedd5; }
+
+  .podium-rank { font-size: 2rem; margin-bottom: 6px; }
+  .podium-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;
+    display: grid; place-items: center; font-weight: 900; font-size: 1.2rem;
+    margin: 0 auto 10px;
+  }
+  .podium-name { font-size: 1rem; font-weight: 800; color: #1e1b4b; margin-bottom: 4px; }
+  .podium-xp { font-size: 0.85rem; font-weight: 800; color: #4f46e5; }
+
+  .lb-table-card {
+    background: #fff; border: 1px solid #ede9fe; border-radius: 20px; padding: 12px 24px;
+  }
+  .lb-table-row {
+    display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid #f1f5f9;
+  }
+  .lb-table-row:last-child { border-bottom: none; }
+  .lb-table-row.me { background: #f0eeff; margin: 0 -24px; padding: 14px 24px; border-radius: 12px; }
+  .lb-pos { width: 32px; font-weight: 900; font-size: 0.95rem; color: #64748b; text-align: center; }
+  .lb-user-info { flex: 1; display: flex; align-items: center; gap: 12px; }
+  .lb-user-name { font-weight: 800; font-size: 0.95rem; color: #1e1b4b; }
+  .lb-user-level { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+  .lb-user-xp { font-size: 0.95rem; font-weight: 900; color: #4f46e5; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lb-header">
+  <h1>{{ student_class.class_label }} — Leaderboard 🏆</h1>
+  <p>Compete with peers in {{ student_class.class_label }}. Ranked by total XP earned.</p>
+</div>
+
+<!-- Podium for Top 3 -->
+{% if leaderboard|length >= 3 %}
+<div class="podium-grid">
+  <!-- Rank 2 -->
+  {% with p2=leaderboard.1 %}
+  <div class="podium-card second">
+    <div class="podium-rank">🥈</div>
+    <div class="podium-avatar">{{ p2.user.first_name|default:p2.user.username|first|upper }}</div>
+    <div class="podium-name">{{ p2.user.first_name|default:p2.user.username }}</div>
+    <div class="podium-xp">{{ p2.xp }} XP</div>
+  </div>
+  {% endwith %}
+
+  <!-- Rank 1 -->
+  {% with p1=leaderboard.0 %}
+  <div class="podium-card first">
+    <div class="podium-rank">👑 🥇</div>
+    <div class="podium-avatar" style="width:60px;height:60px;font-size:1.4rem;">{{ p1.user.first_name|default:p1.user.username|first|upper }}</div>
+    <div class="podium-name">{{ p1.user.first_name|default:p1.user.username }}</div>
+    <div class="podium-xp" style="font-size:1rem;">{{ p1.xp }} XP</div>
+  </div>
+  {% endwith %}
+
+  <!-- Rank 3 -->
+  {% with p3=leaderboard.2 %}
+  <div class="podium-card third">
+    <div class="podium-rank">🥉</div>
+    <div class="podium-avatar">{{ p3.user.first_name|default:p3.user.username|first|upper }}</div>
+    <div class="podium-name">{{ p3.user.first_name|default:p3.user.username }}</div>
+    <div class="podium-xp">{{ p3.xp }} XP</div>
+  </div>
+  {% endwith %}
+</div>
+{% endif %}
+
+<!-- Full Table -->
+<div class="lb-table-card">
+  {% for student in leaderboard %}
+  <div class="lb-table-row {% if student.id == profile.id %}me{% endif %}">
+    <div class="lb-pos">#{{ student.rank }}</div>
+    <div class="lb-user-info">
+      <div class="student-avatar" style="width:36px;height:36px;font-size:0.9rem;">{{ student.user.first_name|default:student.user.username|first|upper }}</div>
+      <div>
+        <div class="lb-user-name">
+          {{ student.user.first_name|default:student.user.username }}
+          {% if student.id == profile.id %}<span class="badge-pill purple" style="font-size:0.65rem;margin-left:6px;">You</span>{% endif %}
+        </div>
+        <div class="lb-user-level">Level {{ student.current_level }} · 🔥 {{ student.streak }} Day Streak</div>
+      </div>
+    </div>
+    <div class="lb-user-xp">{{ student.xp }} XP</div>
+  </div>
+  {% empty %}
+  <p style="color:#94a3b8;text-align:center;padding:30px 0;">No rankings available yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

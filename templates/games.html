@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Games — Tezz-Mindz{% endblock %}
+{% block nav_games %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .games-header { margin-bottom: 24px; }
+  .games-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .games-header p { font-size: 0.9rem; color: #64748b; font-weight: 600; margin: 0; }
+
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .game-card {
+    background: #fff; border: 1.5px solid #ede9fe; border-radius: 18px; padding: 24px;
+    display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s;
+  }
+  .game-card:hover { transform: translateY(-2px); border-color: #c4b5fd; box-shadow: 0 8px 24px rgba(79,70,229,0.08); }
+  .game-icon {
+    width: 52px; height: 52px; border-radius: 14px; background: #ede9fe; color: #6d28d9;
+    display: grid; place-items: center; font-size: 1.6rem; margin-bottom: 14px;
+  }
+  .game-card h3 { font-size: 1.1rem; font-weight: 800; color: #1e1b4b; margin: 0 0 4px; }
+  .game-card p { font-size: 0.82rem; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
+  .game-meta { display: flex; gap: 10px; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="games-header">
+  <h1>Learning Games 🎮</h1>
+  <p>Play games designed for {{ profile.student_class.class_label }} to earn XP, level up, and master concepts.</p>
+</div>
+
+<div class="games-grid">
+  {% for game in games %}
+  <div class="game-card">
+    <div>
+      <div class="game-icon">{% if game.game_type == "house_builder" %}🏠{% else %}🍕{% endif %}</div>
+      <span class="badge-pill purple" style="margin-bottom:8px;">{{ game.template.name|default:game.title }}</span>
+      <h3>{{ game.title }}</h3>
+      <p>{{ game.concept.name }} · {{ game.concept.chapter.class_subject.subject.title }}</p>
+    </div>
+    <div>
+      <div class="game-meta">
+        <span><i class="bi bi-lightning-charge-fill" style="color:#f59e0b;"></i> +{{ game.xp_reward|default:"15" }} XP</span>
+        <span><i class="bi bi-coin" style="color:#eab308;"></i> +{{ game.coin_reward|default:"7" }} Coins</span>
+      </div>
+      {% if game.slug == "dream-house-builder" %}
+        <a class="btn-primary" href="{% url 'games:dream_house_builder' %}" style="width:100%;justify-content:center;background:linear-gradient(135deg,#5B50EB,#3B82F6);">
+          Build Dream House <i class="bi bi-arrow-right-circle-fill"></i>
+        </a>
+      {% else %}
+        <a class="btn-primary" href="/game/{{ game.id }}/play/" style="width:100%;justify-content:center;">
+          Play Game <i class="bi bi-play-fill"></i>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="card" style="grid-column:1/-1;text-align:center;padding:48px;">
+    <div style="font-size:3rem;margin-bottom:12px;">🕹️</div>
+    <h3 style="color:#1e1b4b;margin:0 0 6px;">No games available for your class</h3>
+    <p style="color:#64748b;margin:0;">Games will appear here as you progress through topics.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

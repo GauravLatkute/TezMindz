@@ -1,0 +1,569 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} — Brain Booster Quiz — Tezz-Mindz{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block m_nav_subjects %}active{% endblock %}
+
+{% block extra_head %}
+<!-- Google Fonts: Rounded Kid-Friendly Font -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+
+  .quiz-adventure-wrapper {
+    max-width: 820px;
+    margin: 0 auto;
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  }
+
+  /* ── PLAYFUL HUD ── */
+  .quiz-top-hud {
+    background: #FFFFFF;
+    border: 3px solid #E2E8F0;
+    border-bottom: 8px solid #E2E8F0;
+    border-radius: 24px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .quiz-hud-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .quiz-timer-pill {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #5B50EB;
+    background: #EEF2F6;
+    padding: 6px 14px;
+    border-radius: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Star Pathway Progress Bar */
+  .hud-star-path-container {
+    background: #F1F5F9;
+    height: 12px;
+    border-radius: 100px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+  }
+  .hud-star-path-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* ── CARTOON STYLED QUESTION CARD ── */
+  .q-card-adventure {
+    background: #FFFFFF;
+    border: 3px solid #E2E8F0;
+    border-bottom: 12px solid #E2E8F0;
+    border-radius: 32px;
+    padding: 36px;
+    margin-bottom: 24px;
+    display: none;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  .q-card-adventure.active { 
+    display: block; 
+    animation: popCardIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+  }
+
+  /* Animations definitions */
+  @keyframes popCardIn {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes correctPop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  @keyframes wrongWobble {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px) rotate(-1deg); }
+    75% { transform: translateX(6px) rotate(1deg); }
+  }
+  @keyframes floatAi {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .q-meta-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .q-badge-tag {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #5B50EB;
+    background: #EEF2F6;
+    padding: 6px 16px;
+    border-radius: 100px;
+  }
+
+  .q-title-text {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 28px;
+    line-height: 1.4;
+  }
+
+  /* ── 3D OPTION BUTTONS ── */
+  .options-adventure-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .opt-adventure-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #FFFFFF;
+    border: 3px solid #E2E8F0;
+    border-bottom: 8px solid #E2E8F0;
+    border-radius: 24px;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1E293B;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-align: left;
+    position: relative;
+  }
+  .opt-adventure-btn:hover {
+    background: #F8FAFC;
+    transform: translateY(-2px);
+    border-bottom-width: 10px;
+  }
+  .opt-adventure-btn:active {
+    transform: translateY(4px);
+    border-bottom-width: 4px;
+  }
+  
+  /* Selection States */
+  .opt-adventure-btn.selected {
+    background: #EDE9FE;
+    border-color: #A78BFA;
+    border-bottom-color: #8B5CF6;
+    color: #4C1D95;
+  }
+  .opt-adventure-btn.correct-highlight {
+    background: #D1FAE5 !important;
+    border-color: #34D399 !important;
+    border-bottom-color: #059669 !important;
+    color: #065F46 !important;
+    animation: correctPop 0.4s ease-in-out;
+  }
+  .opt-adventure-btn.wrong-highlight {
+    background: #FEE2E2 !important;
+    border-color: #F87171 !important;
+    border-bottom-color: #DC2626 !important;
+    color: #991B1B !important;
+    animation: wrongWobble 0.4s ease-in-out;
+  }
+
+  .opt-letter-sphere {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #EEF2F6;
+    color: #475569;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .opt-adventure-btn.selected .opt-letter-sphere {
+    background: #8B5CF6;
+    color: #FFFFFF;
+  }
+  .opt-adventure-btn.correct-highlight .opt-letter-sphere {
+    background: #059669;
+    color: #FFFFFF;
+  }
+  .opt-adventure-btn.wrong-highlight .opt-letter-sphere {
+    background: #DC2626;
+    color: #FFFFFF;
+  }
+
+  /* ── PLAYFUL FEEDBACK ── */
+  .fb-adventure-box {
+    border-radius: 24px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: none;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+  .fb-adventure-box.correct {
+    background: #ECFDF5;
+    border: 3px solid #34D399;
+    color: #047857;
+  }
+  .fb-adventure-box.wrong {
+    background: #FFF1F2;
+    border: 3px solid #F87171;
+    color: #BE123C;
+  }
+
+  /* Hint Toast Callout */
+  .hint-toast-box {
+    background: #FFFBEB;
+    border: 3px solid #FCD34D;
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    font-size: 0.95rem;
+    color: #92400E;
+    font-weight: 800;
+    display: none;
+  }
+
+  /* ── FRIENDLY AI TUTOR SPEECH BUBBLE ── */
+  .ai-tutor-callout {
+    background: #FAF5FF;
+    border: 3px solid #D8B4FE;
+    border-radius: 28px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: none;
+    position: relative;
+    animation: floatAi 5s ease-in-out infinite;
+  }
+  .ai-tutor-callout strong {
+    color: #7C3AED;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-tutor-callout p {
+    font-size: 0.95rem;
+    color: #4A044E;
+    margin: 10px 0 0;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  /* ── 3D BUTTON OVERRIDES ── */
+  .btn-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+    border-radius: 20px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    border: 3px solid transparent;
+  }
+  .btn-3d.secondary-hint {
+    background: #FFFBEB;
+    border-color: #FCD34D;
+    border-bottom: 6px solid #FCD34D;
+    color: #92400E;
+  }
+  .btn-3d.secondary-hint:hover {
+    transform: translateY(-2px);
+    border-bottom-width: 8px;
+  }
+  .btn-3d.secondary-hint:active {
+    transform: translateY(3px);
+    border-bottom-width: 3px;
+  }
+
+  .btn-3d.purple-ai {
+    background: #FAF5FF;
+    border-color: #D8B4FE;
+    border-bottom: 6px solid #D8B4FE;
+    color: #7C3AED;
+  }
+  .btn-3d.purple-ai:hover {
+    transform: translateY(-2px);
+    border-bottom-width: 8px;
+  }
+  .btn-3d.purple-ai:active {
+    transform: translateY(3px);
+    border-bottom-width: 3px;
+  }
+
+  .btn-3d.green-submit {
+    background: #10B981;
+    border-color: #059669;
+    border-bottom: 8px solid #059669;
+    color: #FFFFFF;
+  }
+  .btn-3d.green-submit:hover {
+    transform: translateY(-2px);
+    border-bottom-width: 10px;
+  }
+  .btn-3d.green-submit:active {
+    transform: translateY(4px);
+    border-bottom-width: 4px;
+  }
+
+  .btn-3d.blue-next {
+    background: #3B82F6;
+    border-color: #2563EB;
+    border-bottom: 8px solid #2563EB;
+    color: #FFFFFF;
+  }
+  .btn-3d.blue-next:hover {
+    transform: translateY(-2px);
+    border-bottom-width: 10px;
+  }
+  .btn-3d.blue-next:active {
+    transform: translateY(4px);
+    border-bottom-width: 4px;
+  }
+
+  .quiz-bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quiz-adventure-wrapper">
+  
+  <!-- Playful Top HUD Grid -->
+  <div class="quiz-top-hud">
+    <div class="quiz-hud-top-row">
+      <a href="/concept/{{ quiz.concept.id }}/" style="text-decoration:none;color:#64748B;font-weight:900;font-size:0.9rem;">
+        🦁 Back to Map
+      </a>
+      <div style="font-weight:900;font-size:1.05rem;color:#0F172A;" id="progress-hud-text">
+        ⭐ Question 1 of {{ questions.count }}
+      </div>
+      <div class="quiz-timer-pill">
+        ⏱️ <span id="timer">00:00</span>
+      </div>
+    </div>
+    
+    <!-- Star Progress Pathway -->
+    <div class="hud-star-path-container">
+      <div class="hud-star-path-fill" id="hud-star-path-fill"></div>
+    </div>
+  </div>
+
+  <!-- Carousel Question Cards -->
+  {% for q in questions %}
+  <div class="q-card-adventure {% if forloop.first %}active{% endif %}" id="q-card-{{ forloop.counter0 }}">
+    <div class="q-meta-top">
+      <span class="q-badge-tag">Stage {{ forloop.counter }} of {{ questions.count }}</span>
+      <span class="stat-chip gold"><i class="bi bi-star-fill"></i> +{{ q.marks }} Points</span>
+    </div>
+
+    <h2 class="q-title-text">{{ q.question_text }}</h2>
+
+    <!-- Big Option Cards -->
+    <div class="options-adventure-stack">
+      {% for opt in q.options.all %}
+      <button type="button" class="opt-adventure-btn" onclick="chooseQuizOption({{ forloop.parentloop.counter0 }}, {{ q.id }}, {{ opt.id }}, '{{ opt.option_text|escapejs }}', {{ opt.is_correct|yesno:'true,false' }}, this)">
+        <div class="opt-letter-sphere">{{ forloop.counter }}</div>
+        <span>{{ opt.option_text }}</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <!-- Animal Companion Instant Feedback -->
+    <div class="fb-adventure-box" id="feedback-{{ forloop.counter0 }}"></div>
+
+    <!-- Glowing Hints -->
+    <div class="hint-toast-box" id="hint-box-{{ forloop.counter0 }}"></div>
+
+    <!-- Speach Bubble TezBuddy AI Tutor -->
+    <div class="ai-tutor-callout" id="ai-box-{{ forloop.counter0 }}">
+      <strong>🤖 TezBuddy AI Companion:</strong>
+      <p id="ai-text-{{ forloop.counter0 }}"></p>
+    </div>
+
+    <!-- 3D Actions Bar -->
+    <div class="quiz-bottom-actions">
+      <div style="display:flex;gap:12px;">
+        <button type="button" class="btn-3d secondary-hint" onclick="requestQuizHint({{ forloop.counter0 }})">
+          💡 Hint (<span id="hint-cnt-{{ forloop.counter0 }}">0</span>/3)
+        </button>
+        <button type="button" class="btn-3d purple-ai" onclick="askAiQuizExplainer({{ forloop.counter0 }}, '{{ q.question_text|escapejs }}')">
+          🤖 AI Explain
+        </button>
+      </div>
+
+      <div>
+        {% if not forloop.last %}
+          <button type="button" class="btn-3d blue-next" onclick="goToNextQuizQuestion({{ forloop.counter0 }})">
+            Next Question 🚀
+          </button>
+        {% else %}
+          <button type="button" class="btn-3d green-submit" id="btn-submit-quiz" onclick="finishAndSubmitQuiz()">
+            Finish Quiz 🏆
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const quizId = {{ quiz.id }};
+const totalQs = {{ questions.count }};
+let answers = {};
+let selectedOptionData = {};
+let hintsData = {};
+let timerSeconds = 0;
+
+// Update the Star progress bar on load
+updateStarPath(1);
+
+const timerEl = document.getElementById('timer');
+const timerInterval = setInterval(() => {
+  timerSeconds++;
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+  const s = String(timerSeconds % 60).padStart(2, '0');
+  timerEl.textContent = `${m}:${s}`;
+}, 1000);
+
+function updateStarPath(currentQuestionIndex) {
+  const fillPct = (currentQuestionIndex / totalQs) * 100;
+  document.getElementById('hud-star-path-fill').style.width = fillPct + '%';
+}
+
+function chooseQuizOption(qIndex, qId, optId, optText, isCorrect, btn) {
+  const card = document.getElementById('q-card-' + qIndex);
+  card.querySelectorAll('.opt-adventure-btn').forEach(b => {
+    b.classList.remove('selected', 'correct-highlight', 'wrong-highlight');
+  });
+
+  btn.classList.add('selected');
+  answers[qId] = optId;
+  selectedOptionData[qIndex] = { text: optText, isCorrect: isCorrect };
+
+  const fb = document.getElementById('feedback-' + qIndex);
+  fb.style.display = 'block';
+  if (isCorrect) {
+    btn.classList.add('correct-highlight');
+    fb.className = 'fb-adventure-box correct';
+    fb.innerHTML = '🎉 <strong>AWESOME JOB!</strong> You are a math superstar! 🦄 Keep going!';
+  } else {
+    btn.classList.add('wrong-highlight');
+    fb.className = 'fb-adventure-box wrong';
+    fb.innerHTML = '🐼 <strong>Super try!</strong> Let\'s solve this mystery. Tap <em>AI Explain</em> for super clues!';
+  }
+}
+
+function requestQuizHint(index) {
+  const count = hintsData[index] || 0;
+  if (count >= 3) {
+    alert("Super Solver! You've used all 3 hints. Ask TezBuddy for more help!");
+    return;
+  }
+  hintsData[index] = count + 1;
+  document.getElementById('hint-cnt-' + index).textContent = hintsData[index];
+
+  const hintBox = document.getElementById('hint-box-' + index);
+  hintBox.style.display = 'block';
+
+  const hintsList = [
+    "⭐ Clue 1: In the Indian System, count 3 digits from the right to lock the Ones period!",
+    "⭐ Clue 2: The next space contains 2 digits. That's the Thousands period!",
+    "⭐ Clue 3: Read the periods out loud step-by-step from left to right!"
+  ];
+  hintBox.textContent = hintsList[hintsData[index] - 1];
+}
+
+function askAiQuizExplainer(index, qText) {
+  const selected = selectedOptionData[index] || { text: "None selected yet", isCorrect: false };
+  const aiBox = document.getElementById('ai-box-' + index);
+  const aiText = document.getElementById('ai-text-' + index);
+  aiBox.style.display = 'block';
+  aiText.textContent = "TezBuddy AI is running to search for clues... 🤖⚡";
+
+  fetch('/api/explain/question/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({
+      question_text: qText,
+      selected_text: selected.text,
+      correct_text: "the mathematical definition",
+      is_correct: selected.isCorrect
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      aiText.textContent = data.explanation;
+    }
+  })
+  .catch(() => {
+    aiText.textContent = "Quick Rule: Comma goes after the first 3 digits from right, and subsequent commas are placed every 2 digits! Easy peasy!";
+  });
+}
+
+function goToNextQuizQuestion(curr) {
+  if (curr < totalQs - 1) {
+    document.querySelectorAll('.q-card-adventure').forEach(c => c.classList.remove('active'));
+    document.getElementById('q-card-' + (curr + 1)).classList.add('active');
+    document.getElementById('progress-hud-text').textContent = `⭐ Question ${curr + 2} of ${totalQs}`;
+    updateStarPath(curr + 2);
+  }
+}
+
+function finishAndSubmitQuiz() {
+  clearInterval(timerInterval);
+  const btn = document.getElementById('btn-submit-quiz');
+  btn.disabled = true;
+  btn.textContent = 'Calculating Stars...';
+
+  let totalHints = Object.values(hintsData).reduce((a, b) => a + b, 0);
+
+  fetch('/api/quiz/submit/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({
+      quiz_id: quizId,
+      answers: answers,
+      time_taken: timerSeconds,
+      hints_used: totalHints
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.href = `/quiz/result/${data.attempt_id}/`;
+    }
+  })
+  .catch(() => {
+    window.location.reload();
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1304 @@
+{% extends "base.html" %}
+{% block title %}Adventure World — Tezz-Mindz{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block m_nav_dashboard %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+     TEZZ-MINDZ CINEMATIC 3D GAMIFIED DASHBOARD STYLESHEET
+     ══════════════════════════════════════════════════════════════════════════ */
+
+  :root {
+    --tm-glow-xp: rgba(168, 85, 247, 0.4);
+    --tm-glow-coin: rgba(245, 158, 11, 0.4);
+    --tm-glow-streak: rgba(239, 68, 68, 0.4);
+    --tm-glow-rank: rgba(59, 130, 246, 0.4);
+    --tm-portal-purple: #7C3AED;
+    --tm-cyber-blue: #2563EB;
+    --tm-emerald: #059669;
+  }
+
+  /* ── 1. TOP 4 VIBRANT 3D STAT CRYSTALS ── */
+  .stats-crystals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 1024px) {
+    .stats-crystals-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px) {
+    .stats-crystals-grid { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  .stat-crystal-card {
+    border-radius: 24px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+    cursor: default;
+  }
+  .stat-crystal-card:hover {
+    transform: translateY(-6px) scale(1.02);
+  }
+
+  /* Crystal Card Themes */
+  .stat-crystal-card.c-xp {
+    background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 50%, #EDE9FE 100%);
+    border-color: #DDD6FE;
+  }
+  .stat-crystal-card.c-xp:hover {
+    box-shadow: 0 16px 36px var(--tm-glow-xp);
+    border-color: #C084FC;
+  }
+
+  .stat-crystal-card.c-coins {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 50%, #FDE68A 100%);
+    border-color: #FCD34D;
+  }
+  .stat-crystal-card.c-coins:hover {
+    box-shadow: 0 16px 36px var(--tm-glow-coin);
+    border-color: #FBBF24;
+  }
+
+  .stat-crystal-card.c-streak {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FED7AA 100%);
+    border-color: #FDBA74;
+  }
+  .stat-crystal-card.c-streak:hover {
+    box-shadow: 0 16px 36px var(--tm-glow-streak);
+    border-color: #FB923C;
+  }
+
+  .stat-crystal-card.c-rank {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
+    border-color: #93C5FD;
+  }
+  .stat-crystal-card.c-rank:hover {
+    box-shadow: 0 16px 36px var(--tm-glow-rank);
+    border-color: #60A5FA;
+  }
+
+  /* 3D Icon Spheres */
+  .crystal-icon-wrap {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .stat-crystal-card:hover .crystal-icon-wrap {
+    transform: scale(1.12) rotate(6deg);
+  }
+
+  .stat-crystal-card.c-xp .crystal-icon-wrap { background: linear-gradient(135deg, #9333EA, #7C3AED); }
+  .stat-crystal-card.c-coins .crystal-icon-wrap { background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .stat-crystal-card.c-streak .crystal-icon-wrap { background: linear-gradient(135deg, #EA580C, #DC2626); }
+  .stat-crystal-card.c-rank .crystal-icon-wrap { background: linear-gradient(135deg, #2563EB, #1D4ED8); }
+
+  .crystal-text h3 {
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 2px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+  .crystal-text span {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+  }
+
+  /* ── 2. DASHBOARD MAIN 2-COLUMN LAYOUT ── */
+  .dash-canvas-grid {
+    display: grid;
+    grid-template-columns: 1fr 390px;
+    gap: 26px;
+  }
+  @media (max-width: 1100px) {
+    .dash-canvas-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── 3. CINEMATIC 3D ADVENTURE ISLAND HERO CARD ── */
+  .adventure-hero-realm {
+    background: linear-gradient(135deg, #1E1B4B 0%, #2E1065 40%, #3B0764 70%, #1E1B4B 100%);
+    border-radius: 32px;
+    padding: 36px 38px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid rgba(168, 85, 247, 0.35);
+    box-shadow: 0 24px 60px rgba(46, 16, 101, 0.35);
+    margin-bottom: 32px;
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Interactive Parallax Island Landscape Background */
+  .realm-backdrop-env {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .env-nebula {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.45;
+  }
+  .nebula-1 { width: 320px; height: 320px; background: #9333EA; top: -100px; right: 100px; }
+  .nebula-2 { width: 280px; height: 280px; background: #3B82F6; bottom: -80px; left: -60px; }
+
+  /* Floating Cyber Particles */
+  .cyber-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: #FFFFFF;
+    opacity: 0.6;
+    animation: particleDrift 6s infinite ease-in-out alternate;
+  }
+  @keyframes particleDrift {
+    0% { transform: translateY(0) scale(0.8); opacity: 0.3; }
+    50% { transform: translateY(-15px) scale(1.2); opacity: 0.8; }
+    100% { transform: translateY(-30px) scale(0.9); opacity: 0.2; }
+  }
+
+  /* 3D Character "Nova" Avatar in Hero */
+  .hero-character-nova {
+    position: absolute;
+    right: 32px;
+    bottom: 20px;
+    width: 200px;
+    height: 250px;
+    z-index: 3;
+    pointer-events: none;
+    animation: novaIdleBreath 4s infinite ease-in-out;
+  }
+  @media (max-width: 680px) {
+    .hero-character-nova { display: none; }
+  }
+  @keyframes novaIdleBreath {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.02); }
+  }
+
+  .realm-content {
+    position: relative;
+    z-index: 4;
+    max-width: 580px;
+  }
+
+  .realm-badge-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #F3E8FF;
+    margin-bottom: 16px;
+  }
+  .beacon-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 12px #10B981;
+    animation: beaconGlow 1.8s infinite;
+  }
+  @keyframes beaconGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+
+  .realm-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.3rem);
+    font-weight: 900;
+    color: #FFFFFF;
+    margin: 0 0 8px;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  .realm-sub {
+    font-size: 0.98rem;
+    color: #E9D5FF;
+    font-weight: 600;
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Dimensional Portal Progress Bar */
+  .portal-progress-track {
+    position: relative;
+    margin-bottom: 26px;
+    max-width: 480px;
+  }
+  .portal-bar-bg {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .portal-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F59E0B, #FBBF24, #FDE047);
+    border-radius: 100px;
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.8);
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .portal-pct-label {
+    position: absolute;
+    right: 0;
+    top: -24px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #FDE047;
+    letter-spacing: 0.05em;
+  }
+
+  /* 3D Action Button */
+  .btn-enter-portal {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
+    color: #4338CA;
+    border-radius: 18px;
+    padding: 15px 32px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    text-decoration: none;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 255, 255, 0.4);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-enter-portal:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 28px rgba(255, 255, 255, 0.6);
+    color: #3730A3;
+  }
+  .btn-enter-portal svg {
+    transition: transform 0.2s ease;
+  }
+  .btn-enter-portal:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     4. EPIC 3D LEARNING WORLDS (COMPACT AAA GAME CARDS)
+     ══════════════════════════════════════════════════════════════════════════ */
+  .section-headline-3d {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 30px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .worlds-3d-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 900px) {
+    .worlds-3d-grid { grid-template-columns: 1fr; }
+  }
+
+  .world-3d-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1.5px solid #E2E8F0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .world-3d-card:hover {
+    transform: translateY(-5px);
+  }
+  .world-3d-card.w-math:hover { border-color: #60A5FA; box-shadow: 0 14px 32px rgba(37, 99, 235, 0.15); }
+  .world-3d-card.w-science:hover { border-color: #34D399; box-shadow: 0 14px 32px rgba(5, 150, 105, 0.15); }
+  .world-3d-card.w-english:hover { border-color: #F472B6; box-shadow: 0 14px 32px rgba(219, 39, 119, 0.15); }
+
+  /* 3D Illustrated Game Realm Canvas Header (Compact) */
+  .world-stage-canvas {
+    height: 92px;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.1);
+  }
+  .world-stage-canvas.w-math {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 45%, #2563EB 85%, #38BDF8 100%);
+  }
+  .world-stage-canvas.w-science {
+    background: linear-gradient(135deg, #022C22 0%, #065F46 45%, #059669 85%, #34D399 100%);
+  }
+  .world-stage-canvas.w-english {
+    background: linear-gradient(135deg, #4A044E 0%, #831843 45%, #DB2777 85%, #F472B6 100%);
+  }
+
+  /* Environment Illustration Layer */
+  .stage-illustration-art {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* Top Stage Badges Row */
+  .stage-top-meta {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 6px;
+  }
+  .olympiad-code-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px;
+    padding: 3px 9px;
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .bounty-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 100px;
+    padding: 3px 8px;
+    font-size: 0.66rem;
+    font-weight: 900;
+    color: #FDE047;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* 3D Mascot Character Stage Avatar */
+  .stage-mascot-actor {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    width: 52px;
+    height: 52px;
+    z-index: 4;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+    animation: mascotIdle 3.5s infinite ease-in-out alternate;
+  }
+  @keyframes mascotIdle {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-4px) scale(1.04); }
+  }
+
+  /* Card Body Content */
+  .world-card-body {
+    padding: 0 4px 4px;
+  }
+  .world-card-body h4 {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 2px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .world-card-subtopics {
+    font-size: 0.76rem;
+    color: #64748B;
+    font-weight: 700;
+    margin: 0 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Feature Mini-Chips Bar */
+  .world-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: nowrap;
+  }
+  .world-mini-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 0.70rem;
+    font-weight: 800;
+    color: #334155;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Progress Bar Container */
+  .world-progress-block {
+    margin-bottom: 12px;
+  }
+  .world-progress-labels {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #64748B;
+    margin-bottom: 5px;
+  }
+  .world-progress-labels strong {
+    color: #0F172A;
+  }
+  .world-progress-track-bg {
+    height: 6px;
+    background: #F1F5F9;
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+  .world-progress-track-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* CTA Button */
+  .btn-enter-world-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    border-radius: 12px;
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    color: #1E293B;
+    font-size: 0.85rem;
+    font-weight: 900;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .world-3d-card.w-math:hover .btn-enter-world-action {
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: #FFFFFF;
+    border-color: #2563EB;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  }
+  .world-3d-card.w-science:hover .btn-enter-world-action {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #FFFFFF;
+    border-color: #059669;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+  }
+  .world-3d-card.w-english:hover .btn-enter-world-action {
+    background: linear-gradient(135deg, #DB2777, #BE185D);
+    color: #FFFFFF;
+    border-color: #DB2777;
+    box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+  }
+
+  /* ── 5. LEARNING GALAXY CONSTELLATION MAP ── */
+  .galaxy-map-section {
+    background: #FFFFFF;
+    border: 1.5px solid #EEF2F6;
+    border-radius: 28px;
+    padding: 28px 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  }
+  .galaxy-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .galaxy-header h3 {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .galaxy-constellation-track {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    position: relative;
+    padding: 10px 0;
+  }
+  @media (max-width: 760px) {
+    .galaxy-constellation-track { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .galaxy-node {
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 16px 12px;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .galaxy-node.completed {
+    background: #ECFDF5;
+    border-color: #A7F3D0;
+  }
+  .galaxy-node.active {
+    background: #FAF5FF;
+    border-color: #C084FC;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+    transform: scale(1.04);
+  }
+  .galaxy-node-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: grid;
+    place-items: center;
+  }
+  .galaxy-node.completed .galaxy-node-icon { background: #10B981; color: #FFFFFF; }
+  .galaxy-node.active .galaxy-node-icon { background: #7C3AED; color: #FFFFFF; }
+  .galaxy-node.locked .galaxy-node-icon { background: #E2E8F0; color: #94A3B8; }
+
+  .galaxy-node-name {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .galaxy-node-status {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+  }
+
+  /* ── 6. RIGHT COLUMN SIDE PANELS ── */
+  .side-station-card {
+    background: #FFFFFF;
+    border: 1.5px solid #EEF2F6;
+    border-radius: 28px;
+    padding: 26px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  }
+  .side-station-title {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Daily Mission Command Center */
+  .daily-command-box {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 1.5px solid #FDE68A;
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .daily-command-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .zippy-bot-companion {
+    width: 48px;
+    height: 48px;
+    animation: zippyBounce 3s infinite ease-in-out alternate;
+  }
+  @keyframes zippyBounce {
+    0% { transform: translateY(0) rotate(-3deg); }
+    100% { transform: translateY(-6px) rotate(3deg); }
+  }
+
+  .daily-command-box h4 {
+    font-size: 1.12rem;
+    font-weight: 900;
+    color: #92400E;
+    margin: 0 0 6px;
+    letter-spacing: -0.015em;
+  }
+  .daily-command-box p {
+    font-size: 0.86rem;
+    color: #78350F;
+    line-height: 1.45;
+    margin: 0 0 16px;
+    font-weight: 600;
+  }
+
+  .daily-bounty-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .bounty-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 900;
+    color: #92400E;
+  }
+  .btn-start-daily-quest {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    text-decoration: none;
+    border: none;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    transition: transform 0.2s ease;
+  }
+  .btn-start-daily-quest:hover {
+    transform: scale(1.05);
+    color: #FFFFFF;
+  }
+
+  /* 3D Champions Podium */
+  .podium-stage-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 0 10px;
+    border-bottom: 1.5px solid #F1F5F9;
+    margin-bottom: 16px;
+  }
+  .podium-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30%;
+  }
+  .podium-avatar-bubble {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #EEF2FF;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 6px;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: #4F46E5;
+  }
+  .podium-step-block {
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-weight: 900;
+    padding: 8px 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .podium-column.rank-1 .podium-step-block { height: 90px; background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .podium-column.rank-2 .podium-step-block { height: 70px; background: linear-gradient(135deg, #94A3B8, #64748B); }
+  .podium-column.rank-3 .podium-step-block { height: 55px; background: linear-gradient(135deg, #D97706, #92400E); }
+
+  .champions-roster-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .champion-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    transition: transform 0.15s ease;
+  }
+  .champion-row:hover {
+    transform: translateX(4px);
+  }
+  .champion-row.highlight-student {
+    background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+    border-color: #C4B5FD;
+    color: #4F46E5;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.12);
+  }
+
+  /* 3D Student Profile & Gear Customizer */
+  .student-avatar-card {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border: 1.5px solid #BFDBFE;
+    border-radius: 22px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .avatar-character-head {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: #FFFFFF;
+    border: 2px solid #93C5FD;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
+  }
+  .btn-customize-gear {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .btn-customize-gear:hover {
+    background: #F8FAFC;
+    border-color: #7C3AED;
+    color: #7C3AED;
+    transform: translateY(-2px);
+  }
+
+  /* ── 7. GEAR CUSTOMIZER MODAL ── */
+  .customizer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    place-items: center;
+    padding: 20px;
+  }
+  .customizer-modal {
+    background: #FFFFFF;
+    border-radius: 28px;
+    max-width: 520px;
+    width: 100%;
+    padding: 30px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    position: relative;
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stats-crystals-grid">
+  <div class="stat-crystal-card c-xp">
+    <div class="crystal-icon-wrap">
+      <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+        <defs>
+          <linearGradient id="starCrystGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="50%" stop-color="#E9D5FF"/>
+            <stop offset="100%" stop-color="#C084FC"/>
+          </linearGradient>
+        </defs>
+        <path d="M16 2 L19.5 11.5 L29 13.5 L22 20.5 L24 30 L16 24.5 L8 30 L10 20.5 L3 13.5 L12.5 11.5 Z" fill="url(#starCrystGrad)" stroke="#FFFFFF" stroke-width="1.2"/>
+        <polygon points="16,6 18.5,12.5 25,14 20,19 21.5,25.5 16,21.5 10.5,25.5 12,19 7,14 13.5,12.5" fill="#FAF5FF" opacity="0.75"/>
+      </svg>
+    </div>
+    <div class="crystal-text">
+      <h3 id="hud-total-xp">{{ profile.xp|default:0 }}</h3>
+      <span>Total XP Points</span>
+    </div>
+  </div>
+
+  <div class="stat-crystal-card c-coins">
+    <div class="crystal-icon-wrap">
+      <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+        <defs>
+          <linearGradient id="coinCrystGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FEF08A"/>
+            <stop offset="50%" stop-color="#F59E0B"/>
+            <stop offset="100%" stop-color="#B45309"/>
+          </linearGradient>
+        </defs>
+        <circle cx="16" cy="16" r="14" fill="url(#coinCrystGrad)" stroke="#FEF08A" stroke-width="1.5"/>
+        <circle cx="16" cy="16" r="10.5" fill="#FDE047" stroke="#B45309" stroke-width="0.8"/>
+        <path d="M16 9.5 L17.8 13.6 L22.3 14.1 L18.9 17.2 L19.8 21.6 L16 19.4 L12.2 21.6 L13.1 17.2 L9.7 14.1 L14.2 13.6 Z" fill="#FFFFFF"/>
+      </svg>
+    </div>
+    <div class="crystal-text">
+      <h3 id="hud-total-coins">{{ profile.coins|default:0 }}</h3>
+      <span>Adventure Coins</span>
+    </div>
+  </div>
+
+  <div class="stat-crystal-card c-streak">
+    <div class="crystal-icon-wrap">
+      <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+        <defs>
+          <linearGradient id="flameCrystGrad" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FEF08A"/>
+            <stop offset="40%" stop-color="#F59E0B"/>
+            <stop offset="80%" stop-color="#EA580C"/>
+            <stop offset="100%" stop-color="#DC2626"/>
+          </linearGradient>
+          <radialGradient id="plasmaCenter" cx="16" cy="21" r="8" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="60%" stop-color="#FDE047"/>
+            <stop offset="100%" stop-color="#F59E0B"/>
+          </radialGradient>
+        </defs>
+        <path d="M16 2 C12.5 8.5 6 13 6 20.5 C6 25.5 10.2 29.5 16 29.5 C21.8 29.5 26 25.5 26 20.5 C26 13 19.5 8.5 16 2 Z" fill="url(#flameCrystGrad)" stroke="#FEF08A" stroke-width="1"/>
+        <path d="M16 12 C13.8 16 10.5 18.5 10.5 22 C10.5 24.8 12.8 27 16 27 C19.2 27 21.5 24.8 21.5 22 C21.5 18.5 18.2 16 16 12 Z" fill="url(#plasmaCenter)"/>
+      </svg>
+    </div>
+    <div class="crystal-text">
+      <h3>{{ profile.streak|default:0 }} Days</h3>
+      <span>Daily Learning Streak</span>
+    </div>
+  </div>
+
+  <div class="stat-crystal-card c-rank">
+    <div class="crystal-icon-wrap">
+      <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
+        <defs>
+          <linearGradient id="rankCupGrad" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="40%" stop-color="#93C5FD"/>
+            <stop offset="100%" stop-color="#3B82F6"/>
+          </linearGradient>
+        </defs>
+        <path d="M8 4 H24 V12 C24 17.5 20 20.5 16 20.5 C12 20.5 8 17.5 8 12 V4 Z" fill="url(#rankCupGrad)" stroke="#FFFFFF" stroke-width="1.2"/>
+        <path d="M8 7 H4 C3 7 2 8 2 9.5 C2 12 4.5 13.5 8 13.5" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+        <path d="M24 7 H28 C29 7 30 8 30 9.5 C30 12 27.5 13.5 24 13.5" stroke="#93C5FD" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 20.5 V25 M11 29 H21" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+        <polygon points="16,8 17.5,11.5 21,12 18.5,14.5 19.2,18 16,16 12.8,18 13.5,14.5 11,12 14.5,11.5" fill="#FEF08A"/>
+      </svg>
+    </div>
+    <div class="crystal-text">
+      <h3>#{{ my_rank|default:1 }}</h3>
+      <span>{{ student_class.class_label|default:"Class 5" }} Rank</span>
+    </div>
+  </div>
+</div>
+
+<div class="dash-canvas-grid">
+  <div>
+    {% if continue_learning %}
+    <div class="adventure-hero-realm">
+      <div class="realm-backdrop-env">
+        <div class="env-nebula nebula-1"></div>
+        <div class="env-nebula nebula-2"></div>
+        <div class="cyber-particle" style="top:20%;left:15%;width:6px;height:6px;animation-delay:0s;"></div>
+        <div class="cyber-particle" style="top:60%;left:45%;width:8px;height:8px;animation-delay:2s;"></div>
+        <div class="cyber-particle" style="top:30%;left:75%;width:5px;height:5px;animation-delay:1s;"></div>
+      </div>
+
+      <div class="hero-character-nova" aria-hidden="true">
+        <svg viewBox="0 0 200 250" width="100%" height="100%">
+          <defs>
+            <linearGradient id="novaSuit" x1="40" y1="50" x2="160" y2="240" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#38BDF8"/>
+              <stop offset="40%" stop-color="#2563EB"/>
+              <stop offset="100%" stop-color="#1E3A8A"/>
+            </linearGradient>
+            <linearGradient id="novaJetpack" x1="120" y1="90" x2="190" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#F59E0B"/>
+              <stop offset="100%" stop-color="#EA580C"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="145" cy="185" rx="14" ry="24" fill="url(#novaJetpack)"/>
+          <path d="M136 205 Q145 240 154 205 Q145 220 136 205 Z" fill="#FDE047"/>
+          <ellipse cx="100" cy="150" rx="36" ry="46" fill="url(#novaSuit)"/>
+          <circle cx="100" cy="140" r="10" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2"/>
+          <path d="M68 135 Q40 110 32 90 Q44 80 58 105 Z" fill="#2563EB"/>
+          <circle cx="32" cy="85" r="10" fill="#FFFFFF"/>
+          <path d="M132 135 Q160 150 165 170" stroke="#2563EB" stroke-width="16" stroke-linecap="round"/>
+          <circle cx="168" cy="175" r="12" fill="#38BDF8" opacity="0.8"/>
+          <circle cx="100" cy="75" r="34" fill="#FFFFFF" stroke="#93C5FD" stroke-width="3"/>
+          <path d="M74 65 C74 50 126 50 126 65 C126 80 115 85 100 85 C85 85 74 80 74 65 Z" fill="#0284C7"/>
+          <ellipse cx="90" cy="62" rx="8" ry="3" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M92 92 Q100 100 108 92" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="realm-content">
+        <div class="realm-badge-live">
+          <span class="beacon-pulse"></span>
+          <span>Dimensional Mission • {{ continue_stage_label }}</span>
+        </div>
+
+        <h2 class="realm-title">{{ continue_learning.concept.name }}</h2>
+        <div class="realm-sub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2"></polygon>
+          </svg>
+          <span>{{ continue_learning.concept.chapter.class_subject.subject.title }} • Mission 0{{ continue_learning.concept.chapter.order }}: {{ continue_learning.concept.chapter.name }}</span>
+        </div>
+
+        <div class="portal-progress-track">
+          <span class="portal-pct-label">{{ continue_learning.mastery_percentage|floatformat:0 }}% MASTERED</span>
+          <div class="portal-bar-bg">
+            <div class="portal-bar-fill" style="width: {{ continue_learning.mastery_percentage|floatformat:0 }}%;"></div>
+          </div>
+        </div>
+
+        <a class="btn-enter-portal" href="{{ continue_action_url }}">
+          <span>{{ continue_action_text }}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="section-headline-3d">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span>Interactive Learning Worlds</span>
+    </div>
+
+    <div class="worlds-3d-grid">
+      {% for cs in class_subjects %}
+      <a class="world-3d-card {% if cs.subject.icon_type == 'math' %}w-math{% elif cs.subject.icon_type == 'science' %}w-science{% else %}w-english{% endif %}" href="/subject/{{ cs.id }}/">
+        <div>
+          <div class="world-stage-canvas {% if cs.subject.icon_type == 'math' %}w-math{% elif cs.subject.icon_type == 'science' %}w-science{% else %}w-english{% endif %}">
+            <div class="stage-illustration-art" aria-hidden="true">
+              {% if cs.subject.icon_type == 'math' %}
+                <svg viewBox="0 0 300 100" width="100%" height="100%" preserveAspectRatio="none">
+                  <defs><linearGradient id="mathGrid" x1="0" y1="0" x2="0" y2="100%"><stop offset="0%" stop-color="rgba(56, 189, 248, 0.4)"/><stop offset="100%" stop-color="rgba(37, 99, 235, 0.05)"/></linearGradient></defs>
+                  <rect x="20" y="40" width="25" height="60" fill="#1E3A8A" opacity="0.6"/><rect x="55" y="25" width="30" height="75" fill="#1D4ED8" opacity="0.8"/><rect x="95" y="45" width="28" height="55" fill="#1E3A8A" opacity="0.6"/>
+                  <polygon points="35,30 45,22 55,30 45,40" fill="#38BDF8" opacity="0.8"/><text x="25" y="80" fill="#FDE047" font-size="16" font-weight="900" opacity="0.85">∑</text><text x="110" y="50" fill="#FFFFFF" font-size="16" font-weight="900" opacity="0.7">π</text>
+                </svg>
+              {% elif cs.subject.icon_type == 'science' %}
+                <svg viewBox="0 0 300 100" width="100%" height="100%" preserveAspectRatio="none">
+                  <ellipse cx="60" cy="50" rx="45" ry="18" fill="none" stroke="rgba(52, 211, 153, 0.4)" stroke-width="1.8" transform="rotate(-20 60 50)"/><circle cx="60" cy="50" r="12" fill="#F59E0B" opacity="0.9"/>
+                  <circle cx="120" cy="35" r="4" fill="#67E8F9"/><circle cx="150" cy="30" r="5" fill="#34D399" opacity="0.7"/><circle cx="140" cy="65" r="5" fill="#A7F3D0" opacity="0.6"/>
+                </svg>
+              {% else %}
+                <svg viewBox="0 0 300 100" width="100%" height="100%" preserveAspectRatio="none">
+                  <circle cx="35" cy="25" r="1.5" fill="#FFFFFF" opacity="0.9"/><circle cx="85" cy="35" r="1.5" fill="#FDE047" opacity="0.8"/><circle cx="140" cy="20" r="2" fill="#FDE047" opacity="0.9"/>
+                  <text x="30" y="60" fill="#FFFFFF" font-size="20" font-weight="900" opacity="0.85">A</text><text x="85" y="45" fill="#FDE047" font-size="18" font-weight="900" opacity="0.8">B</text><text x="140" y="65" fill="#F472B6" font-size="19" font-weight="900" opacity="0.9">C</text>
+                </svg>
+              {% endif %}
+            </div>
+
+            <div class="stage-top-meta">
+              <span class="olympiad-code-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                {% if cs.subject.icon_type == 'math' %}IMO • Math{% elif cs.subject.icon_type == 'science' %}NSO • Science{% else %}IEO • English{% endif %}
+              </span>
+              <span class="bounty-tag-pill">{% if cs.subject.icon_type == 'math' %}⚡ +120 XP{% elif cs.subject.icon_type == 'science' %}⚡ +150 XP{% else %}⚡ +100 XP{% endif %}</span>
+            </div>
+
+            <div class="stage-mascot-actor" aria-hidden="true">
+              {% if cs.subject.icon_type == 'math' %}
+                <svg viewBox="0 0 80 80" width="100%" height="100%"><circle cx="40" cy="40" r="32" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2.5"/><rect x="24" y="22" width="32" height="40" rx="7" fill="#1E3A8A" stroke="#93C5FD" stroke-width="2"/><rect x="29" y="27" width="22" height="9" rx="3" fill="#67E8F9"/><circle cx="32" cy="43" r="2.5" fill="#FDE047"/><circle cx="40" cy="43" r="2.5" fill="#FDE047"/><circle cx="48" cy="43" r="2.5" fill="#FDE047"/><circle cx="32" cy="52" r="2.5" fill="#FFFFFF"/><circle cx="40" cy="52" r="2.5" fill="#FFFFFF"/><circle cx="48" cy="52" r="2.5" fill="#10B981"/></svg>
+              {% elif cs.subject.icon_type == 'science' %}
+                <svg viewBox="0 0 80 80" width="100%" height="100%"><circle cx="40" cy="40" r="32" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/><circle cx="40" cy="40" r="10" fill="#F59E0B"/><ellipse cx="40" cy="40" rx="26" ry="9" fill="none" stroke="#FFFFFF" stroke-width="2.2" transform="rotate(35 40 40)"/><ellipse cx="40" cy="40" rx="26" ry="9" fill="none" stroke="#FFFFFF" stroke-width="2.2" transform="rotate(-35 40 40)"/><circle cx="56" cy="30" r="3.5" fill="#67E8F9"/><circle cx="24" cy="50" r="3.5" fill="#67E8F9"/></svg>
+              {% else %}
+                <svg viewBox="0 0 80 80" width="100%" height="100%"><circle cx="40" cy="40" r="32" fill="#DB2777" stroke="#FFFFFF" stroke-width="2.5"/><path d="M18 30 C28 25 40 28 40 52 C40 28 52 25 62 30 L62 55 C52 50 40 52 40 52 C40 52 28 50 18 55 Z" fill="#FFFFFF" stroke="#831843" stroke-width="2"/><line x1="40" y1="28" x2="40" y2="52" stroke="#DB2777" stroke-width="2"/><polygon points="40,20 43,26 49,27 45,31 46,37 40,34 34,37 35,31 31,27 37,26" fill="#FDE047"/></svg>
+              {% endif %}
+            </div>
+          </div>
+          <div class="world-card-body">
+            <h4>{{ cs.subject.title }}</h4>
+            <div class="world-card-subtopics">
+              {% if cs.subject.icon_type == 'math' %}<span>Numbers • Logic</span>{% elif cs.subject.icon_type == 'science' %}<span>Physics • Biology</span>{% else %}<span>Grammar • Reading</span>{% endif %}
+            </div>
+            <div class="world-chips-row">
+              <span class="world-mini-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path></svg>{{ cs.total_concepts|default:10 }} Missions</span>
+              <span class="world-mini-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 12 12 16 14"></polygon></svg>Olympiad</span>
+            </div>
+            <div class="world-progress-block">
+              <div class="world-progress-labels">
+                <span><strong>{{ cs.done_concepts|default:0 }}</strong>/{{ cs.total_concepts|default:0 }} Topics</span>
+                <span style="color:{% if cs.subject.icon_type == 'math' %}#2563EB{% elif cs.subject.icon_type == 'science' %}#059669{% else %}#DB2777{% endif %}; font-weight:900;">{{ cs.progress_pct|default:0 }}%</span>
+              </div>
+              <div class="world-progress-track-bg">
+                <div class="world-progress-track-fill" style="width: {{ cs.progress_pct|default:0 }}%; background: {% if cs.subject.icon_type == 'math' %}linear-gradient(90deg, #2563EB, #60A5FA){% elif cs.subject.icon_type == 'science' %}linear-gradient(90deg, #059669, #34D399){% else %}linear-gradient(90deg, #DB2777, #F472B6){% endif %};"></div>
+              </div>
+            </div>
+            <div class="btn-enter-world-action">
+              <span>Enter World</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="side-station-card" style="grid-column: 1/-1; text-align:center; padding:32px;">
+        <p style="color:#64748B;">No learning worlds configured for this grade level yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="galaxy-map-section">
+      <div class="galaxy-header">
+        <h3>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01L12 2z"></path></svg>
+          <span>Learning Galaxy Constellation</span>
+        </h3>
+        <span style="font-size:0.84rem;font-weight:900;color:#7C3AED;background:#FAF5FF;padding:4px 12px;border-radius:100px;border:1px solid #DDD6FE;">{{ completed_concepts|default:0 }} / {{ total_concepts|default:0 }} Checkpoints</span>
+      </div>
+      <div class="galaxy-constellation-track">
+        <div class="galaxy-node {% if completed_concepts >= 1 %}completed{% else %}active{% endif %}">
+          <div class="galaxy-node-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if completed_concepts >= 1 %}<polyline points="20 6 9 17 4 12"></polyline>{% else %}<polygon points="5 3 19 12 5 21 5 3"></polygon>{% endif %}</svg></div>
+          <div class="galaxy-node-name">Mission 01</div>
+          <div class="galaxy-node-status">Large Numbers</div>
+        </div>
+        <div class="galaxy-node {% if completed_concepts >= 2 %}completed{% elif completed_concepts == 1 %}active{% else %}locked{% endif %}">
+          <div class="galaxy-node-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if completed_concepts >= 2 %}<polyline points="20 6 9 17 4 12"></polyline>{% elif completed_concepts == 1 %}<polygon points="5 3 19 12 5 21 5 3"></polygon>{% else %}<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>{% endif %}</svg></div>
+          <div class="galaxy-node-name">Mission 02</div>
+          <div class="galaxy-node-status">Shapes & Angles</div>
+        </div>
+        <div class="galaxy-node {% if completed_concepts >= 3 %}completed{% elif completed_concepts == 2 %}active{% else %}locked{% endif %}">
+          <div class="galaxy-node-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if completed_concepts >= 3 %}<polyline points="20 6 9 17 4 12"></polyline>{% elif completed_concepts == 2 %}<polygon points="5 3 19 12 5 21 5 3"></polygon>{% else %}<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>{% endif %}</svg></div>
+          <div class="galaxy-node-name">Mission 03</div>
+          <div class="galaxy-node-status">Factor Tree</div>
+        </div>
+        <div class="galaxy-node {% if completed_concepts >= 4 %}completed{% elif completed_concepts == 3 %}active{% else %}locked{% endif %}">
+          <div class="galaxy-node-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if completed_concepts >= 4 %}<polyline points="20 6 9 17 4 12"></polyline>{% elif completed_concepts == 3 %}<polygon points="5 3 19 12 5 21 5 3"></polygon>{% else %}<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>{% endif %}</svg></div>
+          <div class="galaxy-node-name">Mission 04</div>
+          <div class="galaxy-node-status">Bio-Reactor</div>
+        </div>
+        <div class="galaxy-node {% if completed_concepts >= 5 %}completed{% else %}locked{% endif %}">
+          <div class="galaxy-node-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path></svg></div>
+          <div class="galaxy-node-name">Grand Mastery</div>
+          <div class="galaxy-node-status">Olympiad Cup</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="side-station-card">
+      <div class="side-station-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 12 12 16 14"></polygon></svg>
+        <span>Daily Quest Command</span>
+      </div>
+      <div class="daily-command-box">
+        <div class="daily-command-header">
+          <div><span style="font-size:0.72rem;font-weight:900;color:#B45309;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px;">TODAY'S MISSION</span><h4>{{ today_challenge.title|default:"Class 5 Daily Mind Challenge" }}</h4></div>
+          <div class="zippy-bot-companion" aria-hidden="true"><svg viewBox="0 0 48 48" width="100%" height="100%"><circle cx="24" cy="26" r="18" fill="#FBBF24" stroke="#D97706" stroke-width="2"/><rect x="12" y="20" width="24" height="10" rx="5" fill="#1E293B"/><circle cx="18" cy="25" r="2.5" fill="#38BDF8"/><circle cx="30" cy="25" r="2.5" fill="#38BDF8"/><line x1="24" y1="8" x2="24" y2="4" stroke="#D97706" stroke-width="2"/><circle cx="24" cy="4" r="3" fill="#EF4444"/></svg></div>
+        </div>
+        <p>{{ today_challenge.description|default:"Solve today's 5 quick questions on Class 5 topics to earn double XP and unlock your reward chest." }}</p>
+        <div class="daily-bounty-row">
+          <div class="bounty-chips"><span>+{{ today_challenge.xp_reward|default:50 }} XP</span><span>•</span><span>+{{ today_challenge.coin_reward|default:25 }} Coins</span></div>
+          <a class="btn-start-daily-quest" href="/learn/">START MISSION</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-station-card">
+      <div class="side-station-title" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path></svg><span>Champions Arena</span></div>
+        <a href="/leaderboard/" style="font-size:0.8rem;font-weight:900;color:#2563EB;text-decoration:none;">View All →</a>
+      </div>
+      <div class="podium-stage-container">
+        <div class="podium-column rank-2"><div class="podium-avatar-bubble"><span>2nd</span></div><div class="podium-step-block"><span style="font-size:0.7rem;opacity:0.9;">SILVER</span><span style="font-size:1.1rem;font-weight:900;">2</span></div></div>
+        <div class="podium-column rank-1"><div class="podium-avatar-bubble" style="border-color:#F59E0B;background:#FFFBEB;"><svg width="24" height="24" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div><div class="podium-step-block"><span style="font-size:0.75rem;opacity:0.9;">CHAMPION</span><span style="font-size:1.4rem;font-weight:900;">1</span></div></div>
+        <div class="podium-column rank-3"><div class="podium-avatar-bubble"><span>3rd</span></div><div class="podium-step-block"><span style="font-size:0.7rem;opacity:0.9;">BRONZE</span><span style="font-size:1rem;font-weight:900;">3</span></div></div>
+      </div>
+      <div class="champions-roster-list">
+        {% for cm in classmates|slice:":4" %}
+        <div class="champion-row {% if cm.id == profile.id %}highlight-student{% endif %}">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="font-weight:900;color:#64748B;width:20px;">#{{ forloop.counter }}</span><span>{{ cm.user.first_name|default:cm.user.username }}</span>{% if cm.id == profile.id %}<span style="font-size:0.68rem;font-weight:900;background:#7C3AED;color:#FFF;padding:2px 8px;border-radius:100px;">YOU</span>{% endif %}</div>
+          <span style="font-weight:900;color:#4F46E5;">{{ cm.xp }} XP</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="side-station-card">
+      <div class="side-station-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Student Avatar</span></div>
+      <div class="student-avatar-card">
+        <div class="avatar-character-head" id="dash-avatar-preview">
+          <svg viewBox="0 0 48 48" width="44" height="44"><circle cx="24" cy="24" r="22" fill="#818CF8"/><ellipse cx="24" cy="25" rx="14" ry="15" fill="#FFFFFF"/><path id="avatar-visor-path" d="M13 22 C13 18 35 18 35 22 C35 26 31 27 24 27 C17 27 13 26 13 22 Z" fill="#38BDF8"/><path id="avatar-suit-collar" d="M14 38 C17 34 31 34 34 38 L36 46 C31 48 17 48 12 46 Z" fill="#312E81"/></svg>
+        </div>
+        <div>
+          <strong style="font-size:1.05rem;color:#0F172A;display:block;line-height:1.2;">{% if profile and profile.user %}{{ profile.user.first_name|default:profile.user.username }}{% elif user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}Explorer{% endif %}</strong>
+          <span style="font-size:0.8rem;font-weight:800;color:#2563EB;">{{ student_class.class_label|default:"Class 5" }} • Level {{ profile.current_level|default:1 }} Explorer</span>
+        </div>
+      </div>
+      <button type="button" class="btn-customize-gear" onclick="openAvatarCustomizer()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <span>CUSTOMIZE AVATAR GEAR</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="customizer-backdrop" id="customizer-modal-backdrop" onclick="closeAvatarCustomizer(event)">
+  <div class="customizer-modal" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1.5px solid #F1F5F9;">
+      <h3 style="margin:0;font-size:1.3rem;font-weight:900;color:#0F172A;display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>Customize Avatar Gear</h3>
+      <button type="button" onclick="closeAvatarCustomizer()" style="border:none;background:#F1F5F9;border-radius:50%;width:34px;height:34px;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="margin-bottom:18px;">
+      <label style="display:block;font-size:0.86rem;font-weight:800;color:#334155;margin-bottom:8px;">1. Explorer Suit Theme</label>
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;">
+        <button type="button" class="gear-opt-btn active" onclick="setSuitColor('#312E81', '#38BDF8', this)" style="padding:10px;border-radius:14px;border:2px solid #2563EB;background:#EFF6FF;font-weight:800;font-size:0.8rem;cursor:pointer;">Cosmic Blue</button>
+        <button type="button" class="gear-opt-btn" onclick="setSuitColor('#064E3B', '#34D399', this)" style="padding:10px;border-radius:14px;border:2px solid #E2E8F0;background:#F8FAFC;font-weight:800;font-size:0.8rem;cursor:pointer;">Quantum Emerald</button>
+        <button type="button" class="gear-opt-btn" onclick="setSuitColor('#581C87', '#C084FC', this)" style="padding:10px;border-radius:14px;border:2px solid #E2E8F0;background:#F8FAFC;font-weight:800;font-size:0.8rem;cursor:pointer;">Cyber Purple</button>
+        <button type="button" class="gear-opt-btn" onclick="setSuitColor('#7C2D12', '#FBBF24', this)" style="padding:10px;border-radius:14px;border:2px solid #E2E8F0;background:#F8FAFC;font-weight:800;font-size:0.8rem;cursor:pointer;">Solar Flame</button>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <label style="display:block;font-size:0.86rem;font-weight:800;color:#334155;margin-bottom:8px;">2. Holographic Visor Glow</label>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;">
+        <button type="button" class="gear-visor-btn active" onclick="setVisorColor('#38BDF8', this)" style="padding:10px;border-radius:14px;border:2px solid #0284C7;background:#E0F2FE;font-weight:800;font-size:0.8rem;cursor:pointer;">Cyan Pulse</button>
+        <button type="button" class="gear-visor-btn" onclick="setVisorColor('#F59E0B', this)" style="padding:10px;border-radius:14px;border:2px solid #E2E8F0;background:#F8FAFC;font-weight:800;font-size:0.8rem;cursor:pointer;">Amber Laser</button>
+        <button type="button" class="gear-visor-btn" onclick="setVisorColor('#EC4899', this)" style="padding:10px;border-radius:14px;border:2px solid #E2E8F0;background:#F8FAFC;font-weight:800;font-size:0.8rem;cursor:pointer;">Ruby Ray</button>
+      </div>
+    </div>
+    <button type="button" onclick="saveGearSettings()" style="width:100%;padding:14px;border-radius:16px;background:linear-gradient(135deg, #4F46E5, #7C3AED);color:#FFFFFF;font-weight:900;font-size:1rem;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,229,0.35);">SAVE GEAR CONFIGURATION</button>
+  </div>
+</div>
+
+<script>
+  function openAvatarCustomizer() {
+    const modal = document.getElementById('customizer-modal-backdrop');
+    if (modal) modal.style.display = 'grid';
+  }
+  function closeAvatarCustomizer(e) {
+    const modal = document.getElementById('customizer-modal-backdrop');
+    if (modal) modal.style.display = 'none';
+  }
+  function setSuitColor(suitColor, visorColor, btn) {
+    document.querySelectorAll('.gear-opt-btn').forEach(b => {
+      b.style.borderColor = '#E2E8F0';
+      b.style.background = '#F8FAFC';
+    });
+    btn.style.borderColor = '#2563EB';
+    btn.style.background = '#EFF6FF';
+    const collar = document.getElementById('avatar-suit-collar');
+    if (collar) collar.setAttribute('fill', suitColor);
+    localStorage.setItem('tm_avatar_suit', suitColor);
+  }
+  function setVisorColor(visorColor, btn) {
+    document.querySelectorAll('.gear-visor-btn').forEach(b => {
+      b.style.borderColor = '#E2E8F0';
+      b.style.background = '#F8FAFC';
+    });
+    btn.style.borderColor = '#0284C7';
+    btn.style.background = '#E0F2FE';
+    const visor = document.getElementById('avatar-visor-path');
+    if (visor) visor.setAttribute('fill', visorColor);
+    localStorage.setItem('tm_avatar_visor', visorColor);
+  }
+  function saveGearSettings() {
+    closeAvatarCustomizer();
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedSuit = localStorage.getItem('tm_avatar_suit');
+    const savedVisor = localStorage.getItem('tm_avatar_visor');
+    if (savedSuit) {
+      const collar = document.getElementById('avatar-suit-collar');
+      if (collar) collar.setAttribute('fill', savedSuit);
+    }
+    if (savedVisor) {
+      const visor = document.getElementById('avatar-visor-path');
+      if (visor) visor.setAttribute('fill', savedVisor);
+    }
+  });
+</script>
+{% endblock %}
+

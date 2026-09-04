@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Learn — Tezz-Mindz{% endblock %}
+{% block nav_learn %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .learn-header { margin-bottom: 28px; }
+  .learn-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
+  .learn-header p { color: #64748b; font-size: 0.9rem; font-weight: 600; margin: 0; }
+
+  .subject-cards { display: flex; flex-direction: column; gap: 20px; }
+  .subject-card {
+    background: #fff; border: 1px solid #ede9fe; border-radius: 18px;
+    padding: 24px; transition: box-shadow 0.18s;
+  }
+  .subject-card:hover { box-shadow: 0 8px 28px rgba(79,70,229,0.1); }
+
+  .subject-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .subject-card-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    display: grid; place-items: center; font-size: 1.6rem; flex-shrink: 0;
+  }
+  .subject-card-icon.math { background: #fffbeb; }
+  .subject-card-icon.science { background: #f0fdf4; }
+  .subject-card-icon.english { background: #fdf2f8; }
+  .subject-card-meta h2 { font-size: 1.1rem; font-weight: 800; color: #1e1b4b; margin: 0 0 4px; }
+  .subject-card-meta p { font-size: 0.8rem; color: #64748b; font-weight: 600; margin: 0; }
+  .subject-progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .subject-progress-row .progress-bar-wrap { flex: 1; }
+  .subject-progress-pct { font-size: 0.9rem; font-weight: 800; color: #4f46e5; width: 42px; text-align: right; }
+  .subject-stats { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+  .chapters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .chapter-tile {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 14px 16px; text-decoration: none; transition: all 0.15s;
+  }
+  .chapter-tile:hover { background: #f0eeff; border-color: #c4b5fd; }
+  .chapter-tile-num { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .chapter-tile-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; margin-bottom: 8px; }
+  .chapter-tile-meta { font-size: 0.72rem; color: #64748b; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="learn-header">
+  <h1>{{ student_class.class_label }} — Subjects</h1>
+  <p>{{ student_class.stage }} · Pick a subject and start learning</p>
+</div>
+
+<div class="subject-cards">
+{% for cs in class_subjects %}
+<div class="subject-card">
+  <div class="subject-card-header">
+    <div class="subject-card-icon {{ cs.subject.icon_type }}">
+      {% if cs.subject.icon_type == "math" %}🔢
+      {% elif cs.subject.icon_type == "science" %}🧪
+      {% else %}📖{% endif %}
+    </div>
+    <div class="subject-card-meta">
+      <h2>{{ cs.subject.title }}</h2>
+      <p>{{ cs.subject.subtitle }} · {{ cs.subject.olympiad_code }}</p>
+    </div>
+    <div style="margin-left:auto;">
+      <a class="btn-primary" href="/subject/{{ cs.id }}/">Explore <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </div>
+
+  <div class="subject-progress-row">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:{{ cs.progress_pct }}%"></div></div>
+    <div class="subject-progress-pct">{{ cs.progress_pct }}%</div>
+  </div>
+
+  <div class="subject-stats">
+    <span class="stat-chip green"><i class="bi bi-check-circle-fill"></i> {{ cs.done_concepts }} mastered</span>
+    <span class="stat-chip"><i class="bi bi-journal-text"></i> {{ cs.total_concepts }} topics</span>
+    <span class="stat-chip"><i class="bi bi-layers"></i> {{ cs.total_modules }} modules</span>
+  </div>
+
+  <!-- Preview first 4 chapters -->
+  {% with chapters=cs.chapters.all %}
+  {% if chapters %}
+  <div class="chapters-grid">
+    {% for ch in chapters|slice:":4" %}
+    <a class="chapter-tile" href="/chapter/{{ ch.id }}/">
+      <div class="chapter-tile-num">Chapter {{ ch.order }}</div>
+      <div class="chapter-tile-name">{{ ch.name }}</div>
+      <div class="chapter-tile-meta">{{ ch.concepts.count }} topics</div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+</div>
+{% empty %}
+<div class="card" style="text-align:center;padding:48px;">
+  <div style="font-size:3rem;margin-bottom:12px;">📚</div>
+  <h3 style="color:#1e1b4b;margin:0 0 8px;">No subjects yet</h3>
+  <p style="color:#64748b;">Content for {{ student_class.class_label }} is being prepared.</p>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

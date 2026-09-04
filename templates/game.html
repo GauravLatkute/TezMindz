@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+{% block title %}Number Train Adventure — Tezz-Mindz{% endblock %}
+{% block nav_games %}active{% endblock %}
+{% block m_nav_games %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .game-adventure-wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 28px;
+    padding: 36px 32px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  }
+  .game-adventure-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1.5px solid #EEF2F6;
+  }
+
+  /* Train Goal Banner */
+  .train-mission-banner {
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    border: 2px solid #FDE68A;
+    border-radius: 24px;
+    padding: 24px 28px;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.08);
+  }
+  .train-mission-banner h2 {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #92400E;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .train-mission-banner p {
+    font-size: 0.92rem;
+    color: #78350F;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* ── NUMBER TRAIN COMPARTMENTS ── */
+  .train-visual-track {
+    background: #F8FAFC;
+    border: 2px dashed #CBD5E1;
+    border-radius: 22px;
+    padding: 20px 16px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .train-engine-title {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #5B50EB;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+  }
+  .train-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+  @media (max-width: 600px) {
+    .train-slots-grid { gap: 6px; }
+  }
+
+  .train-compartment {
+    background: #FFFFFF;
+    border: 2.5px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 14px 6px;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  }
+  .train-compartment:hover {
+    border-color: #A78BFA;
+    transform: translateY(-2px);
+  }
+  .train-compartment.filled {
+    background: #EFF6FF;
+    border-color: #3B82F6;
+  }
+  .compartment-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #64748B;
+    text-transform: uppercase;
+  }
+  .compartment-digit {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: #3B82F6;
+    color: #FFFFFF;
+    font-size: 1.4rem;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  }
+
+  /* Live Number Display */
+  .live-indian-preview {
+    background: #F0FDF4;
+    border: 2px solid #BBF7D0;
+    border-radius: 18px;
+    padding: 14px 20px;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #15803D;
+  }
+
+  /* Digits Rack */
+  .digits-picker-tray {
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .digit-tile-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
+    color: #0F172A;
+    font-size: 1.35rem;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .digit-tile-btn:hover {
+    background: #EDE9FE;
+    border-color: #8B5CF6;
+    color: #5B50EB;
+    transform: translateY(-3px) scale(1.08);
+  }
+  .digit-tile-btn.used {
+    opacity: 0.3;
+    pointer-events: none;
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+  }
+
+  .game-feedback-toast {
+    border-radius: 18px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 0.95rem;
+  }
+  .game-feedback-toast.correct { background: #ECFDF5; border: 2px solid #A7F3D0; color: #065F46; }
+  .game-feedback-toast.almost { background: #FEF2F2; border: 2px solid #FECACA; color: #991B1B; }
+
+  .hint-toast-card {
+    background: #FFFBEB;
+    border: 1.5px solid #FDE68A;
+    border-radius: 16px;
+    padding: 14px 18px;
+    color: #92400E;
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: none;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-adventure-wrapper">
+  <!-- Top Bar -->
+  <div class="game-adventure-header">
+    <a href="/concept/{{ game.concept.id }}/" style="color:#64748B;font-weight:800;text-decoration:none;font-size:0.88rem;">
+      ← Back to {{ game.concept.name }}
+    </a>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="badge-pill purple"><i class="bi bi-star-fill"></i> Easy Mission</span>
+      <span class="hud-pill coins" style="border-color:#FDE68A;"><i class="bi bi-lightbulb-fill"></i> Hints: <strong id="hints-counter-hud">0</strong>/3</span>
+    </div>
+  </div>
+
+  <!-- Goal Banner -->
+  <div class="train-mission-banner">
+    <h2>🚂 Goal: Build the Number Train!</h2>
+    <p>Target Number: <strong>"Three Lakh Seventy-Five Thousand Four Hundred Twenty"</strong></p>
+  </div>
+
+  <!-- Visual Train Track -->
+  <div class="train-visual-track">
+    <div class="train-engine-title">🚂 INDIAN RAILWAYS NUMBER TRAIN</div>
+    <div class="train-slots-grid">
+      <div class="train-compartment" id="slot-0" onclick="clearSlot(0)">
+        <div class="compartment-label">Lakhs (L)</div>
+        <div id="slot-val-0" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+      <div class="train-compartment" id="slot-1" onclick="clearSlot(1)">
+        <div class="compartment-label">T-Th</div>
+        <div id="slot-val-1" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+      <div class="train-compartment" id="slot-2" onclick="clearSlot(2)">
+        <div class="compartment-label">Thousands</div>
+        <div id="slot-val-2" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+      <div class="train-compartment" id="slot-3" onclick="clearSlot(3)">
+        <div class="compartment-label">Hundreds</div>
+        <div id="slot-val-3" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+      <div class="train-compartment" id="slot-4" onclick="clearSlot(4)">
+        <div class="compartment-label">Tens</div>
+        <div id="slot-val-4" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+      <div class="train-compartment" id="slot-5" onclick="clearSlot(5)">
+        <div class="compartment-label">Ones</div>
+        <div id="slot-val-5" style="font-weight:900;color:#94A3B8;">_</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Number Preview -->
+  <div class="live-indian-preview">
+    Train Number: <span id="live-formatted-num" style="font-family:monospace;font-size:1.4rem;letter-spacing:2px;">_ , _ _ , _ _ _</span>
+  </div>
+
+  <!-- Digits Rack -->
+  <div style="font-size:0.82rem;font-weight:800;color:#64748B;text-transform:uppercase;margin-bottom:8px;text-align:center;">
+    Tap Digits to Place in Train:
+  </div>
+  <div class="digits-picker-tray">
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('3', this)">3</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('7', this)">7</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('5', this)">5</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('4', this)">4</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('2', this)">2</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('0', this)">0</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('8', this)">8</button>
+    <button type="button" class="digit-tile-btn" onclick="selectDigit('1', this)">1</button>
+  </div>
+
+  <!-- Feedback Toast -->
+  <div class="game-feedback-toast" id="game-feedback"></div>
+
+  <!-- Hint Card -->
+  <div class="hint-toast-card" id="game-hint-card"></div>
+
+  <!-- Actions -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <button type="button" class="btn-primary" id="btn-submit-game" onclick="submitNumberTrain()" style="padding:16px;font-size:1.05rem;justify-content:center;">
+      Submit Train Number <i class="bi bi-check-circle-fill"></i>
+    </button>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <button type="button" class="btn-outline" onclick="useGameHint()">
+        <i class="bi bi-lightbulb"></i> Use Hint
+      </button>
+      <button type="button" class="btn-outline" style="background:#F5F3FF;border-color:#DDD6FE;color:#5B50EB;" onclick="explainWithTezBuddy()">
+        <i class="bi bi-robot"></i> Explain with AI
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const gameId = {{ game.id }};
+let hintsUsed = 0;
+let startTime = Date.now();
+
+let placed = [null, null, null, null, null, null];
+let btnRefs = [null, null, null, null, null, null];
+
+function updateUI() {
+  for (let i = 0; i < 6; i++) {
+    const slot = document.getElementById('slot-' + i);
+    const val = document.getElementById('slot-val-' + i);
+    if (placed[i] !== null) {
+      slot.classList.add('filled');
+      val.innerHTML = `<div class="compartment-digit">${placed[i]}</div>`;
+    } else {
+      slot.classList.remove('filled');
+      val.innerHTML = '_';
+    }
+  }
+
+  const d0 = placed[0] !== null ? placed[0] : '_';
+  const d1 = placed[1] !== null ? placed[1] : '_';
+  const d2 = placed[2] !== null ? placed[2] : '_';
+  const d3 = placed[3] !== null ? placed[3] : '_';
+  const d4 = placed[4] !== null ? placed[4] : '_';
+  const d5 = placed[5] !== null ? placed[5] : '_';
+
+  document.getElementById('live-formatted-num').textContent = `${d0} , ${d1}${d2} , ${d3}${d4}${d5}`;
+}
+
+function selectDigit(digit, btn) {
+  const emptyIdx = placed.findIndex(d => d === null);
+  if (emptyIdx === -1) {
+    alert("All compartments are filled! Tap a compartment to remove a digit.");
+    return;
+  }
+  placed[emptyIdx] = digit;
+  btnRefs[emptyIdx] = btn;
+  btn.classList.add('used');
+  updateUI();
+}
+
+function clearSlot(idx) {
+  if (placed[idx] !== null) {
+    if (btnRefs[idx]) btnRefs[idx].classList.remove('used');
+    placed[idx] = null;
+    btnRefs[idx] = null;
+    updateUI();
+  }
+}
+
+function useGameHint() {
+  if (hintsUsed >= 3) {
+    alert("You've used all 3 hints! Click 'Explain with AI' for guided tutoring.");
+    return;
+  }
+  hintsUsed++;
+  document.getElementById('hints-counter-hud').textContent = hintsUsed;
+  const hc = document.getElementById('game-hint-card');
+  hc.style.display = 'block';
+
+  const hints = [
+    "Hint 1: 'Three Lakh' means place 3 in the Lakhs compartment.",
+    "Hint 2: 'Seventy-Five Thousand' has 7 in T-Th and 5 in Thousands.",
+    "Hint 3: 'Four Hundred Twenty' has 4 in Hundreds, 2 in Tens, 0 in Ones = 3,75,420."
+  ];
+  hc.textContent = hints[hintsUsed - 1];
+}
+
+function explainWithTezBuddy() {
+  const hc = document.getElementById('game-hint-card');
+  hc.style.display = 'block';
+  hc.textContent = "🤖 TezBuddy AI: In the Indian System, 'Three Lakh Seventy-Five Thousand Four Hundred Twenty' is written as 3 (Lakhs), 75 (Thousands), 420 (Ones) = 3,75,420.";
+}
+
+function submitNumberTrain() {
+  const assembled = placed.join('');
+  const fb = document.getElementById('game-feedback');
+  const btn = document.getElementById('btn-submit-game');
+  fb.style.display = 'block';
+
+  if (assembled === '375420') {
+    btn.disabled = true;
+    btn.textContent = 'Train Arrived! Unlocking Quiz...';
+    fb.className = 'game-feedback-toast correct';
+    fb.innerHTML = '🎉 <strong>TRAIN ARRIVED!</strong> 3,75,420 is the exact number! Brain Quiz is now unlocked!';
+
+    const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+    fetch('/api/game/submit/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        game_id: gameId,
+        difficulty: 'easy',
+        score: 100,
+        accuracy: 100.0,
+        time_spent: timeSpent,
+        hints_used: hintsUsed
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/result/';
+      }
+    })
+    .catch(() => {
+      window.location.href = '/result/';
+    });
+  } else {
+    fb.className = 'game-feedback-toast almost';
+    fb.innerHTML = `💪 <strong>Almost!</strong> Your current number is ${assembled.replace(/null/g, '_')}. Remember: 3 in Lakhs, 75 in Thousands, 420 in Ones.`;
+  }
+}
+</script>
+{% endblock %}

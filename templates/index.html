@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tezz-Mindz — Olympiad Learning, Now More Fun!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+      :root {
+        --tm-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --tm-ink: #0F172A;
+        --tm-slate: #334155;
+        --tm-muted: #64748B;
+        --tm-bg: #FAFAFC;
+        --tm-brand: #4F46E5;
+        --tm-brand-light: #6366F1;
+        --tm-brand-soft: #EEF2FF;
+        --tm-emerald: #059669;
+        --tm-emerald-soft: #ECFDF5;
+        --tm-purple: #7C3AED;
+        --tm-purple-soft: #FAF5FF;
+        --tm-rose: #E11D48;
+        --tm-rose-soft: #FFF1F2;
+        --tm-amber: #D97706;
+        --tm-amber-soft: #FFFBEB;
+        --tm-cyan: #0891B2;
+        --tm-cyan-soft: #ECFEFF;
+        --tm-card-radius: 22px;
+        --tm-shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.04);
+        --tm-shadow-md: 0 12px 30px rgba(15, 23, 42, 0.06);
+        --tm-shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.09);
+        --tm-border: #F1F5F9;
+      }
+
+      * { box-sizing: border-box; }
+
+      body.page.landing {
+        background-color: var(--tm-bg);
+        font-family: var(--tm-font);
+        color: var(--tm-ink);
+        overflow-x: hidden;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── BACKGROUND ORBS ── */
+      .bg-ambient-orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .orb-top-right {
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, rgba(238, 220, 255, 0.7) 0%, rgba(224, 231, 255, 0.2) 60%, transparent 80%);
+        top: -120px;
+        right: -100px;
+        filter: blur(60px);
+      }
+      .orb-mid-left {
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(224, 242, 254, 0.8) 0%, rgba(254, 243, 199, 0.3) 60%, transparent 80%);
+        top: 600px;
+        left: -120px;
+        filter: blur(50px);
+      }
+
+      /* ── NAVBAR ── */
+      .public-nav-v2 {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.25s ease;
+      }
+      .public-nav-v2.scrolled {
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      }
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1260px;
+        margin: 0 auto;
+        padding: 16px 24px;
+      }
+      .landing-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+      .landing-logo-mark {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        box-shadow: 0 8px 18px rgba(99, 102, 241, 0.3);
+        transition: transform 0.25s ease;
+      }
+      .landing-logo:hover .landing-logo-mark {
+        transform: scale(1.05) rotate(3deg);
+      }
+      .landing-logo-text strong {
+        display: block;
+        font-size: 1.38rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+      .landing-logo-text span {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--tm-muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .landing-nav-links {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      .landing-nav-links a {
+        text-decoration: none;
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--tm-slate);
+        transition: color 0.2s ease;
+        position: relative;
+        padding: 6px 0;
+      }
+      .landing-nav-links a:hover {
+        color: var(--tm-brand);
+      }
+      .landing-nav-links a.active {
+        color: var(--tm-brand);
+      }
+      .landing-nav-links a.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        border-radius: 99px;
+        background: var(--tm-brand);
+      }
+      .landing-nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-nav-search {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid var(--tm-border);
+        background: #FFFFFF;
+        color: var(--tm-slate);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-nav-search:hover {
+        background: var(--tm-brand-soft);
+        color: var(--tm-brand);
+        border-color: #C7D2FE;
+      }
+      .btn-nav-login {
+        border-radius: 99px;
+        padding: 10px 22px;
+        font-weight: 700;
+        font-size: 0.94rem;
+        border: 1.5px solid var(--tm-brand-light);
+        background: #FFFFFF;
+        color: var(--tm-brand);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      .btn-nav-login:hover {
+        background: var(--tm-brand-soft);
+        transform: translateY(-1px);
+      }
+      .btn-nav-started {
+        border-radius: 99px;
+        padding: 10px 24px;
+        font-weight: 800;
+        font-size: 0.94rem;
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        color: #FFFFFF;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        transition: all 0.25s ease;
+      }
+      .btn-nav-started:hover {
+        box-shadow: 0 8px 22px rgba(99, 102, 241, 0.45);
+        transform: translateY(-2px);
+      }
+
+      /* ── SECTION HEADING REUSABLE ── */
+      .section-heading-block {
+        text-align: center;
+        max-width: 720px;
+        margin: 0 auto 46px;
+      }
+      .section-tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--tm-brand-soft);
+        color: var(--tm-brand);
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 6px 14px;
+        border-radius: 99px;
+        margin-bottom: 14px;
+        border: 1px solid #E0E7FF;
+      }
+      .section-heading-block h2 {
+        font-size: clamp(2rem, 3.5vw, 2.6rem);
+        font-weight: 900;
+        color: var(--tm-ink);
+        letter-spacing: -0.03em;
+        margin: 0 0 12px;
+        line-height: 1.2;
+      }
+      .section-heading-block p {
+        font-size: 1.12rem;
+        color: var(--tm-muted);
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      /* ── HERO SECTION ── */
+      .landing-hero-grid {
+        max-width: 1260px;
+        margin: 10px auto 60px;
+        padding: 30px 24px 40px;
+        display: grid;
+        grid-template-columns: 1.12fr 0.88fr;
+        align-items: center;
+        gap: 48px;
+        position: relative;
+        z-index: 10;
+      }
+      .hero-left-content {
+        max-width: 600px;
+      }
+
+      /* Hero Announcement Badge */
+      .hero-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #F3E8FF;
+        border: 1px solid #E9D5FF;
+        border-radius: 99px;
+        padding: 6px 18px 6px 8px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+      }
+      .hero-badge-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #FEF3C7;
+        color: #D97706;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(217, 119, 6, 0.2);
+      }
+      .hero-badge-text {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #6B21A8;
+        letter-spacing: -0.01em;
+      }
+
+      /* Hero Main Title */
+      .hero-main-title {
+        font-size: clamp(2.6rem, 5vw, 3.8rem);
+        font-weight: 900;
+        color: var(--tm-ink);
+        line-height: 1.12;
+        letter-spacing: -0.035em;
+        margin: 0 0 20px;
+      }
+      .hero-highlight-fun {
+        color: #5B4DF5;
+        position: relative;
+        display: inline-block;
+      }
+      .hero-title-curve {
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 14px;
+        pointer-events: none;
+      }
+
+      .hero-description {
+        font-size: 1.15rem;
+        color: #475569;
+        line-height: 1.7;
+        margin: 0 0 32px;
+        font-weight: 500;
+      }
+      .hero-description strong {
+        color: var(--tm-ink);
+        font-weight: 800;
+      }
+
+      /* Hero CTA Buttons */
+      .hero-cta-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 34px;
+      }
+      .btn-hero-primary {
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        color: #FFFFFF;
+        border-radius: 99px;
+        padding: 15px 36px;
+        font-size: 1.05rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        border: none;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+        transition: all 0.25s ease;
+      }
+      .btn-hero-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(79, 70, 229, 0.45);
+      }
+      .btn-hero-secondary {
+        background: #FFFFFF;
+        color: var(--tm-ink);
+        border: 1.5px solid var(--tm-brand-light);
+        border-radius: 99px;
+        padding: 14px 28px;
+        font-size: 1.02rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: var(--tm-shadow-sm);
+        transition: all 0.25s ease;
+      }
+      .btn-hero-secondary:hover {
+        background: var(--tm-brand-soft);
+        transform: translateY(-2px);
+      }
+
+      /* ── 4 BOTTOM FEATURE MINI-PILLS ROW ── */
+      .hero-features-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        max-width: 580px;
+      }
+      @media (max-width: 640px) {
+        .hero-features-bar {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .hero-mini-pill {
+        background: #FFFFFF;
+        border-radius: 14px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid #F1F5F9;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .hero-mini-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+      }
+      .hero-mini-pill.f-pill-indigo { background: #EEF2FF; border-color: #E0E7FF; }
+      .hero-mini-pill.f-pill-rose { background: #FFF1F2; border-color: #FFE4E6; }
+      .hero-mini-pill.f-pill-emerald { background: #ECFDF5; border-color: #D1FAE5; }
+      .hero-mini-pill.f-pill-amber { background: #FFFBEB; border-color: #FEF3C7; }
+
+      .pill-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+      }
+      .pill-text-block {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+        text-align: left;
+      }
+      .pill-text-block strong {
+        font-size: 0.76rem;
+        font-weight: 800;
+        color: #0F172A;
+      }
+      .pill-text-block span {
+        font-size: 0.70rem;
+        font-weight: 600;
+        color: #64748B;
+      }
+
+      /* ── HERO RIGHT ILLUSTRATION & FLOATING UI CHIPS ── */
+      .hero-right-illustration {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .hero-cloud-backdrop {
+        position: absolute;
+        width: 125%;
+        height: 125%;
+        background: radial-gradient(circle at 60% 50%, rgba(254, 215, 170, 0.42) 0%, rgba(224, 231, 255, 0.55) 45%, rgba(243, 232, 255, 0.45) 70%, transparent 85%);
+        filter: blur(30px);
+        z-index: 1;
+        pointer-events: none;
+      }
+      .hero-character-stage {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 540px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-character-stage img {
+        width: 100%;
+        height: auto;
+        display: block;
+        mix-blend-mode: multiply;
+        -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 70%, transparent 100%);
+        mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 70%, transparent 100%);
+        animation: heroFloat 5s ease-in-out infinite alternate;
+      }
+      @keyframes heroFloat {
+        0% { transform: translateY(0px); }
+        100% { transform: translateY(-10px); }
+      }
+
+      /* Modern Floating UI Chips (No Emojis) */
+      .floating-ui-chip {
+        position: absolute;
+        z-index: 4;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1.5px solid rgba(255, 255, 255, 0.9);
+        border-radius: 100px;
+        padding: 8px 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        user-select: none;
+        white-space: nowrap;
+      }
+      .chip-icon-box {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chip-text strong {
+        display: block;
+        font-size: 0.84rem;
+        font-weight: 800;
+        color: var(--tm-ink);
+        line-height: 1.15;
+      }
+      .chip-text span {
+        font-size: 0.70rem;
+        font-weight: 600;
+        color: var(--tm-muted);
+      }
+
+      .chip-xp {
+        top: 20px;
+        left: -15px;
+        animation: floatChipA 4.5s ease-in-out infinite alternate;
+      }
+      .chip-xp .chip-icon-box { background: #EEF2FF; color: #4F46E5; }
+
+      .chip-streak {
+        bottom: 40px;
+        left: -10px;
+        animation: floatChipB 5s ease-in-out infinite alternate;
+      }
+      .chip-streak .chip-icon-box { background: #FFFBEB; color: #D97706; }
+
+      .chip-badge {
+        top: 35px;
+        right: -10px;
+        animation: floatChipC 4.8s ease-in-out infinite alternate;
+      }
+      .chip-badge .chip-icon-box { background: #ECFDF5; color: #059669; }
+
+      .chip-level {
+        bottom: 60px;
+        right: -15px;
+        animation: floatChipD 5.2s ease-in-out infinite alternate;
+      }
+      .chip-level .chip-icon-box { background: #FAF5FF; color: #7C3AED; }
+
+      @keyframes floatChipA { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-8px) rotate(-1deg); } }
+      @keyframes floatChipB { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(8px) rotate(1deg); } }
+      @keyframes floatChipC { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-6px) rotate(1deg); } }
+      @keyframes floatChipD { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(7px) rotate(-1deg); } }
+
+      /* ── 5. EXPLORE CLASSES SECTION ── */
+      .classes-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .classes-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 32px 0 20px;
+        padding-bottom: 10px;
+        border-bottom: 1.5px solid #E2E8F0;
+      }
+      .classes-group-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--tm-slate);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .classes-group-count {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--tm-muted);
+      }
+      .classes-grid-premium {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 36px;
+      }
+      .class-card-premium {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 26px 22px;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 230px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--tm-shadow-sm);
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+      }
+      .class-card-premium::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .class-card-premium:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .class-card-premium:hover::before {
+        opacity: 1;
+      }
+      .class-icon-container {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        transition: transform 0.25s ease;
+      }
+      .class-card-premium:hover .class-icon-container {
+        transform: scale(1.08);
+      }
+      .class-card-body h3 {
+        font-size: 1.30rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 6px;
+      }
+      .class-card-body p {
+        font-size: 0.88rem;
+        color: var(--tm-muted);
+        line-height: 1.5;
+        margin: 0;
+        font-weight: 500;
+      }
+      .class-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 14px;
+        border-top: 1px solid #F1F5F9;
+        font-size: 0.86rem;
+        font-weight: 800;
+        color: var(--tm-brand);
+      }
+      .class-arrow-icon {
+        transition: transform 0.2s ease;
+      }
+      .class-card-premium:hover .class-arrow-icon {
+        transform: translateX(4px);
+      }
+
+      /* Class Color Identities */
+      .c-cyan { border-color: rgba(6, 182, 212, 0.18); }
+      .c-cyan::before { background: #06B6D4; }
+      .c-cyan .class-icon-container { background: var(--tm-cyan-soft); color: var(--tm-cyan); border: 1.5px solid #A5F3FC; }
+      .c-cyan:hover { border-color: #06B6D4; }
+
+      .c-blue { border-color: rgba(59, 130, 246, 0.18); }
+      .c-blue::before { background: #3B82F6; }
+      .c-blue .class-icon-container { background: #EFF6FF; color: #2563EB; border: 1.5px solid #BFDBFE; }
+      .c-blue:hover { border-color: #3B82F6; }
+
+      .c-pink { border-color: rgba(236, 72, 153, 0.18); }
+      .c-pink::before { background: #EC4899; }
+      .c-pink .class-icon-container { background: #FDF2F8; color: #DB2777; border: 1.5px solid #FBCFE8; }
+      .c-pink:hover { border-color: #EC4899; }
+
+      .c-purple { border-color: rgba(139, 92, 246, 0.18); }
+      .c-purple::before { background: #8B5CF6; }
+      .c-purple .class-icon-container { background: var(--tm-purple-soft); color: var(--tm-purple); border: 1.5px solid #DDD6FE; }
+      .c-purple:hover { border-color: #8B5CF6; }
+
+      .c-orange { border-color: rgba(249, 115, 22, 0.18); }
+      .c-orange::before { background: #F97316; }
+      .c-orange .class-icon-container { background: #FFF7ED; color: #EA580C; border: 1.5px solid #FED7AA; }
+      .c-orange:hover { border-color: #F97316; }
+
+      .c-emerald { border-color: rgba(16, 185, 129, 0.18); }
+      .c-emerald::before { background: #10B981; }
+      .c-emerald .class-icon-container { background: var(--tm-emerald-soft); color: var(--tm-emerald); border: 1.5px solid #A7F3D0; }
+      .c-emerald:hover { border-color: #10B981; }
+
+      .c-red { border-color: rgba(239, 68, 68, 0.18); }
+      .c-red::before { background: #EF4444; }
+      .c-red .class-icon-container { background: var(--tm-rose-soft); color: var(--tm-rose); border: 1.5px solid #FECDD3; }
+      .c-red:hover { border-color: #EF4444; }
+
+      .c-indigo { border-color: rgba(79, 70, 229, 0.18); }
+      .c-indigo::before { background: #4F46E5; }
+      .c-indigo .class-icon-container { background: var(--tm-brand-soft); color: var(--tm-brand); border: 1.5px solid #C7D2FE; }
+      .c-indigo:hover { border-color: #4F46E5; }
+
+      /* ── 6. WHY TEZMINDZ FEATURE CARDS ── */
+      .tez-features-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .tez-features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      .tez-feature-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 30px 24px;
+        box-shadow: var(--tm-shadow-sm);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+      }
+      .tez-feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .tez-feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .tez-feature-card:hover::before {
+        opacity: 1;
+      }
+      .card-step-num {
+        font-size: 0.76rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        padding: 4px 10px;
+        border-radius: 99px;
+      }
+      .tez-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .tez-feature-card:hover .tez-icon-box {
+        transform: scale(1.08);
+      }
+      .tez-feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 10px;
+        letter-spacing: -0.02em;
+      }
+      .tez-feature-card p {
+        font-size: 0.94rem;
+        color: var(--tm-muted);
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      /* Feature Themes */
+      .f-gamified { border-color: rgba(99, 102, 241, 0.2); }
+      .f-gamified::before { background: linear-gradient(90deg, #4F46E5, #6366F1); }
+      .f-gamified .card-step-num { background: #EEF2FF; color: #4F46E5; }
+      .f-gamified .tez-icon-box { background: #EEF2FF; color: #4F46E5; border: 1.5px solid #C7D2FE; box-shadow: 0 6px 16px rgba(79, 70, 229, 0.12); }
+      .f-gamified:hover { border-color: #4F46E5; }
+
+      .f-olympiad { border-color: rgba(16, 185, 129, 0.2); }
+      .f-olympiad::before { background: linear-gradient(90deg, #059669, #10B981); }
+      .f-olympiad .card-step-num { background: #ECFDF5; color: #059669; }
+      .f-olympiad .tez-icon-box { background: #ECFDF5; color: #059669; border: 1.5px solid #A7F3D0; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.12); }
+      .f-olympiad:hover { border-color: #059669; }
+
+      .f-quizzes { border-color: rgba(168, 85, 247, 0.2); }
+      .f-quizzes::before { background: linear-gradient(90deg, #7C3AED, #A855F7); }
+      .f-quizzes .card-step-num { background: #FAF5FF; color: #7C3AED; }
+      .f-quizzes .tez-icon-box { background: #FAF5FF; color: #7C3AED; border: 1.5px solid #DDD6FE; box-shadow: 0 6px 16px rgba(124, 58, 237, 0.12); }
+      .f-quizzes:hover { border-color: #7C3AED; }
+
+      .f-tracking { border-color: rgba(244, 63, 94, 0.2); }
+      .f-tracking::before { background: linear-gradient(90deg, #E11D48, #F43F5E); }
+      .f-tracking .card-step-num { background: #FFF1F2; color: #E11D48; }
+      .f-tracking .tez-icon-box { background: #FFF1F2; color: #E11D48; border: 1.5px solid #FECDD3; box-shadow: 0 6px 16px rgba(225, 29, 72, 0.12); }
+      .f-tracking:hover { border-color: #E11D48; }
+
+      /* ── 7. HOW IT WORKS 4-STEP JOURNEY ── */
+      .how-it-works-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .journey-steps-container {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-top: 40px;
+      }
+      .journey-progress-line {
+        position: absolute;
+        top: 44px;
+        left: 60px;
+        right: 60px;
+        height: 4px;
+        background: #E2E8F0;
+        z-index: 1;
+        border-radius: 99px;
+      }
+      .journey-progress-fill {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, #6366F1 0%, #059669 35%, #F59E0B 70%, #7C3AED 100%);
+        border-radius: 99px;
+      }
+      .step-journey-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 30px 22px;
+        position: relative;
+        z-index: 2;
+        text-align: left;
+        box-shadow: var(--tm-shadow-sm);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .step-journey-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .step-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .step-badge-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--tm-ink);
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.05rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      }
+      .step-icon-indicator {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .step-journey-card h3 {
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 8px;
+      }
+      .step-journey-card p {
+        font-size: 0.92rem;
+        color: var(--tm-muted);
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      /* ── 8. GAMES ARENA SECTION ── */
+      .games-arena-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .game-featured-hero-card {
+        background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+        border-radius: 28px;
+        padding: 36px 40px;
+        color: #FFFFFF;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: center;
+        gap: 36px;
+        margin-bottom: 32px;
+        box-shadow: 0 20px 50px rgba(49, 46, 129, 0.25);
+        position: relative;
+        overflow: hidden;
+      }
+      .game-featured-hero-card::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+        filter: blur(40px);
+        pointer-events: none;
+      }
+      .game-featured-content h3 {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 12px 0 10px;
+        letter-spacing: -0.02em;
+      }
+      .game-featured-content p {
+        font-size: 1.05rem;
+        color: #C7D2FE;
+        line-height: 1.6;
+        margin: 0 0 24px;
+        max-width: 500px;
+      }
+      .game-meta-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .game-meta-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+      .btn-play-game-featured {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: #FFFFFF;
+        border-radius: 99px;
+        padding: 14px 34px;
+        font-size: 1.05rem;
+        font-weight: 900;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
+        transition: all 0.25s ease;
+      }
+      .btn-play-game-featured:hover {
+        transform: scale(1.03);
+        box-shadow: 0 12px 28px rgba(217, 119, 6, 0.5);
+      }
+      .game-featured-visual {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .game-pizza-graphic {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: conic-gradient(#F59E0B 0% 65%, #EA580C 65% 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        margin-bottom: 16px;
+        position: relative;
+      }
+      .game-pizza-graphic::after {
+        content: "3/4";
+        color: #FFFFFF;
+        font-weight: 900;
+        font-size: 1.2rem;
+      }
+
+      /* 3 Smaller Games Row */
+      .games-row-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .game-sub-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 24px;
+        box-shadow: var(--tm-shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 200px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .game-sub-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .game-sub-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .game-sub-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .game-sub-card h4 {
+        font-size: 1.18rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 4px;
+      }
+      .game-sub-card p {
+        font-size: 0.88rem;
+        color: var(--tm-muted);
+        margin: 0;
+        font-weight: 500;
+      }
+      .game-sub-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid #F1F5F9;
+      }
+      .btn-play-mini {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: var(--tm-brand);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* ── 9. GAMIFICATION ENGINE DASHBOARD ── */
+      .gamification-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .gami-dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      .gami-stat-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: 20px;
+        padding: 22px 18px;
+        box-shadow: var(--tm-shadow-sm);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .gami-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .gami-stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .gami-stat-val {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        line-height: 1.1;
+      }
+      .gami-stat-lbl {
+        font-size: 0.76rem;
+        font-weight: 800;
+        color: var(--tm-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Central Gamification Showcase Card */
+      .gami-mastery-banner {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: var(--tm-shadow-sm);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 36px;
+      }
+      .progress-visual-bar-wrap {
+        background: #F1F5F9;
+        height: 12px;
+        border-radius: 99px;
+        overflow: hidden;
+        margin: 12px 0;
+      }
+      .progress-visual-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
+        border-radius: 99px;
+        width: 78%;
+      }
+      .streak-days-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .streak-day-dot {
+        flex: 1;
+        height: 36px;
+        border-radius: 10px;
+        background: #F1F5F9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-weight: 800;
+        color: var(--tm-muted);
+      }
+      .streak-day-dot.active {
+        background: #FEF3C7;
+        color: #D97706;
+        border: 1px solid #FDE68A;
+      }
+
+      /* ── 10. LEADERBOARD & TESTIMONIALS ── */
+      .social-proof-grid {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 32px;
+      }
+      .leaderboard-container-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: 24px;
+        padding: 30px 24px;
+        box-shadow: var(--tm-shadow-sm);
+      }
+      .leaderboard-row-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: #F8FAFC;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .leaderboard-row-item.highlight-me {
+        background: var(--tm-brand-soft);
+        border: 1.5px solid #C7D2FE;
+      }
+      .rank-user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .rank-num-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 900;
+      }
+      .rank-1 { background: #FEF3C7; color: #D97706; }
+      .rank-2 { background: #E2E8F0; color: #475569; }
+      .rank-3 { background: #FFEDD5; color: #C2410C; }
+
+      .testimonials-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .testimonial-quote-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: var(--tm-shadow-sm);
+      }
+      .testimonial-quote-card p {
+        font-size: 0.98rem;
+        line-height: 1.6;
+        color: var(--tm-slate);
+        font-style: italic;
+        margin: 0 0 14px;
+      }
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .author-avatar-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--tm-brand-soft);
+        color: var(--tm-brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.95rem;
+      }
+
+      /* ── 11. FINAL CTA BANNER ── */
+      .final-cta-section {
+        max-width: 1260px;
+        margin: 0 auto 90px;
+        padding: 0 24px;
+      }
+      .final-cta-card {
+        background: linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #7C3AED 100%);
+        border-radius: 32px;
+        padding: 60px 40px;
+        text-align: center;
+        color: #FFFFFF;
+        box-shadow: 0 20px 50px rgba(79, 70, 229, 0.25);
+        position: relative;
+        overflow: hidden;
+      }
+      .final-cta-card h2 {
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 900;
+        margin: 0 0 14px;
+        letter-spacing: -0.025em;
+      }
+      .final-cta-card p {
+        font-size: 1.15rem;
+        color: #E0E7FF;
+        max-width: 600px;
+        margin: 0 auto 32px;
+        line-height: 1.6;
+      }
+      .final-cta-btn-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+      .btn-cta-white {
+        background: #FFFFFF;
+        color: var(--tm-brand);
+        border-radius: 99px;
+        padding: 15px 36px;
+        font-size: 1.05rem;
+        font-weight: 900;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.25s ease;
+      }
+      .btn-cta-white:hover {
+        transform: translateY(-2px);
+      }
+      .btn-cta-outline {
+        background: transparent;
+        color: #FFFFFF;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        border-radius: 99px;
+        padding: 14px 30px;
+        font-size: 1.05rem;
+        font-weight: 800;
+        text-decoration: none;
+        transition: all 0.25s ease;
+      }
+      .btn-cta-outline:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #FFFFFF;
+      }
+
+      /* ── 12. FOOTER ── */
+      .site-footer-v2 {
+        background: #FFFFFF;
+        border-top: 1px solid var(--tm-border);
+        padding: 60px 24px 30px;
+      }
+      .footer-inner-grid {
+        max-width: 1260px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+      }
+      .footer-col h5 {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--tm-ink);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 16px;
+      }
+      .footer-col a {
+        display: block;
+        color: var(--tm-muted);
+        text-decoration: none;
+        font-size: 0.92rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+        transition: color 0.2s ease;
+      }
+      .footer-col a:hover {
+        color: var(--tm-brand);
+      }
+      .footer-bottom-bar {
+        max-width: 1260px;
+        margin: 0 auto;
+        padding-top: 24px;
+        border-top: 1px solid #F1F5F9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--tm-muted);
+        font-weight: 600;
+      }
+
+      /* ── RESPONSIVE BREAKPOINTS ── */
+      @media (max-width: 1024px) {
+        .landing-hero-grid { grid-template-columns: 1fr; text-align: center; }
+        .hero-left-content { margin: 0 auto; }
+        .hero-cta-group { justify-content: center; }
+        .hero-trust-bar { justify-content: center; }
+        .classes-grid-premium { grid-template-columns: repeat(2, 1fr); }
+        .tez-features-grid { grid-template-columns: repeat(2, 1fr); }
+        .journey-steps-container { grid-template-columns: repeat(2, 1fr); }
+        .journey-progress-line { display: none; }
+        .game-featured-hero-card { grid-template-columns: 1fr; }
+        .games-row-grid { grid-template-columns: 1fr; }
+        .gami-dashboard-grid { grid-template-columns: repeat(3, 1fr); }
+        .gami-mastery-banner { grid-template-columns: 1fr; }
+        .social-proof-grid { grid-template-columns: 1fr; }
+        .footer-inner-grid { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 640px) {
+        .landing-nav-links { display: none; }
+        .classes-grid-premium { grid-template-columns: 1fr; }
+        .tez-features-grid { grid-template-columns: 1fr; }
+        .journey-steps-container { grid-template-columns: 1fr; }
+        .gami-dashboard-grid { grid-template-columns: 1fr; }
+        .hero-cta-group { flex-direction: column; width: 100%; }
+        .final-cta-btn-group { flex-direction: column; width: 100%; }
+        .footer-inner-grid { grid-template-columns: 1fr; }
+        .floating-ui-chip { display: none; }
+      }
+    </style>
+  </head>
+  <body class="page landing">
+    <!-- Ambient glowing backdrop orbs -->
+    <div class="bg-ambient-orb orb-top-right"></div>
+    <div class="bg-ambient-orb orb-mid-left"></div>
+
+    <!-- 1. NAVBAR -->
+    <header class="public-nav-v2" id="main-navbar">
+      <div class="nav-container">
+        <!-- Logo -->
+        <a class="landing-logo" href="/">
+          <div class="landing-logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5" />
+              <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z" />
+              <path d="M9 15l-3-3" />
+            </svg>
+          </div>
+          <div class="landing-logo-text">
+            <strong>Tezz-Mindz</strong>
+            <span>Learn • Play • Master</span>
+          </div>
+        </a>
+        
+        <!-- Center Nav Links -->
+        <nav class="landing-nav-links" aria-label="Main Navigation">
+          <a href="/" class="active">Home</a>
+          <a href="#subjects">Subjects</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+        </nav>
+
+        <!-- Right Action Controls -->
+        <div class="landing-nav-actions">
+          <button type="button" class="btn-nav-search" title="Search platform" aria-label="Search">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <a class="btn-nav-login" href="/login/">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Login</span>
+          </a>
+          <a class="btn-nav-started" href="/register/">
+            <span>Get Started</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. HERO SECTION -->
+    <section class="landing-hero-grid">
+      <div class="hero-left-content">
+        
+        <!-- Top Announcement Badge -->
+        <div class="hero-badge-pill">
+          <span class="hero-badge-icon">🏆</span>
+          <span class="hero-badge-text">India's Next Gen Olympiad Learning Platform</span>
+        </div>
+
+        <!-- Headline with Curved Accent -->
+        <h1 class="hero-main-title">
+          Olympiad Learning,<br />
+          Now <span class="hero-highlight-fun">More Fun!
+            <svg class="hero-title-curve" viewBox="0 0 220 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 13C60 4 160 4 217 13" stroke="#F59E0B" stroke-width="5.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-description">
+          Learn concepts, play games, solve challenges and become an Olympiad Champion with <strong>Tezz-Mindz</strong>.
+        </p>
+        
+        <!-- CTA Group -->
+        <div class="hero-cta-group">
+          <a class="btn-hero-primary" href="/register/">
+            <span>Start Learning</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a class="btn-hero-secondary" href="/dashboard/" id="demo-link">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8" fill="#6366F1"></polygon>
+            </svg>
+            <span>Watch Demo</span>
+          </a>
+        </div>
+
+        <!-- Bottom 4 Feature Mini-Pills Bar -->
+        <div class="hero-features-bar">
+          <!-- 1. Game Based Learning -->
+          <div class="hero-mini-pill f-pill-indigo">
+            <div class="pill-icon-box">🎮</div>
+            <div class="pill-text-block">
+              <strong>Game Based</strong>
+              <span>Learning</span>
+            </div>
+          </div>
+
+          <!-- 2. Olympiad Focused -->
+          <div class="hero-mini-pill f-pill-rose">
+            <div class="pill-icon-box">🎯</div>
+            <div class="pill-text-block">
+              <strong>Olympiad</strong>
+              <span>Focused</span>
+            </div>
+          </div>
+
+          <!-- 3. Progress Tracking -->
+          <div class="hero-mini-pill f-pill-emerald">
+            <div class="pill-icon-box">📊</div>
+            <div class="pill-text-block">
+              <strong>Progress</strong>
+              <span>Tracking</span>
+            </div>
+          </div>
+
+          <!-- 4. Rewards & Certificates -->
+          <div class="hero-mini-pill f-pill-amber">
+            <div class="pill-icon-box">🏆</div>
+            <div class="pill-text-block">
+              <strong>Rewards</strong>
+              <span>&amp; Certificates</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column Hero Illustration -->
+      <div class="hero-right-illustration">
+        <div class="hero-cloud-backdrop"></div>
+        <div class="hero-character-stage">
+          <img src="/static/media/hero_student.jpg" alt="Tezz-Mindz Student Learning with Laptop and Olympiad Trophies" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. EXPLORE CLASSES (PRIMARY & UPPER PRIMARY) -->
+    <section class="classes-section" id="subjects">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Personalized Curriculum</span>
+        <h2>Explore Classes</h2>
+        <p>Choose your class and explore a personalized Olympiad & NCERT learning roadmap.</p>
+      </div>
+
+      <!-- Group 1: Primary Classes -->
+      <div class="classes-group-header">
+        <div class="classes-group-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+          <span>Primary Classes (Class 1 – Class 4)</span>
+        </div>
+        <span class="classes-group-count">4 Classes • Foundation Stage</span>
+      </div>
+
+      <div class="classes-grid-premium">
+        <!-- Class 1 -->
+        <a href="#" onclick="selectClass(event, 1)" class="class-card-premium c-cyan">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+              <path d="M6 6h10"></path>
+              <path d="M6 10h10"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 1</h3>
+            <p>Number intuition, counting blocks, basic shapes, and visual word builders.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 2 -->
+        <a href="#" onclick="selectClass(event, 2)" class="class-card-premium c-blue">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m18 2 4 4-14 14H4v-4L18 2z"></path>
+              <path d="m14.5 5.5 4 4"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 2</h3>
+            <p>Addition & subtraction quests, 2D patterns, animal habitats, and phonics.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 3 -->
+        <a href="#" onclick="selectClass(event, 3)" class="class-card-premium c-pink">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+              <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+              <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+              <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 3</h3>
+            <p>Introduction to fractions, measurement scales, plants & living systems.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 4 -->
+        <a href="#" onclick="selectClass(event, 4)" class="class-card-premium c-purple">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+              <path d="M9 21h6"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 4</h3>
+            <p>Factors, multiples, area & perimeter, human body systems, and grammar.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Group 2: Upper Primary Classes -->
+      <div class="classes-group-header">
+        <div class="classes-group-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+          </svg>
+          <span>Upper Primary Classes (Class 5 – Class 8)</span>
+        </div>
+        <span class="classes-group-count">4 Classes • Olympiad Mastery Stage</span>
+      </div>
+
+      <div class="classes-grid-premium">
+        <!-- Class 5 -->
+        <a href="#" onclick="selectClass(event, 5)" class="class-card-premium c-orange">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 5</h3>
+            <p>Indian Number System to 10 Lakhs, Dream House 3D Builder & NSO Science.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 6 -->
+        <a href="#" onclick="selectClass(event, 6)" class="class-card-premium c-emerald">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M7 16h10"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 6</h3>
+            <p>Integers, algebra intro, ratio & proportion, food science & light optics.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 7 -->
+        <a href="#" onclick="selectClass(event, 7)" class="class-card-premium c-red">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 7</h3>
+            <p>Rational numbers, algebraic equations, lines & angles, heat & respiration.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+
+        <!-- Class 8 -->
+        <a href="#" onclick="selectClass(event, 8)" class="class-card-premium c-indigo">
+          <div class="class-icon-container">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5"></path>
+              <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z"></path>
+              <path d="M9 15l-3-3"></path>
+            </svg>
+          </div>
+          <div class="class-card-body">
+            <h3>Class 8</h3>
+            <p>Linear equations in one variable, exponents, force & pressure, Olympiad mastery.</p>
+          </div>
+          <div class="class-card-footer">
+            <span>View Syllabus</span>
+            <span class="class-arrow-icon">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 6. WHY TEZMINDZ FEATURE CARDS -->
+    <section class="tez-features-section" id="features">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Why Students Succeed</span>
+        <h2>Why TezMindz?</h2>
+        <p>Built dynamically to optimize conceptual understanding, memory retention, and Olympiad test scores.</p>
+      </div>
+
+      <div class="tez-features-grid">
+        <!-- 01 Gamified Learning -->
+        <div class="tez-feature-card f-gamified">
+          <span class="card-step-num">01 Pillar</span>
+          <div class="tez-icon-box" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="12" x2="10" y2="12"></line>
+              <line x1="8" y1="10" x2="8" y2="14"></line>
+              <line x1="15" y1="13" x2="15.01" y2="13"></line>
+              <line x1="18" y1="11" x2="18.01" y2="11"></line>
+              <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+            </svg>
+          </div>
+          <h3>Gamified Learning</h3>
+          <p>Every concept is paired with an interactive 3D visual challenge to bridge theory and concrete physical application.</p>
+        </div>
+
+        <!-- 02 Olympiad Prep -->
+        <div class="tez-feature-card f-olympiad">
+          <span class="card-step-num">02 Pillar</span>
+          <div class="tez-icon-box" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
+              <path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path>
+            </svg>
+          </div>
+          <h3>Olympiad Prep</h3>
+          <p>Curated questions, full-length test simulators, and verified syllabus pathways aligned with IMO, NSO, and IEO standards.</p>
+        </div>
+
+        <!-- 03 Interactive Quizzes -->
+        <div class="tez-feature-card f-quizzes">
+          <span class="card-step-num">03 Pillar</span>
+          <div class="tez-icon-box" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
+              <path d="M19 3v4"></path>
+              <path d="M21 5h-4"></path>
+            </svg>
+          </div>
+          <h3>Interactive Quizzes</h3>
+          <p>AI-driven Little Teacher feedback from TezBuddy that diagnoses and explains underlying logic when students make mistakes.</p>
+        </div>
+
+        <!-- 04 Progress Tracking -->
+        <div class="tez-feature-card f-tracking">
+          <span class="card-step-num">04 Pillar</span>
+          <div class="tez-icon-box" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+              <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+          </div>
+          <h3>Progress Tracking</h3>
+          <p>Real-time analytics detailing topic mastery percentages, response accuracy scores, and weak-point diagnostics.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. HOW IT WORKS (VISUAL 4-STEP JOURNEY) -->
+    <section class="how-it-works-section" id="how-it-works">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Learning Methodology</span>
+        <h2>How It Works</h2>
+        <p>A proven four-step pedagogical journey designed to turn learners into Olympiad Champions.</p>
+      </div>
+
+      <div class="journey-steps-container">
+        <div class="journey-progress-line">
+          <div class="journey-progress-fill"></div>
+        </div>
+
+        <!-- Step 1: Learn -->
+        <div class="step-journey-card">
+          <div class="step-header-row">
+            <div class="step-badge-circle">1</div>
+            <div class="step-icon-indicator" style="background: #EEF2FF; color: #4F46E5;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </div>
+          </div>
+          <h3>01. Learn</h3>
+          <p>Understand core concepts with interactive visual simulations, number lines, and voice-assisted AI Little Teacher explanations.</p>
+        </div>
+
+        <!-- Step 2: Practice -->
+        <div class="step-journey-card">
+          <div class="step-header-row">
+            <div class="step-badge-circle">2</div>
+            <div class="step-icon-indicator" style="background: #ECFDF5; color: #059669;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+            </div>
+          </div>
+          <h3>02. Practice</h3>
+          <p>Solve Olympiad-level practice questions with instant step-by-step logic verification and hint breakdowns.</p>
+        </div>
+
+        <!-- Step 3: Play -->
+        <div class="step-journey-card">
+          <div class="step-header-row">
+            <div class="step-badge-circle">3</div>
+            <div class="step-icon-indicator" style="background: #FFFBEB; color: #D97706;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="12" x2="10" y2="12"></line>
+                <line x1="8" y1="10" x2="8" y2="14"></line>
+                <line x1="15" y1="13" x2="15.01" y2="13"></line>
+                <line x1="18" y1="11" x2="18.01" y2="11"></line>
+                <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+              </svg>
+            </div>
+          </div>
+          <h3>03. Play</h3>
+          <p>Apply acquired formulas in 3D construction and science games like Dream House Builder and Fraction Quest.</p>
+        </div>
+
+        <!-- Step 4: Earn -->
+        <div class="step-journey-card">
+          <div class="step-header-row">
+            <div class="step-badge-circle">4</div>
+            <div class="step-icon-indicator" style="background: #FAF5FF; color: #7C3AED;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
+            </div>
+          </div>
+          <h3>04. Earn</h3>
+          <p>Accumulate XP, level up daily streak multipliers, collect digital mastery badges, and climb the platform leaderboard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. GAMES ARENA SHOWCASE -->
+    <section class="games-arena-section" id="games">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Play-Based Learning</span>
+        <h2>Games Arena</h2>
+        <p>Turn every complex academic formula into an interactive, visual 3D challenge.</p>
+      </div>
+
+      <!-- Featured Flagship Game: Fraction Quest -->
+      <div class="game-featured-hero-card">
+        <div class="game-featured-content">
+          <span style="background: rgba(245, 158, 11, 0.25); color: #FDE68A; border: 1px solid rgba(245, 158, 11, 0.4); padding: 5px 14px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase;">Flagship 3D Game</span>
+          <h3>Fraction Quest: Pizza Master</h3>
+          <p>Construct visual pizza slices to represent equivalent fractions, improper fractions, and decimals in real-time.</p>
+          
+          <div class="game-meta-tags">
+            <div class="game-meta-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Mathematics • Class 5</span>
+            </div>
+            <div class="game-meta-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              <span>+150 XP Reward</span>
+            </div>
+            <div class="game-meta-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>1,200+ Active Players</span>
+            </div>
+          </div>
+
+          <a class="btn-play-game-featured" href="/game/1/difficulty/">
+            <span>PLAY GAME NOW</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+
+        <div class="game-featured-visual">
+          <div class="game-pizza-graphic"></div>
+          <div style="font-weight: 800; font-size: 1.05rem;">Visual Pizza Slices Engine</div>
+          <div style="font-size: 0.82rem; color: #A5B4FC; margin-top: 4px;">Dynamic Place Value &amp; Fraction Math</div>
+        </div>
+      </div>
+
+      <!-- 3 Sub Games Row -->
+      <div class="games-row-grid">
+        <!-- Game 1 -->
+        <div class="game-sub-card">
+          <div>
+            <div class="game-sub-header">
+              <div class="game-sub-icon" style="background: #EEF2FF; color: #4F46E5;">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="6" width="20" height="12" rx="6"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/></svg>
+              </div>
+              <div>
+                <h4>Dream House Builder 3D</h4>
+                <p>Mathematics • Indian Place Value</p>
+              </div>
+            </div>
+            <p style="font-size: 0.90rem; color: #64748B; line-height: 1.5;">Build Villa Royale stage-by-stage by solving place-value concrete mixer and crane scanner puzzles.</p>
+          </div>
+          <div class="game-sub-action">
+            <span style="font-size: 0.84rem; font-weight: 800; color: #4F46E5;">+180 XP • 5 Stages</span>
+            <a class="btn-play-mini" href="/games/dream-house-builder/">Play Level →</a>
+          </div>
+        </div>
+
+        <!-- Game 2 -->
+        <div class="game-sub-card">
+          <div>
+            <div class="game-sub-header">
+              <div class="game-sub-icon" style="background: #ECFDF5; color: #059669;">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg>
+              </div>
+              <div>
+                <h4>Bio-Reactor Lab</h4>
+                <p>Science • Plant Photosynthesis</p>
+              </div>
+            </div>
+            <p style="font-size: 0.90rem; color: #64748B; line-height: 1.5;">Combine sunlight photons, water molecules, and CO2 in chloroplast chambers to produce glucose.</p>
+          </div>
+          <div class="game-sub-action">
+            <span style="font-size: 0.84rem; font-weight: 800; color: #059669;">+160 XP • Lab Mode</span>
+            <a class="btn-play-mini" href="/subject/2/">Explore Lab →</a>
+          </div>
+        </div>
+
+        <!-- Game 3 -->
+        <div class="game-sub-card">
+          <div>
+            <div class="game-sub-header">
+              <div class="game-sub-icon" style="background: #FFF1F2; color: #E11D48;">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              </div>
+              <div>
+                <h4>Sentence Tokenizer</h4>
+                <p>English • Parts of Speech Quest</p>
+              </div>
+            </div>
+            <p style="font-size: 0.90rem; color: #64748B; line-height: 1.5;">Deconstruct and classify dynamic sentence tokens into Nouns, Verbs, Adjectives, and Adverbs.</p>
+          </div>
+          <div class="game-sub-action">
+            <span style="font-size: 0.84rem; font-weight: 800; color: #E11D48;">+140 XP • Grammar Rush</span>
+            <a class="btn-play-mini" href="/subject/3/">Play Quest →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. THE GAMIFICATION ENGINE (METRICS & PROGRESS) -->
+    <section class="gamification-section">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Rewards &amp; Motivation</span>
+        <h2>The Gamification Engine</h2>
+        <p>Unlock authentic digital achievements, maintain multiplier streaks, and track real-time Olympiad mastery.</p>
+      </div>
+
+      <!-- 5 Floating Dashboard Stat Counters -->
+      <div class="gami-dashboard-grid">
+        <!-- XP -->
+        <div class="gami-stat-card">
+          <div class="gami-stat-icon" style="background: #EEF2FF; color: #4F46E5;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          </div>
+          <div>
+            <div class="gami-stat-val">2,450</div>
+            <div class="gami-stat-lbl">Experience XP</div>
+          </div>
+        </div>
+
+        <!-- Streak -->
+        <div class="gami-stat-card">
+          <div class="gami-stat-icon" style="background: #FFFBEB; color: #D97706;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          </div>
+          <div>
+            <div class="gami-stat-val">7 Days</div>
+            <div class="gami-stat-lbl">Daily Streak</div>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="gami-stat-card">
+          <div class="gami-stat-icon" style="background: #FAF5FF; color: #7C3AED;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          </div>
+          <div>
+            <div class="gami-stat-val">12</div>
+            <div class="gami-stat-lbl">Mastery Badges</div>
+          </div>
+        </div>
+
+        <!-- Level -->
+        <div class="gami-stat-card">
+          <div class="gami-stat-icon" style="background: #ECFDF5; color: #059669;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div class="gami-stat-val">08</div>
+            <div class="gami-stat-lbl">Tier Level</div>
+          </div>
+        </div>
+
+        <!-- Rank -->
+        <div class="gami-stat-card">
+          <div class="gami-stat-icon" style="background: #FFF1F2; color: #E11D48;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path></svg>
+          </div>
+          <div>
+            <div class="gami-stat-val">#04</div>
+            <div class="gami-stat-lbl">Leaderboard</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Central Progress & Mastery Banner -->
+      <div class="gami-mastery-banner">
+        <div>
+          <div style="font-size: 0.82rem; font-weight: 800; color: #4F46E5; text-transform: uppercase; letter-spacing: 0.05em;">Weekly Milestone</div>
+          <h3 style="font-size: 1.6rem; font-weight: 900; color: var(--tm-ink); margin: 6px 0 8px;">Class 5 Olympiad Readiness</h3>
+          <p style="font-size: 0.94rem; color: #64748B; margin: 0;">Completed 8 of 10 Math &amp; Science chapters. 780 XP remaining to unlock Master Challenger Tier.</p>
+          <div class="progress-visual-bar-wrap">
+            <div class="progress-visual-bar-fill"></div>
+          </div>
+          <div style="display:flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; color: var(--tm-slate);">
+            <span>Progress: 78% Completed</span>
+            <span style="color: #4F46E5;">2,450 / 3,000 XP</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 0.82rem; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 0.05em;">7-Day Study Calendar</div>
+          <div style="font-size: 1.15rem; font-weight: 800; color: var(--tm-ink); margin-top: 4px;">Active Daily Multiplier: 1.5x</div>
+          <div class="streak-days-row">
+            <div class="streak-day-dot active">Mon ✓</div>
+            <div class="streak-day-dot active">Tue ✓</div>
+            <div class="streak-day-dot active">Wed ✓</div>
+            <div class="streak-day-dot active">Thu ✓</div>
+            <div class="streak-day-dot active">Fri ✓</div>
+            <div class="streak-day-dot active">Sat ✓</div>
+            <div class="streak-day-dot active">Sun 🔥</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. LEADERBOARD PREVIEW & TESTIMONIALS -->
+    <section class="social-proof-grid" id="leaderboard">
+      <!-- Leaderboard Preview -->
+      <div class="leaderboard-container-card">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--tm-ink); margin: 0 0 4px;">Leaderboard Preview</h3>
+            <p style="font-size: 0.85rem; color: var(--tm-muted); margin: 0;">National Olympiad Top Challengers</p>
+          </div>
+          <a href="/leaderboard/" style="font-size: 0.86rem; font-weight: 800; color: var(--tm-brand); text-decoration: none;">Full Board →</a>
+        </div>
+
+        <div class="leaderboard-row-item">
+          <div class="rank-user-info">
+            <span class="rank-num-badge rank-1">1</span>
+            <div>
+              <div style="font-size: 0.95rem; color: var(--tm-ink);">Aanya Sharma</div>
+              <div style="font-size: 0.72rem; color: var(--tm-muted);">Class 5 • DPS Noida</div>
+            </div>
+          </div>
+          <strong style="color: #4F46E5; font-size: 0.95rem;">1,240 XP</strong>
+        </div>
+
+        <div class="leaderboard-row-item">
+          <div class="rank-user-info">
+            <span class="rank-num-badge rank-2">2</span>
+            <div>
+              <div style="font-size: 0.95rem; color: var(--tm-ink);">Vihaan Patel</div>
+              <div style="font-size: 0.72rem; color: var(--tm-muted);">Class 5 • St. Xavier's</div>
+            </div>
+          </div>
+          <strong style="color: #4F46E5; font-size: 0.95rem;">1,180 XP</strong>
+        </div>
+
+        <div class="leaderboard-row-item highlight-me">
+          <div class="rank-user-info">
+            <span class="rank-num-badge rank-3">3</span>
+            <div>
+              <div style="font-size: 0.95rem; color: #4F46E5;">Aarav (You)</div>
+              <div style="font-size: 0.72rem; color: #6366F1;">Class 5 • Active Streak 7D</div>
+            </div>
+          </div>
+          <strong style="color: #4F46E5; font-size: 0.95rem;">1,100 XP</strong>
+        </div>
+      </div>
+
+      <!-- Testimonials -->
+      <div class="testimonials-stack">
+        <div class="testimonial-quote-card">
+          <p>"Tezz-Mindz helped my son Aarav master fractions in one single afternoon! The 3D pizza quest game made the concepts physically intuitive."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar-circle">AS</div>
+            <div>
+              <strong style="font-size: 0.92rem; color: var(--tm-ink); display: block;">Ananya Sharma (Parent)</strong>
+              <span style="font-size: 0.75rem; color: var(--tm-muted);">Mother of Class 5 Student • New Delhi</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-quote-card">
+          <p>"Earning XP and upgrading my avatar makes me want to practice every day. I solved all Chapter 1 place-value quizzes with 100% accuracy!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar-circle" style="background: #ECFDF5; color: #059669;">VK</div>
+            <div>
+              <strong style="font-size: 0.92rem; color: var(--tm-ink); display: block;">Vihaan K. (Student)</strong>
+              <span style="font-size: 0.75rem; color: var(--tm-muted);">Class 7 Math &amp; Science Challenger</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. FINAL HIGH-CONVERSION CTA BANNER -->
+    <section class="final-cta-section">
+      <div class="final-cta-card">
+        <h2>Ready to Make Learning More Fun?</h2>
+        <p>Join thousands of students across India who prepare for Math, Science, and English Olympiads through interactive 3D games and adaptive quizzes.</p>
+        
+        <div class="final-cta-btn-group">
+          <a class="btn-cta-white" href="/register/">Start Learning Now →</a>
+          <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. SITE FOOTER -->
+    <footer class="site-footer-v2" id="about">
+      <div class="footer-inner-grid">
+        <div class="footer-col">
+          <a class="landing-logo" href="/" style="margin-bottom: 14px;">
+            <div class="landing-logo-mark">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5" />
+                <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z" />
+                <path d="M9 15l-3-3" />
+              </svg>
+            </div>
+            <div class="landing-logo-text">
+              <strong>Tezz-Mindz</strong>
+              <span>Learn • Play • Master</span>
+            </div>
+          </a>
+          <p style="font-size: 0.88rem; color: var(--tm-muted); line-height: 1.6; margin-top: 10px;">India's next-generation gamified Olympiad learning platform combining NCERT syllabus curriculum with interactive 3D games and adaptive quizzes.</p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Subjects</h5>
+          <a href="/subject/1/">Mathematics (IMO)</a>
+          <a href="/subject/2/">Science (NSO)</a>
+          <a href="/subject/3/">English (IEO)</a>
+          <a href="/games/dream-house-builder/">3D Games Arena</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Platform</h5>
+          <a href="#subjects">Class 1 – Class 8</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Why TezMindz</a>
+          <a href="/leaderboard/">National Leaderboard</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Support &amp; Legal</h5>
+          <a href="/login/">Student Login</a>
+          <a href="/register/">Create Free Account</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>© 2026 Tezz-Mindz EdTech Platform. All rights reserved.</span>
+        <span>Built for Young Champions Across India</span>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+      {% if user_data_js %}
+      window.USER_DATA = {{ user_data_js|safe }};
+      {% endif %}
+
+      // Sticky navbar elevation on scroll
+      window.addEventListener('scroll', function() {
+        var nav = document.getElementById('main-navbar');
+        if (window.scrollY > 20) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      });
+
+      function loginDemo(redirectUrl) {
+        fetch("/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: JSON.stringify({ email: "student", password: "password123" })
+        })
+        .then(function(res) {
+          if (res.ok) return res.json();
+          throw new Error("Demo login failed");
+        })
+        .then(function(data) {
+          if (data.success) {
+            location.href = redirectUrl;
+          }
+        })
+        .catch(function(err) {
+          location.href = "/login/";
+        });
+      }
+
+      function selectClass(e, classLevel) {
+        e.preventDefault();
+        var loggedIn = window.USER_DATA && window.USER_DATA.loggedIn;
+        if (loggedIn) {
+          fetch("/class/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ classLevel: classLevel })
+          })
+          .then(function(res) {
+            if (res.ok) return res.json();
+            throw new Error("Failed to select class");
+          })
+          .then(function(data) {
+            if (data.success) {
+              location.href = "/dashboard/";
+            }
+          })
+          .catch(function(err) {
+            location.href = "/dashboard/";
+          });
+        } else {
+          fetch("/login/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ email: "student", password: "password123" })
+          })
+          .then(function(res) {
+            if (res.ok) return res.json();
+            throw new Error("Demo login failed");
+          })
+          .then(function(data) {
+            if (data.success) {
+              fetch("/class/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ classLevel: classLevel })
+              })
+              .then(function() {
+                location.href = "/dashboard/";
+              });
+            }
+          })
+          .catch(function() {
+            location.href = "/login/";
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
