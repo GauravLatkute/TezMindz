@@ -308,7 +308,10 @@ def class_select_page(request):
             return JsonResponse({"success": True})
         return JsonResponse({"success": False, "message": "Class not found."}, status=400)
 
-    return render(request, "class.html", get_user_data_context(request))
+    classes = Class.objects.filter(is_active=True).order_by("grade_number")
+    context = get_user_data_context(request)
+    context["classes"] = classes
+    return render(request, "class.html", context)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

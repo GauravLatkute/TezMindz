@@ -21,41 +21,35 @@
     gap: 24px;
     flex-wrap: wrap;
   }
-  .subject-adventure-hero::after {
-    content: "🧮";
-    position: absolute;
-    right: 28px;
-    bottom: 8px;
-    font-size: 7rem;
-    opacity: 0.14;
-    pointer-events: none;
+  @media (max-width: 600px) {
+    .subject-adventure-hero { padding: 22px 18px; border-radius: 22px; margin-bottom: 22px; }
   }
   .subject-hero-left {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 20px;
+    flex-wrap: wrap;
   }
   .subject-hero-icon-sphere {
-    width: 72px;
-    height: 72px;
-    border-radius: 22px;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
     background: #FFFFFF;
     color: #4F46E5;
     display: grid;
     place-items: center;
-    font-size: 2.4rem;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     flex-shrink: 0;
   }
   .subject-hero-titles h1 {
-    font-size: 1.85rem;
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
     font-weight: 900;
     color: #FFFFFF;
     margin: 0 0 6px;
     letter-spacing: -0.02em;
   }
   .subject-hero-titles p {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: rgba(255, 255, 255, 0.85);
     margin: 0 0 14px;
     font-weight: 500;
@@ -85,32 +79,30 @@
     gap: 22px;
   }
   @media (max-width: 900px) {
-    .chapters-adventure-grid { grid-template-columns: 1fr; }
+    .chapters-adventure-grid { grid-template-columns: 1fr; gap: 16px; }
   }
 
   .chapter-adventure-card {
     background: #FFFFFF;
-    border: 2px solid #EEF2F6;
-    border-radius: 26px;
-    padding: 28px 30px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 24px;
+    padding: 24px 26px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.03);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
     position: relative;
   }
+  @media (max-width: 600px) {
+    .chapter-adventure-card { padding: 18px 16px; border-radius: 20px; }
+  }
   .chapter-adventure-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
     border-color: #A78BFA;
     box-shadow: 0 16px 36px rgba(124, 58, 237, 0.12);
-  }
-  .chapter-adventure-card.locked-card {
-    background: #F8FAFC;
-    opacity: 0.7;
-    cursor: not-allowed;
   }
 
   .chapter-card-top-header {
@@ -121,7 +113,7 @@
   }
   .chapter-badge-tag {
     background: #EDE9FE;
-    color: #5B50EB;
+    color: #4F46E5;
     border-radius: 100px;
     padding: 5px 14px;
     font-size: 0.75rem;
@@ -131,34 +123,35 @@
   }
 
   .chapter-title-heading {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 900;
     color: #0F172A;
     margin: 0 0 6px;
     letter-spacing: -0.01em;
   }
   .chapter-tagline-text {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     color: #64748B;
-    margin: 0 0 20px;
+    margin: 0 0 18px;
     line-height: 1.45;
+    font-weight: 600;
   }
 
   /* Progress in Card */
   .ch-progress-wrap {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .ch-progress-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
     color: #475569;
     margin-bottom: 6px;
   }
   .ch-bar-container {
-    height: 8px;
+    height: 7px;
     background: #F1F5F9;
     border-radius: 100px;
     overflow: hidden;
@@ -174,15 +167,15 @@
   .ch-topics-preview-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 20px;
   }
   .ch-topic-pill {
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 6px 12px;
-    font-size: 0.76rem;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.74rem;
     font-weight: 700;
     color: #334155;
   }
@@ -192,7 +185,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 14px;
     border-top: 1.5px solid #F1F5F9;
   }
 </style>
@@ -200,28 +193,32 @@
 
 {% block content %}
 <!-- Breadcrumb -->
-<div style="font-size:0.84rem;color:#64748B;font-weight:700;margin-bottom:18px;">
-  <a href="/dashboard/" style="color:#5B50EB;text-decoration:none;">Home</a>
-  <span style="margin:0 6px;">›</span>
-  <a href="/learn/" style="color:#5B50EB;text-decoration:none;">{{ student_class.class_label }}</a>
-  <span style="margin:0 6px;">›</span>
+<div style="font-size:0.84rem;color:#64748B;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:6px;">
+  <a href="/dashboard/" style="color:#4F46E5;text-decoration:none;">Home</a>
+  <span>›</span>
+  <a href="/learn/" style="color:#4F46E5;text-decoration:none;">{{ student_class.class_label }}</a>
+  <span>›</span>
   <span>{{ class_subject.subject.title }}</span>
 </div>
 
-<!-- 🧮 SUBJECT ADVENTURE HERO -->
+<!-- SUBJECT ADVENTURE HERO -->
 <div class="subject-adventure-hero">
   <div class="subject-hero-left">
     <div class="subject-hero-icon-sphere">
-      {% if class_subject.subject.icon_type == "math" %}🧮
-      {% elif class_subject.subject.icon_type == "science" %}🔬
-      {% else %}📖{% endif %}
+      {% if class_subject.subject.icon_type == "math" %}
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      {% elif class_subject.subject.icon_type == "science" %}
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path><path d="M5.52 16h12.96"></path></svg>
+      {% else %}
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+      {% endif %}
     </div>
     <div class="subject-hero-titles">
       <h1>{{ student_class.class_label }} — {{ class_subject.subject.title }}</h1>
-      <p>Let's become a {{ class_subject.subject.title }} Champion! 🏆 • {{ class_subject.subject.olympiad_code }}</p>
+      <p>Master {{ class_subject.subject.title }} concepts and prepare for {{ class_subject.subject.olympiad_code }}</p>
       <div class="subject-hero-pills">
-        <span class="hero-glass-pill"><i class="bi bi-map-fill"></i> {{ chapters.count }} Adventure Chapters</span>
-        <span class="hero-glass-pill"><i class="bi bi-star-fill"></i> 40 Missions</span>
+        <span class="hero-glass-pill">{{ chapters.count }} Chapters</span>
+        <span class="hero-glass-pill">Interactive Curriculum</span>
       </div>
     </div>
   </div>
@@ -229,7 +226,10 @@
 
 <!-- Section Header -->
 <div class="section-title-row" style="margin-bottom:20px;">
-  <h2 style="font-size:1.3rem;font-weight:900;color:#0F172A;">🗺️ Choose Your Chapter Adventure</h2>
+  <h2 style="font-size:1.25rem;font-weight:900;color:#0F172A;display:flex;align-items:center;gap:8px;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+    <span>Choose Your Chapter</span>
+  </h2>
 </div>
 
 <!-- ── CHAPTERS ADVENTURE GRID ── -->
@@ -238,30 +238,26 @@
   <a class="chapter-adventure-card" href="/chapter/{{ ch.id }}/">
     <div>
       <div class="chapter-card-top-header">
-        <span class="chapter-badge-tag">🌍 Chapter {{ ch.order }}</span>
+        <span class="chapter-badge-tag">Chapter {{ ch.order }}</span>
         {% if ch.progress_pct >= 100 %}
-          <span class="badge-pill" style="background:#ECFDF5;color:#047857;"><i class="bi bi-trophy-fill"></i> Mastered</span>
+          <span class="badge-pill" style="background:#ECFDF5;color:#047857;font-weight:900;"><i class="bi bi-trophy-fill"></i> Mastered</span>
         {% elif ch.progress_pct > 0 %}
-          <span class="badge-pill" style="background:#FEF3C7;color:#D97706;"><i class="bi bi-play-circle-fill"></i> In Progress</span>
+          <span class="badge-pill" style="background:#FEF3C7;color:#D97706;font-weight:900;"><i class="bi bi-play-circle-fill"></i> In Progress</span>
         {% else %}
-          <span class="badge-pill purple">New Adventure</span>
+          <span class="badge-pill purple" style="font-weight:900;">New Adventure</span>
         {% endif %}
       </div>
 
       <h3 class="chapter-title-heading">{{ ch.name }}</h3>
       <p class="chapter-tagline-text">
-        {% if ch.order == 1 %}
-          Let's explore the world of BIG NUMBERS! 🚂 Place values, reading, writing, and logic.
-        {% else %}
-          {{ ch.description|default:"Discover exciting mathematical principles and Olympiad challenges!" }}
-        {% endif %}
+        {{ ch.description|default:"Discover exciting principles and Olympiad challenges!" }}
       </p>
 
       <!-- Progress -->
       <div class="ch-progress-wrap">
         <div class="ch-progress-meta">
           <span>{{ ch.done_concepts|default:0 }} of {{ ch.total_concepts|default:0 }} Topics Mastered</span>
-          <span style="color:#5B50EB;font-weight:900;">{{ ch.progress_pct|default:0 }}%</span>
+          <span style="color:#4F46E5;font-weight:900;">{{ ch.progress_pct|default:0 }}%</span>
         </div>
         <div class="ch-bar-container">
           <div class="ch-bar-fill" style="width: {{ ch.progress_pct|default:0 }}%;"></div>
@@ -272,7 +268,6 @@
       <div class="ch-topics-preview-row">
         {% for concept in ch.concepts.all|slice:":6" %}
         <span class="ch-topic-pill">
-          <i class="bi bi-circle-fill" style="font-size:0.35rem;color:#5B50EB;"></i>
           {{ concept.name }}
         </span>
         {% endfor %}
@@ -283,15 +278,13 @@
     </div>
 
     <div class="ch-card-action-footer">
-      <span style="font-size:0.84rem;font-weight:800;color:#64748B;">
-        <i class="bi bi-journal-check"></i> {{ ch.concepts.count }} Topics
+      <span style="font-size:0.82rem;font-weight:800;color:#64748B;display:flex;align-items:center;gap:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path></svg>
+        {{ ch.concepts.count }} Topics
       </span>
-      <div class="btn-primary" style="padding:10px 22px;font-size:0.88rem;">
-        {% if ch.progress_pct > 0 %}
-          Continue Adventure 🚀
-        {% else %}
-          Start Adventure 🚀
-        {% endif %}
+      <div class="btn-primary" style="padding:8px 18px;font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;">
+        <span>{% if ch.progress_pct > 0 %}Continue{% else %}Start{% endif %}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       </div>
     </div>
   </a>

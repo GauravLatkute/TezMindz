@@ -1,51 +1,79 @@
 {% extends "base.html" %}
-{% block title %}Learn — Tezz-Mindz{% endblock %}
-{% block nav_learn %}active{% endblock %}
+{% block title %}Learning Worlds — Tezz-Mindz{% endblock %}
+{% block nav_subjects %}active{% endblock %}
+{% block m_nav_subjects %}active{% endblock %}
 
 {% block extra_head %}
 <style>
   .learn-header { margin-bottom: 28px; }
-  .learn-header h1 { font-size: 1.5rem; font-weight: 900; color: #1e1b4b; margin: 0 0 4px; }
-  .learn-header p { color: #64748b; font-size: 0.9rem; font-weight: 600; margin: 0; }
+  .learn-header h1 { font-size: clamp(1.4rem, 3vw, 1.85rem); font-weight: 900; color: #0F172A; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .learn-header p { color: #64748B; font-size: 0.92rem; font-weight: 600; margin: 0; }
 
   .subject-cards { display: flex; flex-direction: column; gap: 20px; }
   .subject-card {
-    background: #fff; border: 1px solid #ede9fe; border-radius: 18px;
-    padding: 24px; transition: box-shadow 0.18s;
+    background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 24px;
+    padding: 24px; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
   }
-  .subject-card:hover { box-shadow: 0 8px 28px rgba(79,70,229,0.1); }
+  .subject-card:hover {
+    box-shadow: 0 12px 32px rgba(79, 70, 229, 0.1);
+    border-color: #C4B5FD;
+    transform: translateY(-2px);
+  }
+  @media (max-width: 600px) {
+    .subject-card { padding: 18px 14px; border-radius: 20px; }
+  }
 
-  .subject-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .subject-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
   .subject-card-icon {
-    width: 56px; height: 56px; border-radius: 16px;
-    display: grid; place-items: center; font-size: 1.6rem; flex-shrink: 0;
+    width: 54px; height: 54px; border-radius: 16px;
+    display: grid; place-items: center; flex-shrink: 0;
   }
-  .subject-card-icon.math { background: #fffbeb; }
-  .subject-card-icon.science { background: #f0fdf4; }
-  .subject-card-icon.english { background: #fdf2f8; }
-  .subject-card-meta h2 { font-size: 1.1rem; font-weight: 800; color: #1e1b4b; margin: 0 0 4px; }
-  .subject-card-meta p { font-size: 0.8rem; color: #64748b; font-weight: 600; margin: 0; }
-  .subject-progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .subject-progress-row .progress-bar-wrap { flex: 1; }
-  .subject-progress-pct { font-size: 0.9rem; font-weight: 800; color: #4f46e5; width: 42px; text-align: right; }
-  .subject-stats { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .subject-card-icon.math { background: #EFF6FF; color: #2563EB; }
+  .subject-card-icon.science { background: #ECFDF5; color: #059669; }
+  .subject-card-icon.english { background: #FDF2F8; color: #DB2777; }
+  .subject-card-meta { flex: 1; min-width: 160px; }
+  .subject-card-meta h2 { font-size: 1.2rem; font-weight: 900; color: #0F172A; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .subject-card-meta p { font-size: 0.82rem; color: #64748B; font-weight: 600; margin: 0; }
+  .subject-action-btn-wrap { margin-left: auto; }
+  @media (max-width: 600px) {
+    .subject-action-btn-wrap { width: 100%; margin-left: 0; margin-top: 6px; }
+    .subject-action-btn-wrap .btn-primary { width: 100%; justify-content: center; }
+  }
 
-  .chapters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-  .chapter-tile {
-    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
-    padding: 14px 16px; text-decoration: none; transition: all 0.15s;
+  .subject-progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .subject-progress-row .progress-bar-wrap { flex: 1; height: 8px; background: #F1F5F9; border-radius: 100px; overflow: hidden; }
+  .subject-progress-row .progress-bar-fill { height: 100%; border-radius: 100px; }
+  .subject-progress-pct { font-size: 0.9rem; font-weight: 900; color: #4F46E5; width: 44px; text-align: right; }
+
+  .subject-stats { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .stat-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px;
+    padding: 4px 10px; font-size: 0.74rem; font-weight: 800; color: #334155;
   }
-  .chapter-tile:hover { background: #f0eeff; border-color: #c4b5fd; }
-  .chapter-tile-num { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
-  .chapter-tile-name { font-size: 0.88rem; font-weight: 700; color: #1e1b4b; margin-bottom: 8px; }
-  .chapter-tile-meta { font-size: 0.72rem; color: #64748b; font-weight: 600; }
+  .stat-chip.green { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
+
+  .chapters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  @media (max-width: 480px) {
+    .chapters-grid { grid-template-columns: 1fr; }
+  }
+  .chapter-tile {
+    background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px;
+    padding: 14px 16px; text-decoration: none; transition: all 0.18s ease;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .chapter-tile:hover { background: #FAF5FF; border-color: #C4B5FD; transform: translateY(-2px); }
+  .chapter-tile-num { font-size: 0.68rem; font-weight: 900; color: #6366F1; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .chapter-tile-name { font-size: 0.9rem; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
+  .chapter-tile-meta { font-size: 0.72rem; color: #64748B; font-weight: 700; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="learn-header">
-  <h1>{{ student_class.class_label }} — Subjects</h1>
-  <p>{{ student_class.stage }} · Pick a subject and start learning</p>
+  <h1>{{ student_class.class_label }} — Learning Worlds</h1>
+  <p>{{ student_class.stage|default:"Explorer Stage" }} • Choose a world and embark on your learning adventure</p>
 </div>
 
 <div class="subject-cards">
@@ -53,28 +81,46 @@
 <div class="subject-card">
   <div class="subject-card-header">
     <div class="subject-card-icon {{ cs.subject.icon_type }}">
-      {% if cs.subject.icon_type == "math" %}🔢
-      {% elif cs.subject.icon_type == "science" %}🧪
-      {% else %}📖{% endif %}
+      {% if cs.subject.icon_type == "math" %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      {% elif cs.subject.icon_type == "science" %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path><path d="M5.52 16h12.96"></path></svg>
+      {% else %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+      {% endif %}
     </div>
     <div class="subject-card-meta">
       <h2>{{ cs.subject.title }}</h2>
-      <p>{{ cs.subject.subtitle }} · {{ cs.subject.olympiad_code }}</p>
+      <p>{{ cs.subject.subtitle }} • {{ cs.subject.olympiad_code }}</p>
     </div>
-    <div style="margin-left:auto;">
-      <a class="btn-primary" href="/subject/{{ cs.id }}/">Explore <i class="bi bi-arrow-right"></i></a>
+    <div class="subject-action-btn-wrap">
+      <a class="btn-primary" href="/subject/{{ cs.id }}/" style="display:inline-flex;align-items:center;gap:8px;">
+        <span>Explore World</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
     </div>
   </div>
 
   <div class="subject-progress-row">
-    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:{{ cs.progress_pct }}%"></div></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" style="width:{{ cs.progress_pct }}%; background:{% if cs.subject.icon_type == 'math' %}linear-gradient(90deg,#2563EB,#60A5FA){% elif cs.subject.icon_type == 'science' %}linear-gradient(90deg,#059669,#34D399){% else %}linear-gradient(90deg,#DB2777,#F472B6){% endif %};"></div>
+    </div>
     <div class="subject-progress-pct">{{ cs.progress_pct }}%</div>
   </div>
 
   <div class="subject-stats">
-    <span class="stat-chip green"><i class="bi bi-check-circle-fill"></i> {{ cs.done_concepts }} mastered</span>
-    <span class="stat-chip"><i class="bi bi-journal-text"></i> {{ cs.total_concepts }} topics</span>
-    <span class="stat-chip"><i class="bi bi-layers"></i> {{ cs.total_modules }} modules</span>
+    <span class="stat-chip green">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      {{ cs.done_concepts }} Mastered
+    </span>
+    <span class="stat-chip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path></svg>
+      {{ cs.total_concepts }} Topics
+    </span>
+    <span class="stat-chip">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      {{ cs.total_modules }} Modules
+    </span>
   </div>
 
   <!-- Preview first 4 chapters -->
@@ -85,7 +131,7 @@
     <a class="chapter-tile" href="/chapter/{{ ch.id }}/">
       <div class="chapter-tile-num">Chapter {{ ch.order }}</div>
       <div class="chapter-tile-name">{{ ch.name }}</div>
-      <div class="chapter-tile-meta">{{ ch.concepts.count }} topics</div>
+      <div class="chapter-tile-meta">{{ ch.concepts.count }} Topics</div>
     </a>
     {% endfor %}
   </div>
@@ -94,9 +140,11 @@
 </div>
 {% empty %}
 <div class="card" style="text-align:center;padding:48px;">
-  <div style="font-size:3rem;margin-bottom:12px;">📚</div>
-  <h3 style="color:#1e1b4b;margin:0 0 8px;">No subjects yet</h3>
-  <p style="color:#64748b;">Content for {{ student_class.class_label }} is being prepared.</p>
+  <div style="width:64px;height:64px;border-radius:20px;background:#EDE9FE;color:#7C3AED;margin:0 auto 16px;display:grid;place-items:center;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path><path d="M6 6h10"></path><path d="M6 10h10"></path></svg>
+  </div>
+  <h3 style="color:#0F172A;margin:0 0 8px;font-weight:900;">No subjects yet</h3>
+  <p style="color:#64748B;margin:0;">Curriculum for {{ student_class.class_label }} is being assembled.</p>
 </div>
 {% endfor %}
 </div>

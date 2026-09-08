@@ -1,67 +1,464 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Select class — TezMindz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/styles.css" />
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  </head>
-  <body class="page">
-    <header class="public-nav">
-      <a class="logo" href="/"><span class="logo-mark">T</span> TezMindz</a>
-    </header>
-    <main class="auth-wrap" style="max-width: 520px">
-      <h1>Which class are you in?</h1>
-      <p class="muted" style="margin: 8px 0 22px">This sets your content, games, and TezBuddy’s language.</p>
-      <div class="class-grid" id="classes"></div>
-    </main>
-    <script>
-      {% if user_data_js %}
-      window.USER_DATA = {{ user_data_js|safe }};
-      {% endif %}
-    </script>
-    <script src="/static/js/store.js"></script>
-    <script>
-      var wrap = document.getElementById("classes");
-      for (var i = 1; i <= 8; i++) {
-        var a = document.createElement("a");
-        a.href = "/dashboard/";
-        a.className = "card class-card" + (i >= 5 ? " featured" : "");
-        a.innerHTML = i + '<span>Class</span>';
-        a.addEventListener(
-          "click",
-          (function (n) {
-            return function (e) {
-              e.preventDefault();
-              fetch("/class/", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: JSON.stringify({ classLevel: n })
-              })
-              .then(function(res) {
-                if (res.ok) return res.json();
-                return res.json().then(function(err) { throw err; });
-              })
-              .then(function(data) {
-                if (data.success) {
-                  location.href = "/dashboard/";
-                } else {
-                  alert("Failed to set class.");
-                }
-              })
-              .catch(function(err) {
-                alert("Error setting class: " + (err.message || err));
-              });
-            };
-          })(i)
-        );
-        wrap.appendChild(a);
+{% extends "base.html" %}
+{% block title %}Select Your Class — Tezz-Mindz{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ══════════════════════════════════════════════════════════════════════════
+     TEZZ-MINDZ 4x4 RESPONSIVE 3D CLASS SELECTOR GRID
+     ══════════════════════════════════════════════════════════════════════════ */
+  
+  .class-picker-shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 10px 0 40px;
+  }
+
+  .class-picker-hero {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 600px) {
+    .class-picker-hero { margin-bottom: 20px; }
+  }
+
+  .class-picker-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #EDE9FE;
+    color: #4F46E5;
+    border: 1px solid #C4B5FD;
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .class-picker-hero h1 {
+    font-size: clamp(1.8rem, 3.8vw, 2.5rem);
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 10px;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .class-picker-hero p {
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    color: #64748B;
+    font-weight: 600;
+    margin: 0 auto;
+    max-width: 620px;
+    line-height: 1.5;
+  }
+
+  /* ── 4x4 RESPONSIVE CLASS GRID MATRIX ── */
+  .classes-4x4-matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 1024px) {
+    .classes-4x4-matrix {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+  }
+  @media (max-width: 768px) {
+    .classes-4x4-matrix {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+  }
+  @media (max-width: 440px) {
+    .classes-4x4-matrix {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+  }
+
+  /* ── 3D CLASS CARD ── */
+  .class-grade-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 22px;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    min-height: 200px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (max-width: 440px) {
+    .class-grade-card {
+      padding: 14px 12px;
+      min-height: 170px;
+      border-radius: 18px;
+    }
+  }
+
+  .class-grade-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: #A78BFA;
+    box-shadow: 0 16px 36px rgba(124, 58, 237, 0.15);
+  }
+
+  .class-grade-card:active {
+    transform: scale(0.97);
+  }
+
+  /* Active / Selected Class Glow */
+  .class-grade-card.active-current {
+    background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 50%, #EDE9FE 100%);
+    border-color: #8B5CF6;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.22);
+  }
+
+  .active-badge-pill {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #7C3AED;
+    color: #FFFFFF;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+  }
+  @media (max-width: 440px) {
+    .active-badge-pill {
+      top: 8px;
+      right: 8px;
+      font-size: 0.58rem;
+      padding: 2px 6px;
+    }
+  }
+
+  /* 3D Grade Number Circle */
+  .grade-number-sphere {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    margin-bottom: 14px;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @media (max-width: 440px) {
+    .grade-number-sphere {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+  }
+
+  .class-grade-card:hover .grade-number-sphere {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  /* Themes by Stage */
+  .theme-primary .grade-number-sphere {
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  }
+  .theme-middle .grade-number-sphere {
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+  }
+  .theme-senior .grade-number-sphere {
+    background: linear-gradient(135deg, #EA580C, #C2410C);
+  }
+  .theme-master .grade-number-sphere {
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+
+  /* Card Meta */
+  .grade-card-info h3 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0 0 4px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  @media (max-width: 440px) {
+    .grade-card-info h3 { font-size: 1.05rem; }
+  }
+
+  .grade-stage-text {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #6366F1;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @media (max-width: 440px) {
+    .grade-stage-text { font-size: 0.70rem; }
+  }
+
+  .grade-age-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94A3B8;
+    margin: 0 0 14px;
+  }
+  @media (max-width: 440px) {
+    .grade-age-text { font-size: 0.66rem; margin-bottom: 10px; }
+  }
+
+  /* Mini Olympiad Badges Row */
+  .grade-olympiad-chips {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 440px) {
+    .grade-olympiad-chips { display: none; }
+  }
+
+  .olympiad-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #475569;
+  }
+
+  /* Select Button */
+  .btn-select-grade {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 800;
+    transition: all 0.2s ease;
+  }
+  @media (max-width: 440px) {
+    .btn-select-grade {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      border-radius: 10px;
+    }
+  }
+
+  .class-grade-card:hover .btn-select-grade {
+    background: #4F46E5;
+    color: #FFFFFF;
+    border-color: #4F46E5;
+  }
+
+  .class-grade-card.active-current .btn-select-grade {
+    background: #7C3AED;
+    color: #FFFFFF;
+    border-color: #7C3AED;
+  }
+
+  .btn-select-grade svg {
+    transition: transform 0.2s ease;
+  }
+  .class-grade-card:hover .btn-select-grade svg {
+    transform: translateX(3px);
+  }
+
+  /* Loading Overlay */
+  .card-loading-spinner {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    place-items: center;
+  }
+  .spinner-circle {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #DDD6FE;
+    border-top-color: #7C3AED;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="class-picker-shell">
+  <!-- Hero Section -->
+  <div class="class-picker-hero">
+    <div class="class-picker-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+      </svg>
+      <span>Customized Learning Realm</span>
+    </div>
+    <h1>Which class are you in?</h1>
+    <p>Select your grade to dynamically tune your 3D learning worlds, Olympiad challenges, math quests, and AI tutor difficulty.</p>
+  </div>
+
+  <!-- 4x4 Responsive Class Grid Matrix -->
+  <div class="classes-4x4-matrix" id="classes-matrix">
+    {% if classes %}
+      {% for cls in classes %}
+      <div 
+        class="class-grade-card {% if cls.grade_number <= 4 %}theme-primary{% elif cls.grade_number <= 6 %}theme-middle{% elif cls.grade_number <= 8 %}theme-senior{% else %}theme-master{% endif %} {% if profile.student_class.grade_number == cls.grade_number %}active-current{% endif %}"
+        onclick="selectGradeLevel({{ cls.grade_number }}, this)"
+        role="button"
+        tabindex="0"
+        aria-label="Select {{ cls.class_label }}"
+      >
+        <div class="card-loading-spinner"><div class="spinner-circle"></div></div>
+
+        {% if profile.student_class.grade_number == cls.grade_number %}
+        <div class="active-badge-pill">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Active</span>
+        </div>
+        {% endif %}
+
+        <div>
+          <div class="grade-number-sphere">
+            {{ cls.grade_number }}
+          </div>
+          <div class="grade-card-info">
+            <h3>{{ cls.class_label }}</h3>
+            <div class="grade-stage-text">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="5"/>
+              </svg>
+              <span>{{ cls.stage|default:"Explorer Stage" }}</span>
+            </div>
+            <div class="grade-age-text">{{ cls.age_group|default:"Age 6 - 15" }}</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="grade-olympiad-chips">
+            <span class="olympiad-chip">IMO</span>
+            <span class="olympiad-chip">NSO</span>
+            <span class="olympiad-chip">IEO</span>
+          </div>
+          <div class="btn-select-grade">
+            <span>{% if profile.student_class.grade_number == cls.grade_number %}Current Grade{% else %}Enter Class {{ cls.grade_number }}{% endif %}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <!-- Dynamic Fallback in case DB query was empty -->
+      <script>
+        const matrix = document.getElementById('classes-matrix');
+        const stages = ["Little Explorer", "Curious Learner", "Young Thinker", "Smart Solver", "Olympiad Challenger", "Logic Master", "Advanced Scholar", "National Champion"];
+        const ages = ["Age 6-7", "Age 7-8", "Age 8-9", "Age 9-10", "Age 10-11", "Age 11-12", "Age 12-13", "Age 13-14"];
+        
+        for (let i = 1; i <= 8; i++) {
+          const theme = i <= 4 ? "theme-primary" : (i <= 6 ? "theme-middle" : "theme-senior");
+          const card = document.createElement('div');
+          card.className = `class-grade-card ${theme} ${i === 5 ? 'active-current' : ''}`;
+          card.onclick = () => selectGradeLevel(i, card);
+          card.innerHTML = `
+            <div class="card-loading-spinner"><div class="spinner-circle"></div></div>
+            ${i === 5 ? '<div class="active-badge-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Active</span></div>' : ''}
+            <div>
+              <div class="grade-number-sphere">${i}</div>
+              <div class="grade-card-info">
+                <h3>Class ${i}</h3>
+                <div class="grade-stage-text"><span>${stages[i-1]}</span></div>
+                <div class="grade-age-text">${ages[i-1]}</div>
+              </div>
+            </div>
+            <div>
+              <div class="grade-olympiad-chips">
+                <span class="olympiad-chip">IMO</span>
+                <span class="olympiad-chip">NSO</span>
+                <span class="olympiad-chip">IEO</span>
+              </div>
+              <div class="btn-select-grade">
+                <span>Enter Class ${i}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          `;
+          matrix.appendChild(card);
+        }
+      </script>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function selectGradeLevel(grade, cardElement) {
+    // Show spinner on the selected card
+    const spinner = cardElement.querySelector('.card-loading-spinner');
+    if (spinner) spinner.style.display = 'grid';
+
+    fetch('/class/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ classLevel: grade })
+    })
+    .then(res => {
+      if (res.ok) return res.json();
+      return res.json().then(err => { throw err; });
+    })
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/dashboard/';
+      } else {
+        if (spinner) spinner.style.display = 'none';
+        alert(data.message || 'Failed to update class.');
       }
-    </script>
-  </body>
-</html>
+    })
+    .catch(err => {
+      if (spinner) spinner.style.display = 'none';
+      alert('Error updating class: ' + (err.message || err));
+    });
+  }
+</script>
+{% endblock %}
