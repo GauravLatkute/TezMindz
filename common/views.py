@@ -665,9 +665,10 @@ def games_page(request):
 @login_required
 def game_page(request, game_id):
     """
-    Dedicated Easy Educational Game screen for the topic.
-    Backend verifies that Learn is completed (game_unlocked=True).
+    Dedicated Educational Game screen for the topic.
+    Delegates to modular_game_runner_view for isolated game architecture.
     """
+    from games.views import modular_game_runner_view as _runner
     profile = _get_profile(request)
     game = get_object_or_404(
         Game.objects.select_related("concept__chapter__class_subject__student_class"),
@@ -681,21 +682,15 @@ def game_page(request, game_id):
     if not tp.game_unlocked:
         return redirect("common:concept", concept_id=game.concept_id)
 
-    difficulty = request.GET.get("difficulty", "easy").lower()
-    level, _ = GameLevel.objects.get_or_create(
-        game=game, difficulty=difficulty,
-        defaults={"xp_reward": 20, "coin_reward": 10}
-    )
+    return _runner(request, game_id=game_id)
 
-    context = get_user_data_context(request)
-    context.update({
-        "game": game,
-        "difficulty": difficulty,
-        "game_level": level,
-        "concept": game.concept,
-        "topic_progress": tp,
-    })
-    return render(request, "game.html", context)
+
+def modular_game_runner_view(request, *args, **kwargs):
+    """Lazy wrapper to prevent circular imports."""
+    from games.views import modular_game_runner_view as _runner
+    return _runner(request, *args, **kwargs)
+
+
 
 
 @login_required

@@ -32,6 +32,8 @@ urlpatterns = [
     path("games/", views.games_page, name="games"),
     path("game/<int:game_id>/difficulty/", views.difficulty_page, name="difficulty"),
     path("game/<int:game_id>/play/", views.game_page, name="game_play"),
+    path("game/<slug:slug>/play/", views.modular_game_runner_view, name="game_play_by_slug"),
+    path("class/<int:grade>/<slug:subject_slug>/chapter/<int:chapter_num>/topic/<int:topic_num>/game/<slug:game_slug>/", views.modular_game_runner_view, name="hierarchical_game_play"),
     path("result/", views.result_page, name="result"),
 
     # Progress / Rewards / Leaderboard

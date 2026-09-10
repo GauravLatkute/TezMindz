@@ -1,0 +1,64 @@
+<!-- 
+  TezMindz Modular Educational Game: Fraction Pizza
+  Class 5 | Mathematics | Chapter 3: Fractions | Topic 1: Understanding Fractions
+-->
+
+<div class="fp-game-container" id="fraction-pizza-game">
+
+  <!-- Mission Banner -->
+  <div class="fp-mission-card">
+    <div class="fp-mission-badge" id="fp-mission-tag">Level 1 • Pizza Chef Mission</div>
+    <h2 class="fp-mission-title" id="fp-task-heading">Slice & Serve the Pizza</h2>
+    <p class="fp-mission-desc" id="fp-task-instruction">Select the pizza slices that represent the requested fraction of the pizza order.</p>
+  </div>
+
+  <!-- Target Fraction Order -->
+  <div class="fp-target-card">
+    <div class="fp-target-label">Customer Order Fraction:</div>
+    <div class="fp-target-fraction" id="fp-target-display">
+      <span class="fp-num" id="fp-target-num">3</span>
+      <span class="fp-bar">/</span>
+      <span class="fp-den" id="fp-target-den">8</span>
+    </div>
+    <div class="fp-target-subtext" id="fp-target-subtext">Click <strong>3</strong> out of <strong>8</strong> slices to complete the order.</div>
+  </div>
+
+  <!-- Interactive Pizza Plate -->
+  <div class="fp-plate-wrapper">
+    <div class="fp-pizza-board" id="fp-pizza-board">
+      <!-- SVG Pizza with dynamic interactive slices -->
+      <svg class="fp-pizza-svg" viewBox="-110 -110 220 220" id="fp-svg-pizza">
+        <circle cx="0" cy="0" r="105" class="fp-crust"></circle>
+        <circle cx="0" cy="0" r="95" class="fp-sauce"></circle>
+        <g id="fp-slices-group"></g>
+      </svg>
+    </div>
+    <div class="fp-selection-counter">
+      Selected Slices: <strong id="fp-selected-count">0</strong> / <span id="fp-total-slices">8</span>
+      (<span id="fp-current-fraction">0/8</span>)
+    </div>
+  </div>
+
+  <!-- Feedback Banner -->
+  <div class="fp-feedback-card" id="fp-feedback" style="display: none;">
+    <div class="fp-fb-icon" id="fp-fb-icon">🍕</div>
+    <div class="fp-fb-content">
+      <h4 id="fp-fb-title">Perfect Portion!</h4>
+      <p id="fp-fb-msg">You served exactly 3/8 of the pizza!</p>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="fp-action-bar">
+    <button type="button" class="fp-btn-hint" id="fp-hint-btn">
+      💡 Need a Hint?
+    </button>
+    <button type="button" class="fp-btn-reset" id="fp-reset-btn">
+      ↺ Reset Slices
+    </button>
+    <button type="button" class="fp-btn-submit" id="fp-submit-btn">
+      Serve Pizza 🍕
+    </button>
+  </div>
+
+</div>

@@ -26,6 +26,12 @@ class Game(models.Model):
     template = models.ForeignKey(GameTemplate, on_delete=models.SET_NULL, null=True, blank=True, related_name="games")
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, blank=True, null=True)
+    game_path = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Path within games/ folder, e.g. class_5/mathematics/chapter_01_large_numbers/topic_01_reading_writing_numbers/number_builder"
+    )
     game_type = models.CharField(max_length=50, default="house_builder", help_text="Engine identifier: house_builder, shopping, fractions, etc.")
     description = models.TextField(blank=True)
     instructions = models.TextField(blank=True)
@@ -43,6 +49,18 @@ class Game(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+    def get_hierarchical_url(self):
+        """Returns clean educational URL: /class/<grade>/<subject>/chapter/<ch>/topic/<top>/game/<slug>/"""
+        try:
+            concept = self.concept
+            chapter = concept.chapter
+            cs = chapter.class_subject
+            grade = cs.student_class.grade_number
+            subject_slug = slugify(cs.subject.title)
+            return f"/class/{grade}/{subject_slug}/chapter/{chapter.order}/topic/{concept.order}/game/{self.slug}/"
+        except Exception:
+            return f"/game/{self.id}/play/"
 
     def __str__(self):
         return f"{self.title} ({self.game_type})"

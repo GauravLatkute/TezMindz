@@ -1,6 +1,8 @@
+import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -35,8 +37,151 @@ from common.views import get_user_data_context, _get_profile, _get_student_class
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# HTML GAME ENGINE PAGE VIEWS
+# HTML GAME ENGINE & MODULAR RUNNER VIEWS
 # ══════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subject_slug=None, chapter_num=None, topic_num=None, game_slug=None):
+    """
+    Unified, dynamic game runner view that loads any educational game from its
+    isolated folder under games/ with standardized HUD and TezMindzGameBridge SDK.
+    Supports hierarchical URLs (/class/5/mathematics/chapter/1/topic/1/game/number-builder/)
+    as well as ID/slug lookups.
+    """
+    profile = _get_profile(request)
+    
+    # 1. Resolve Game instance
+    target_slug = game_slug or slug
+    if target_slug and grade and subject_slug and chapter_num and topic_num:
+        game = get_object_or_404(
+            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
+            slug=target_slug,
+            concept__chapter__class_subject__student_class__grade_number=grade,
+            concept__chapter__order=chapter_num,
+            concept__order=topic_num,
+            is_active=True
+        )
+    elif target_slug:
+        game = get_object_or_404(
+            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
+            slug=target_slug,
+            is_active=True
+        )
+    elif game_id:
+        game = get_object_or_404(
+            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
+            id=game_id,
+            is_active=True
+        )
+    else:
+        return redirect("common:games")
+
+    concept = game.concept
+    chapter = concept.chapter
+    cs = chapter.class_subject
+    student_class = cs.student_class
+
+    # 2. Retrieve or start active session & progress
+    session = start_or_resume_session(profile, game)
+    progress, _ = GameProgress.objects.get_or_create(
+        student=profile,
+        game=game,
+        defaults={"current_level": 1, "highest_level": 1}
+    )
+
+    # 3. Resolve relative game path & static folder
+    game_path = game.game_path.strip("/\\") if game.game_path else ""
+    if not game_path:
+        # Fallback default path based on educational hierarchy
+        subj_name = cs.subject.title.lower().replace(" ", "_")
+        game_path = f"class_{student_class.grade_number}/{subj_name}/chapter_{chapter.order:02d}_{chapter.slug or 'ch'}/topic_{concept.order:02d}_{concept.slug or 'top'}/{game.slug}"
+
+    game_static_base = f"/static/games/{game_path}/"
+    
+    # Check if dedicated HTML template exists in games/ directory
+    full_html_path = settings.BASE_DIR / "games" / game_path / "index.html"
+    has_dedicated_template = full_html_path.exists()
+    game_template_rel = f"{game_path}/index.html" if has_dedicated_template else None
+
+    # 4. Serialize level contents for client SDK
+    levels = game.levels.order_by("level_number")
+    levels_data = []
+    for lvl in levels:
+        contents = lvl.contents.all().order_by("display_order")
+        levels_data.append({
+            "id": lvl.id,
+            "level_number": lvl.level_number,
+            "title": lvl.title,
+            "instructions": lvl.instructions,
+            "difficulty": lvl.difficulty,
+            "time_limit": lvl.time_limit,
+            "points": lvl.points,
+            "xp_reward": lvl.xp_reward,
+            "coin_reward": lvl.coin_reward,
+            "configuration": lvl.configuration,
+            "is_locked": lvl.is_locked,
+            "contents": [
+                {
+                    "id": c.id,
+                    "content_type": c.content_type,
+                    "question": c.question,
+                    "data": c.data,
+                    "points": c.points,
+                    "hint": c.hint,
+                    "explanation": c.explanation,
+                }
+                for c in contents
+            ]
+        })
+
+    game_context = {
+        "game": {
+            "id": game.id,
+            "title": game.title,
+            "slug": game.slug,
+            "game_type": game.game_type,
+            "difficulty": game.difficulty,
+            "xp_reward": game.xp_reward,
+            "coin_reward": game.coin_reward,
+            "game_path": game_path,
+            "static_base": game_static_base,
+        },
+        "session": {
+            "id": session.id,
+            "current_level": session.current_level,
+            "difficulty": session.difficulty,
+            "score": session.score,
+            "status": session.status,
+        },
+        "student": {
+            "id": profile.id if profile else 0,
+            "name": request.user.first_name or request.user.username,
+            "xp": profile.xp if profile else 0,
+            "coins": profile.coins if profile else 0,
+            "streak": profile.streak if profile else 0,
+            "class_grade": student_class.grade_number,
+        },
+        "levels": levels_data,
+    }
+
+    context = get_user_data_context(request)
+    context.update({
+        "game": game,
+        "concept": concept,
+        "chapter": chapter,
+        "class_subject": cs,
+        "student_class": student_class,
+        "session": session,
+        "progress": progress,
+        "levels": levels,
+        "game_path": game_path,
+        "game_static_base": game_static_base,
+        "has_dedicated_template": has_dedicated_template,
+        "game_template_rel": game_template_rel,
+        "game_context_json": json.dumps(game_context),
+    })
+
+    return render(request, "games/modular_runner.html", context)
 
 @login_required
 def dream_house_builder_player_view(request):

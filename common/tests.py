@@ -79,7 +79,7 @@ class Chapter1WeTheTravellersTests(TestCase):
         # Game is now unlocked
         res_game = self.client.get(f"/game/{self.game1.id}/play/")
         self.assertEqual(res_game.status_code, 200)
-        self.assertContains(res_game, "Goal: Build the Number Train!")
+        self.assertContains(res_game, "Number Builder")
 
         # 4. Submit Game
         res_game_submit = self.client.post("/api/game/submit/", {

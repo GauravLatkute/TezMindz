@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ game.title }} — TezMindz{% endblock %}
+{% block nav_games %}active{% endblock %}
+{% block m_nav_games %}active{% endblock %}
+
+{% block extra_head %}
+<!-- TezMindz Standard Game Base Styles -->
+<style>
+  .modular-game-arena-wrapper {
+    max-width: 980px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border: 2px solid #EEF2F6;
+    border-radius: 28px;
+    padding: 28px 32px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    position: relative;
+    min-height: 520px;
+  }
+  @media (max-width: 640px) {
+    .modular-game-arena-wrapper {
+      padding: 20px 16px;
+      border-radius: 20px;
+    }
+  }
+
+  /* ── GAME HUD BAR ── */
+  .game-hud-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 1.5px solid #F1F5F9;
+  }
+  .hud-breadcrumb-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hud-hierarchy-path {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hud-hierarchy-path span { color: #CBD5E1; }
+  .hud-hierarchy-path a {
+    color: #6366F1;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .hud-hierarchy-path a:hover { color: #4F46E5; }
+  .hud-game-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #0F172A;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Right Stats */
+  .hud-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hud-stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 0.88rem;
+  }
+  .hud-stat-pill.score {
+    background: #EEF2FF;
+    color: #4338CA;
+    border: 1.5px solid #C7D2FE;
+  }
+  .hud-stat-pill.coins {
+    background: #FFFBEB;
+    color: #92400E;
+    border: 1.5px solid #FDE68A;
+  }
+  .hud-stat-pill.level {
+    background: #F0FDF4;
+    color: #166534;
+    border: 1.5px solid #BBF7D0;
+  }
+
+  /* Audio & Exit Buttons */
+  .hud-btn {
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1.5px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #475569;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+  .hud-btn:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #0F172A;
+  }
+
+  /* Level Progress Pills */
+  .game-level-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+  }
+  .level-step-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1.5px solid #E2E8F0;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .level-step-badge.active {
+    background: #6366F1;
+    color: #FFFFFF;
+    border-color: #6366F1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+  .level-step-badge.completed {
+    background: #DCFCE7;
+    color: #15803D;
+    border-color: #86EFAC;
+  }
+
+  /* Dynamic Game Container */
+  #tmz-game-viewport {
+    width: 100%;
+    position: relative;
+  }
+</style>
+
+<!-- Injected Game Stylesheet if available -->
+{% if has_dedicated_template %}
+<link rel="stylesheet" href="{{ game_static_base }}style.css">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="modular-game-arena-wrapper">
+
+    <!-- ── HUD HEADER ── -->
+    <div class="game-hud-bar">
+      <div class="hud-breadcrumb-meta">
+        <div class="hud-hierarchy-path">
+          <span>{{ student_class.class_label }}</span>
+          <span>•</span>
+          <span>{{ class_subject.subject.title }}</span>
+          <span>•</span>
+          <a href="{% url 'common:concept' concept.id %}">{{ concept.name }}</a>
+        </div>
+        <h1 class="hud-game-title">
+          🎮 {{ game.title }}
+        </h1>
+      </div>
+
+      <div class="hud-stats-group">
+        <div class="hud-stat-pill score" title="Current Score">
+          ⭐ <span id="tmz-hud-score">{{ session.score|default:"0" }}</span>
+        </div>
+        <div class="hud-stat-pill coins" title="Total Coins">
+          🪙 <span id="tmz-hud-coins">{{ profile.coins|default:"0" }}</span>
+        </div>
+        <button id="tmz-audio-toggle" class="hud-btn" title="Toggle Sound">
+          🔊 Sound: ON
+        </button>
+        <a href="{% url 'common:concept' concept.id %}" class="hud-btn" title="Exit to Topic">
+          ✕ Exit
+        </a>
+      </div>
+    </div>
+
+    <!-- ── LEVEL STEPPER ── -->
+    {% if levels %}
+    <div class="game-level-stepper">
+      {% for lvl in levels %}
+      <div class="level-step-badge {% if lvl.level_number == session.current_level %}active{% elif lvl.level_number < session.current_level %}completed{% endif %}" id="lvl-badge-{{ lvl.level_number }}">
+        Level {{ lvl.level_number }}: {{ lvl.title }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ── GAME VIEWPORT ── -->
+    <div id="tmz-game-viewport">
+      {% if has_dedicated_template %}
+        <!-- Dedicated Game Template Markup Loaded from games/{{ game_path }}/index.html -->
+        {% include game_template_rel %}
+      {% else %}
+        <!-- Default Game Viewport Fallback -->
+        <div class="text-center py-12">
+          <div class="text-5xl mb-4">🚀</div>
+          <h3 class="text-xl font-bold text-slate-800 mb-2">{{ game.title }}</h3>
+          <p class="text-slate-500 max-w-md mx-auto mb-6">{{ game.description|default:"Get ready to master this concept with fun interactive challenges!" }}</p>
+          <button onclick="TezMindzGameBridge.completeGame({score: 100}).then(() => TezMindzGameBridge.finishAndRedirect())" class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition">
+            Start Learning Challenge →
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- 1. Inject Django Session & Game Context -->
+<script>
+  window.GAME_CONTEXT = {{ game_context_json|safe }};
+</script>
+
+<!-- 2. Standardized TezMindz Game SDK Bridge -->
+<script src="{% static 'games/shared/tezmindz-game-sdk.js' %}"></script>
+
+<!-- 3. Audio Toggle Handler -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const audioBtn = document.getElementById('tmz-audio-toggle');
+    if (audioBtn && window.TezMindzGameBridge) {
+      audioBtn.addEventListener('click', () => {
+        const isMuted = !window.TezMindzGameBridge.audio.isMuted;
+        window.TezMindzGameBridge.audio.isMuted = isMuted;
+        audioBtn.textContent = isMuted ? '🔇 Sound: OFF' : '🔊 Sound: ON';
+      });
+    }
+  });
+</script>
+
+<!-- 4. Injected Dedicated Game JavaScript if available -->
+{% if has_dedicated_template %}
+<script src="{{ game_static_base }}game.js"></script>
+{% endif %}
+{% endblock %}

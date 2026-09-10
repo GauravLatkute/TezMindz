@@ -85,6 +85,7 @@ TEMPLATES = [
         "DIRS": [
             BASE_DIR / "frontend" / "templates",
             BASE_DIR / "templates",
+            BASE_DIR / "games",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -173,6 +174,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "static",
+    ("games", BASE_DIR / "games"),
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

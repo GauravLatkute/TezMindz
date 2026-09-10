@@ -1,0 +1,139 @@
+<!-- 
+  TezMindz Modular Educational Game: Number Builder
+  Class 5 | Mathematics | Chapter 1: Large Numbers | Topic 1: Reading & Writing Large Numbers
+-->
+
+<div class="nb-game-container" id="number-builder-game">
+
+  <!-- Mission Banner -->
+  <div class="nb-mission-card">
+    <div class="nb-mission-badge" id="nb-mission-tag">Level 1 • Mission</div>
+    <h2 class="nb-mission-title" id="nb-task-heading">Build the Target Number</h2>
+    <p class="nb-mission-desc" id="nb-task-instruction">Select the correct digits in each place value slot to form the number shown in words.</p>
+  </div>
+
+  <!-- Target Prompt Card -->
+  <div class="nb-target-card">
+    <div class="nb-target-label">Target Number in Words:</div>
+    <div class="nb-target-words" id="nb-target-text">Three Lakh Twenty-Five Thousand Four Hundred Ten</div>
+    <div class="nb-target-subtext" id="nb-target-sub">Standard Indian Number Format: <strong id="nb-target-hint-fmt">L,TTh,Th,H,T,O</strong></div>
+  </div>
+
+  <!-- Interactive Number Train Track -->
+  <div class="nb-train-track">
+    <div class="nb-track-header">
+      <span>🚂 INDIAN PLACE VALUE TRAIN</span>
+      <span class="nb-live-reading" id="nb-current-reading">Current: <strong id="nb-current-val">0</strong></span>
+    </div>
+
+    <div class="nb-slots-grid">
+      <!-- Ten Lakhs (optional) -->
+      <div class="nb-slot-box" data-place="ten_lakhs" id="slot-tl">
+        <span class="nb-slot-place">Ten Lakh</span>
+        <div class="nb-slot-digit" id="digit-tl">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="tl" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="tl" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Lakhs -->
+      <div class="nb-slot-box" data-place="lakhs" id="slot-l">
+        <span class="nb-slot-place">Lakh (L)</span>
+        <div class="nb-slot-digit" id="digit-l">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="l" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="l" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Ten Thousands -->
+      <div class="nb-slot-box" data-place="ten_thousands" id="slot-tth">
+        <span class="nb-slot-place">Ten Th (TTh)</span>
+        <div class="nb-slot-digit" id="digit-tth">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="tth" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="tth" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Thousands -->
+      <div class="nb-slot-box" data-place="thousands" id="slot-th">
+        <span class="nb-slot-place">Thousand (Th)</span>
+        <div class="nb-slot-digit" id="digit-th">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="th" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="th" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Hundreds -->
+      <div class="nb-slot-box" data-place="hundreds" id="slot-h">
+        <span class="nb-slot-place">Hundred (H)</span>
+        <div class="nb-slot-digit" id="digit-h">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="h" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="h" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Tens -->
+      <div class="nb-slot-box" data-place="tens" id="slot-t">
+        <span class="nb-slot-place">Ten (T)</span>
+        <div class="nb-slot-digit" id="digit-t">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="t" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="t" data-dir="-1">▼</button>
+        </div>
+      </div>
+
+      <!-- Ones -->
+      <div class="nb-slot-box" data-place="ones" id="slot-o">
+        <span class="nb-slot-place">One (O)</span>
+        <div class="nb-slot-digit" id="digit-o">0</div>
+        <div class="nb-slot-stepper">
+          <button type="button" class="nb-step-btn up" data-slot="o" data-dir="1">▲</button>
+          <button type="button" class="nb-step-btn dn" data-slot="o" data-dir="-1">▼</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Digit Palette (0-9) -->
+  <div class="nb-palette-card">
+    <div class="nb-palette-label">Quick Digit Stamp (Click a slot above, then click a digit):</div>
+    <div class="nb-digit-buttons">
+      <button type="button" class="nb-stamp-btn" data-num="0">0</button>
+      <button type="button" class="nb-stamp-btn" data-num="1">1</button>
+      <button type="button" class="nb-stamp-btn" data-num="2">2</button>
+      <button type="button" class="nb-stamp-btn" data-num="3">3</button>
+      <button type="button" class="nb-stamp-btn" data-num="4">4</button>
+      <button type="button" class="nb-stamp-btn" data-num="5">5</button>
+      <button type="button" class="nb-stamp-btn" data-num="6">6</button>
+      <button type="button" class="nb-stamp-btn" data-num="7">7</button>
+      <button type="button" class="nb-stamp-btn" data-num="8">8</button>
+      <button type="button" class="nb-stamp-btn" data-num="9">9</button>
+      <button type="button" class="nb-stamp-btn clear" id="nb-clear-btn">Clear</button>
+    </div>
+  </div>
+
+  <!-- Feedback Banner -->
+  <div class="nb-feedback-card" id="nb-feedback" style="display: none;">
+    <div class="nb-fb-icon" id="nb-fb-icon">🎉</div>
+    <div class="nb-fb-content">
+      <h4 id="nb-fb-title">Awesome!</h4>
+      <p id="nb-fb-msg">You correctly built 3,25,410!</p>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="nb-action-bar">
+    <button type="button" class="nb-btn-hint" id="nb-hint-btn">
+      💡 Need a Hint?
+    </button>
+    <button type="button" class="nb-btn-submit" id="nb-submit-btn">
+      Verify & Submit Number 🚀
+    </button>
+  </div>
+
+</div>

@@ -275,6 +275,9 @@ Always read from left to right saying the number followed by its period name! *(
             title="Number Builder",
             defaults={
                 "template": game_tmpl,
+                "slug": "number-builder",
+                "game_path": "class_5/mathematics/chapter_01_large_numbers/topic_01_reading_writing_numbers/number_builder",
+                "game_type": "number_builder",
                 "config": {
                     "game_type": "NUMBER_BUILDER",
                     "time_limit": 60,
@@ -283,6 +286,10 @@ Always read from left to right saying the number followed by its period name! *(
                 }
             }
         )
+        game1.slug = "number-builder"
+        game1.game_path = "class_5/mathematics/chapter_01_large_numbers/topic_01_reading_writing_numbers/number_builder"
+        game1.game_type = "number_builder"
+        game1.save()
         game_level1, _ = GameLevel.objects.get_or_create(
             game=game1,
             difficulty="easy",
