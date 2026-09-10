@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title|default:"Admin Control" }} — TezMindz Admin</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0F172A;
+      --bg-sidebar: #1E293B;
+      --bg-card: #FFFFFF;
+      --bg-body: #F8FAFC;
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .admin-sidebar {
+      width: 270px;
+      background: var(--bg-sidebar);
+      color: #F8FAFC;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-decoration: none;
+      color: #FFFFFF;
+    }
+    .sidebar-brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+    .sidebar-brand-text strong {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .sidebar-brand-text small {
+      font-size: 0.7rem;
+      color: #94A3B8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .sidebar-menu {
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .menu-header {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 14px 10px 6px;
+    }
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      color: #94A3B8;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+    .menu-link i { font-size: 1.1rem; width: 20px; }
+    .menu-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+      transform: translateX(3px);
+    }
+    .menu-link.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── MAIN CONTENT SHELL ── */
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* ── HEADER HUD ── */
+    .admin-header {
+      background: #FFFFFF;
+      border-bottom: 1.5px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .header-title {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .admin-user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #F1F5F9;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    .admin-user-pill .badge {
+      background: #6366F1;
+      color: #FFFFFF;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+    }
+
+    /* ── PAGE CONTENT ── */
+    .admin-body {
+      padding: 28px 32px 60px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    /* ── CARDS & TABLES ── */
+    .admin-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      margin-bottom: 24px;
+    }
+    .admin-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid #F1F5F9;
+    }
+    .admin-card-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-admin-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .btn-admin-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-admin-secondary {
+      background: #F1F5F9;
+      color: #334155;
+      border: 1px solid var(--border);
+    }
+    .btn-admin-secondary:hover {
+      background: #E2E8F0;
+    }
+
+    /* Tables */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .admin-table th {
+      padding: 12px 16px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+      background: #F8FAFC;
+    }
+    .admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+    }
+    .admin-table tr:hover td {
+      background: #F8FAFC;
+    }
+
+    /* Status Pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+    .status-pill.active { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+    .status-pill.draft { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+    .status-pill.archived { background: #F1F5F9; color: #64748B; border: 1px solid var(--border); }
+
+    /* Flash Messages */
+    .admin-alert {
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-alert.success { background: #F0FDF4; border: 1.5px solid #86EFAC; color: #166534; }
+    .admin-alert.error { background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B; }
+
+    /* Modals */
+    .admin-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      place-items: center;
+    }
+    .admin-modal-backdrop.open { display: grid; }
+    .admin-modal {
+      background: #FFFFFF;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 580px;
+      padding: 28px 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      animation: modalPop 0.2s ease-out;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="admin-sidebar">
+    <a href="{% url 'tezadmin:dashboard' %}" class="sidebar-brand">
+      <div class="sidebar-brand-icon">🛡️</div>
+      <div class="sidebar-brand-text">
+        <strong>TezMindz</strong>
+        <small>Control Center</small>
+      </div>
+    </a>
+
+    <nav class="sidebar-menu">
+      <div class="menu-header">Overview</div>
+      <a href="{% url 'tezadmin:dashboard' %}" class="menu-link {% if active_tab == 'dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="menu-header">Academic Hierarchy</div>
+      <a href="{% url 'tezadmin:academic_hierarchy' %}" class="menu-link {% if active_tab == 'academic' %}active{% endif %}">
+        <i class="bi bi-diagram-3-fill"></i>
+        <span>Curriculum Tree</span>
+      </a>
+
+      <div class="menu-header">Games Engine</div>
+      <a href="{% url 'tezadmin:game_library' %}" class="menu-link {% if active_tab == 'games' %}active{% endif %}">
+        <i class="bi bi-controller"></i>
+        <span>Game Library</span>
+      </a>
+      <a href="{% url 'tezadmin:game_add' %}" class="menu-link">
+        <i class="bi bi-plus-circle-fill"></i>
+        <span>+ Add New Game</span>
+      </a>
+
+      <div class="menu-header">Student Ecosystem</div>
+      <a href="{% url 'tezadmin:student_list' %}" class="menu-link {% if active_tab == 'students' %}active{% endif %}">
+        <i class="bi bi-people-fill"></i>
+        <span>Students</span>
+      </a>
+      <a href="{% url 'tezadmin:gamification' %}" class="menu-link {% if active_tab == 'gamification' %}active{% endif %}">
+        <i class="bi bi-trophy-fill"></i>
+        <span>Gamification & XP</span>
+      </a>
+
+      <div class="menu-header">System & Governance</div>
+      <a href="{% url 'tezadmin:audit_logs' %}" class="menu-link {% if active_tab == 'audit_logs' %}active{% endif %}">
+        <i class="bi bi-journal-text"></i>
+        <span>Audit Logs</span>
+      </a>
+      <a href="{% url 'common:dashboard' %}" class="menu-link" target="_blank">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span>Open Student Site ↗</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>v2.4.0 Production</span>
+      <a href="{% url 'common:logout' %}" style="color:#EF4444;text-decoration:none;font-weight:800;">Log Out</a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN BODY ── -->
+  <main class="admin-main">
+    <!-- Header HUD -->
+    <header class="admin-header">
+      <div class="header-title">
+        {% block header_title %}{{ title }}{% endblock %}
+      </div>
+      <div class="header-actions">
+        <div class="admin-user-pill">
+          <span>👤 {{ request.user.username }}</span>
+          <span class="badge">{% if request.user.is_superuser %}Super Admin{% else %}Staff Admin{% endif %}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="admin-body">
+      <!-- Flash Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="admin-alert {{ message.tags }}">
+            {% if message.tags == 'success' %}✅{% else %}⚠️{% endif %}
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script>
+    // Global CSRF Token Helper
+    function getCSRF() {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, 10) === 'csrftoken=') {
+            cookieValue = decodeURIComponent(cookie.substring(10));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

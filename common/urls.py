@@ -17,6 +17,7 @@ urlpatterns = [
 
     # ── Core App ──────────────────────────────────────────────────────────────
     path("dashboard/", views.dashboard_page, name="dashboard"),
+    path("explore/", views.dashboard_page, name="explore"),
 
     # Learning hierarchy
     path("learn/", views.learn_page, name="learn"),

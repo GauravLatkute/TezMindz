@@ -542,8 +542,8 @@ class Command(BaseCommand):
                                 "config": {"time_limit": 60}
                             }
                         )
-                        GameLevel.objects.get_or_create(game=game_obj, difficulty="easy", defaults={"xp_reward": 10, "coin_reward": 5})
-                        GameLevel.objects.get_or_create(game=game_obj, difficulty="medium", defaults={"xp_reward": 15, "coin_reward": 7})
-                        GameLevel.objects.get_or_create(game=game_obj, difficulty="hard", defaults={"xp_reward": 20, "coin_reward": 10})
+                        GameLevel.objects.get_or_create(game=game_obj, level_number=1, defaults={"title": "Level 1 (Easy)", "difficulty": "easy", "xp_reward": 10, "coin_reward": 5})
+                        GameLevel.objects.get_or_create(game=game_obj, level_number=2, defaults={"title": "Level 2 (Medium)", "difficulty": "medium", "xp_reward": 15, "coin_reward": 7})
+                        GameLevel.objects.get_or_create(game=game_obj, level_number=3, defaults={"title": "Level 3 (Hard)", "difficulty": "hard", "xp_reward": 20, "coin_reward": 10})
 
         self.stdout.write(self.style.SUCCESS("All curriculum, chapters, concepts, lessons, quizzes, and games seeded successfully!"))

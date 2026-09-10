@@ -17,14 +17,14 @@
       <h1>Choose your challenge</h1>
       <p class="muted" style="margin: 6px 0 18px">Recommended for you based on your Fractions practice.</p>
       <div class="diff-grid">
-        <a class="card diff" href="/game/{{ game.id }}/play/?d=easy">
+        <a class="card diff" href="/game/{{ game.slug|default:game.id }}/play/?d=easy">
           <div>
             <strong>Easy</strong>
             <p class="muted small">Learn the basics</p>
           </div>
           <span class="chip">🟢</span>
         </a>
-        <a class="card diff rec" href="/game/{{ game.id }}/play/?d=medium">
+        <a class="card diff rec" href="/game/{{ game.slug|default:game.id }}/play/?d=medium">
           <div>
             <strong>Medium</strong>
             <p class="muted small">Test your understanding</p>
@@ -32,7 +32,7 @@
           </div>
           <span class="chip">🟡</span>
         </a>
-        <a class="card diff" href="/game/{{ game.id }}/play/?d=hard">
+        <a class="card diff" href="/game/{{ game.slug|default:game.id }}/play/?d=hard">
           <div>
             <strong>Hard</strong>
             <p class="muted small">Olympiad challenge</p>

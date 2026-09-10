@@ -1,0 +1,121 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-journal-text" style="color:#6366F1;"></i>
+  System Governance & Audit Logs
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .audit-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .search-input {
+    padding: 10px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: var(--text-main);
+    width: 320px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--primary); }
+  .action-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="audit-toolbar">
+  <div>
+    <input type="text" id="logSearch" class="search-input" placeholder="🔍 Search action, admin user, or target..." onkeyup="filterLogs()" />
+  </div>
+  <div style="font-size: 0.88rem; font-weight: 800; color: #64748B;">
+    Displaying last <strong>100</strong> security events
+  </div>
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+  <table class="admin-table" id="logsTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Admin User</th>
+        <th>Action Performed</th>
+        <th>Resource Target</th>
+        <th>Details / Parameters</th>
+        <th>IP Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+        <tr class="log-row" data-text="{{ log.admin_user.username|lower }} {{ log.action|lower }} {{ log.target_model|lower }} {{ log.details|lower }}">
+          <td>
+            <span style="font-size: 0.82rem; color: #64748B; font-weight: 600;">{{ log.created_at|date:"M d, Y H:i:s" }}</span>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 0.85rem; font-weight: 800; color: #1E293B;">👤 {{ log.admin_user.username|default:"System" }}</span>
+            </div>
+          </td>
+          <td>
+            <strong style="color: #334155; font-size: 0.85rem;">{{ log.action }}</strong>
+          </td>
+          <td>
+            {% if log.target_model %}
+              <span class="action-badge" style="background: #EEF2FF; color: #4338CA;">
+                {{ log.target_model }} #{{ log.target_id }}
+              </span>
+            {% else %}
+              <span style="color: #94A3B8;">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <span style="font-size: 0.82rem; color: #475569;">{{ log.details|default:"—" }}</span>
+          </td>
+          <td>
+            <code style="font-size: 0.76rem; color: #64748B;">{{ log.ip_address|default:"127.0.0.1" }}</code>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 48px; color: #94A3B8;">
+            No audit records captured yet.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function filterLogs() {
+    const query = document.getElementById('logSearch').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.log-row');
+    rows.forEach(row => {
+      const text = row.getAttribute('data-text') || '';
+      if (!query || text.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+{% endblock %}

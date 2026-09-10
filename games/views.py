@@ -52,29 +52,54 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
     
     # 1. Resolve Game instance
     target_slug = game_slug or slug
+    if str(target_slug).lower() in ["none", "null", "undefined", ""]:
+        target_slug = None
+
+    if str(game_id).lower() in ["none", "null", "undefined", ""]:
+        game_id = None
+
     if target_slug and grade and subject_slug and chapter_num and topic_num:
-        game = get_object_or_404(
-            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
+        game = Game.objects.select_related(
+            "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
+        ).filter(
             slug=target_slug,
             concept__chapter__class_subject__student_class__grade_number=grade,
             concept__chapter__order=chapter_num,
             concept__order=topic_num,
             is_active=True
-        )
+        ).first()
     elif target_slug:
-        game = get_object_or_404(
-            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
+        game = Game.objects.select_related(
+            "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
+        ).filter(
             slug=target_slug,
             is_active=True
-        )
+        ).first()
     elif game_id:
-        game = get_object_or_404(
-            Game.objects.select_related("concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"),
-            id=game_id,
-            is_active=True
-        )
+        try:
+            game = Game.objects.select_related(
+                "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
+            ).filter(
+                id=int(game_id),
+                is_active=True
+            ).first()
+        except (ValueError, TypeError):
+            game = None
     else:
-        return redirect("common:games")
+        game = None
+
+    # Fallback to the student's class games or any active game
+    if not game:
+        student_class = _get_student_class(profile) if profile else None
+        if student_class:
+            game = Game.objects.filter(
+                concept__chapter__class_subject__student_class=student_class,
+                is_active=True
+            ).first()
+        if not game:
+            game = Game.objects.filter(is_active=True).first()
+        if not game:
+            return redirect("common:games")
 
     concept = game.concept
     chapter = concept.chapter

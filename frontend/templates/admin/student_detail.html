@@ -1,0 +1,249 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-person-badge-fill" style="color:#6366F1;"></i>
+  Student Profile • {{ student.user.username }}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .profile-hero-card {
+    background: linear-gradient(135deg, #1E293B, #0F172A);
+    color: #FFFFFF;
+    border-radius: 20px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  }
+  .student-avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+  }
+  .profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .profile-stat-box {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+  .stat-val {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--text-main);
+    margin-top: 4px;
+  }
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .badge-card {
+    background: #F8FAFC;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+  .badge-icon {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Card -->
+<div class="profile-hero-card">
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <div class="student-avatar-lg">
+      {{ student.user.username|slice:":1"|upper }}
+    </div>
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 900;">
+        {{ student.user.get_full_name|default:student.user.username }}
+      </h1>
+      <p style="font-size: 0.85rem; color: #94A3B8; margin-top: 2px;">
+        @{{ student.user.username }} • {{ student.user.email|default:"No email" }}
+      </p>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+        <span class="status-pill active" style="background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid #6366F1;">
+          {{ student.student_class.class_label|default:"Unassigned" }}
+        </span>
+        <span class="status-pill {% if student.user.is_active %}active{% else %}draft{% endif %}">
+          {% if student.user.is_active %}● Active Account{% else %}○ Suspended{% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <a href="{% url 'tezadmin:student_list' %}" class="btn-admin btn-admin-secondary" style="background: rgba(255,255,255,0.1); color: #FFFFFF; border-color: rgba(255,255,255,0.2);">
+      ← Back to Students
+    </a>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="profile-stats-grid">
+  <div class="profile-stat-box">
+    <div class="stat-label">Total Experience</div>
+    <div class="stat-val" style="color: #6366F1;">✨ {{ student.xp }} XP</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="stat-label">TezCoins Balance</div>
+    <div class="stat-val" style="color: #F59E0B;">🪙 {{ student.coins }}</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="stat-label">Learning Streak</div>
+    <div class="stat-val" style="color: #EA580C;">🔥 {{ student.streak_days }} days</div>
+  </div>
+  <div class="profile-stat-box">
+    <div class="stat-label">Joined Date</div>
+    <div class="stat-val" style="font-size: 1.1rem; padding-top: 6px;">{{ student.user.date_joined|date:"M d, Y" }}</div>
+  </div>
+</div>
+
+<!-- 2-Column Grid: Badges & XP Logs -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+  <!-- Badges Vault -->
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <div class="admin-card-title">
+        <i class="bi bi-award-fill" style="color:#F59E0B;"></i>
+        Earned Badges ({{ badges.count }})
+      </div>
+    </div>
+
+    {% if badges %}
+      <div class="badge-grid">
+        {% for sb in badges %}
+          <div class="badge-card">
+            <div class="badge-icon">{{ sb.badge.icon|default:"🏅" }}</div>
+            <strong style="font-size: 0.85rem; color: #1E293B; display: block;">{{ sb.badge.name }}</strong>
+            <span style="font-size: 0.72rem; color: #64748B;">Earned {{ sb.earned_at|date:"M d, Y" }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: #94A3B8; font-size: 0.88rem;">
+        No badges unlocked by this student yet.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- XP Transaction Ledger -->
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <div class="admin-card-title">
+        <i class="bi bi-journal-check" style="color:#6366F1;"></i>
+        Recent XP Ledger
+      </div>
+    </div>
+
+    {% if xp_txs %}
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Amount</th>
+            <th>Reason / Source</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in xp_txs %}
+            <tr>
+              <td>
+                <strong style="color: #6366F1;">+{{ tx.amount }} XP</strong>
+              </td>
+              <td>
+                <span style="font-size: 0.82rem; color: #334155;">{{ tx.reason }}</span>
+              </td>
+              <td>
+                <span style="font-size: 0.75rem; color: #64748B;">{{ tx.created_at|date:"M d, H:i" }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: #94A3B8; font-size: 0.88rem;">
+        No recent XP transactions.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Game Sessions -->
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+  <div class="admin-card-header" style="padding: 20px 24px; margin: 0;">
+    <div class="admin-card-title">
+      <i class="bi bi-controller" style="color:#6366F1;"></i>
+      Recent Game Sessions
+    </div>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Game Played</th>
+        <th>Played At</th>
+        <th>Score</th>
+        <th>Difficulty</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+        <tr>
+          <td>
+            <strong style="color: #1E293B;">{{ s.game.title }}</strong>
+          </td>
+          <td>
+            <span style="font-size: 0.82rem; color: #64748B;">{{ s.started_at|date:"M d, Y H:i" }}</span>
+          </td>
+          <td>
+            <strong style="color: #6366F1;">{{ s.score }} pts</strong>
+          </td>
+          <td>
+            <span class="diff-pill diff-{{ s.difficulty }}">{{ s.difficulty }}</span>
+          </td>
+          <td>
+            <span class="status-pill {% if s.status == 'COMPLETED' %}active{% else %}draft{% endif %}">
+              {{ s.status }}
+            </span>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 32px; color: #94A3B8;">
+            No gameplay activity recorded yet.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -19,6 +19,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     
     # ── Page views ────────────────────────────────────────────────────────────
+    path("tezadmin/", include("common.admin_urls")),
     path("", include("common.urls")),
     path("games/dream-house-builder/", dream_house_builder_player_view, name="dream_house_builder"),
     path("games/dream-house-builder/result/<int:session_id>/", dream_house_builder_result_view, name="dream_house_builder_result"),

@@ -766,9 +766,13 @@
         <a class="btn-primary" href="{% url 'games:dream_house_builder' %}" style="background:linear-gradient(135deg,#5B50EB,#3B82F6);padding:12px 24px;">
           Launch 3D Game Arena <i class="bi bi-arrow-right"></i>
         </a>
-      {% else %}
-        <a class="btn-primary" href="/game/{{ first_game.id|default:1 }}/play/" style="padding:12px 24px;">
+      {% elif first_game %}
+        <a class="btn-primary" href="/game/{{ first_game.slug }}/play/" style="padding:12px 24px;">
           Launch Game Challenge <i class="bi bi-arrow-right"></i>
+        </a>
+      {% else %}
+        <a class="btn-primary" href="/games/" style="padding:12px 24px;">
+          Browse Game Arena <i class="bi bi-arrow-right"></i>
         </a>
       {% endif %}
     </div>

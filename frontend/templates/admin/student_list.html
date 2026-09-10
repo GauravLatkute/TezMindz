@@ -1,0 +1,184 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-people-fill" style="color:#6366F1;"></i>
+  Student Ecosystem Directory
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .student-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    padding: 10px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: var(--text-main);
+    width: 280px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--primary); }
+  .filter-select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+  }
+  .student-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="student-toolbar">
+  <form method="GET" class="filter-group">
+    <input type="text" name="q" class="search-input" placeholder="🔍 Search student name, email, username..." value="{{ query }}" />
+    <select name="class" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Classes</option>
+      {% for cls in classes %}
+        <option value="{{ cls.grade_number }}" {% if selected_class == cls.grade_number|stringformat:"s" %}selected{% endif %}>
+          {{ cls.class_label|default:cls.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn-admin btn-admin-primary" style="padding: 10px 18px;">Filter</button>
+    {% if query or selected_class %}
+      <a href="{% url 'tezadmin:student_list' %}" class="btn-admin btn-admin-secondary">Clear</a>
+    {% endif %}
+  </form>
+
+  <div style="font-size: 0.88rem; font-weight: 800; color: #64748B;">
+    Total Students: <strong style="color: #1E293B;">{{ total_count }}</strong>
+  </div>
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Student Profile</th>
+        <th>Email</th>
+        <th>Class Enrolled</th>
+        <th>XP & Coins</th>
+        <th>Streak</th>
+        <th>Account Status</th>
+        <th style="text-align: right; padding-right: 24px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for st in students %}
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="student-avatar">
+                {{ st.user.username|slice:":1"|upper }}
+              </div>
+              <div>
+                <strong style="font-size: 0.95rem; color: #1E293B; display: block;">
+                  {{ st.user.get_full_name|default:st.user.username }}
+                </strong>
+                <span style="font-size: 0.76rem; color: #64748B;">@{{ st.user.username }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span style="font-size: 0.85rem; color: #475569;">{{ st.user.email|default:"—" }}</span>
+          </td>
+          <td>
+            <span class="status-pill active" style="background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE;">
+              {{ st.student_class.class_label|default:"Not Assigned" }}
+            </span>
+          </td>
+          <td>
+            <div style="font-size: 0.85rem; font-weight: 700;">
+              <span style="color: #6366F1;">✨ {{ st.xp }} XP</span>
+              <span style="color: #F59E0B; margin-left: 8px;">🪙 {{ st.coins }}</span>
+            </div>
+          </td>
+          <td>
+            <span style="font-size: 0.85rem; font-weight: 800; color: #EA580C;">
+              🔥 {{ st.streak_days }} days
+            </span>
+          </td>
+          <td>
+            <span class="status-pill {% if st.user.is_active %}active{% else %}draft{% endif %}" id="student-status-{{ st.id }}">
+              {% if st.user.is_active %}● Active{% else %}○ Suspended{% endif %}
+            </span>
+          </td>
+          <td style="text-align: right; padding-right: 24px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px;">
+              <a href="{% url 'tezadmin:student_detail' st.id %}" class="btn-admin btn-admin-secondary" style="padding: 6px 12px; font-size: 0.78rem;">
+                <i class="bi bi-eye-fill"></i> View Details
+              </a>
+              <button type="button" class="btn-admin btn-admin-secondary" style="padding: 6px 12px; font-size: 0.78rem; color: #EF4444;" onclick="toggleStudentActive('{{ st.id }}')">
+                {% if st.user.is_active %}Suspend{% else %}Activate{% endif %}
+              </button>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 48px; color: #94A3B8;">
+            No students found matching your search criteria.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  async function toggleStudentActive(studentId) {
+    if (!confirm('Are you sure you want to toggle this student account status?')) return;
+    try {
+      const res = await fetch(`/tezadmin/students/${studentId}/toggle-active/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRF()
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert('Failed to update student account status.');
+      }
+    } catch (err) {
+      alert('Error: ' + err);
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,380 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-controller" style="color:#6366F1;"></i>
+  {% if game %}Edit Game • {{ game.title }}{% else %}Add New Educational Game{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .form-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .form-section-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 768px) {
+    .form-grid-2, .form-grid-4 {
+      grid-template-columns: 1fr;
+    }
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748B;
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: #F8FAFC;
+    color: var(--text-main);
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .form-control:focus {
+    border-color: var(--primary);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
+  .upload-box {
+    border: 2px dashed #CBD5E1;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    background: #F8FAFC;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .upload-box:hover {
+    border-color: var(--primary);
+    background: #EEF2FF;
+  }
+  .upload-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  .security-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEF3C7;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- 1. Curriculum Hierarchy Association -->
+    <div class="admin-card">
+      <div class="form-section-title">
+        <i class="bi bi-diagram-3-fill" style="color:var(--primary);"></i>
+        1. Academic Hierarchy Placement
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+        Choose the exact Class → Subject → Chapter → Topic this game reinforces.
+      </p>
+
+      <div class="form-grid-4">
+        <div class="form-group">
+          <label>Class</label>
+          <select id="classSelect" class="form-control" onchange="onClassChange()" required>
+            <option value="">Select Class...</option>
+            {% for cls in classes %}
+              <option value="{{ cls.id }}" {% if game and game.concept.chapter.class_subject.student_class.id == cls.id %}selected{% endif %}>
+                {{ cls.class_label|default:cls.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="subjectSelect" class="form-control" onchange="onSubjectChange()" required>
+            <option value="">Select Subject...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Chapter</label>
+          <select id="chapterSelect" class="form-control" onchange="onChapterChange()" required>
+            <option value="">Select Chapter...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Topic (Concept)</label>
+          <select id="topicSelect" name="topic_id" class="form-control" required>
+            <option value="">Select Topic...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Game Identity & Rules -->
+    <div class="admin-card">
+      <div class="form-section-title">
+        <i class="bi bi-controller" style="color:var(--primary);"></i>
+        2. Game Identity & Configuration
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Game Title</label>
+          <input type="text" id="gameTitle" name="title" class="form-control" placeholder="e.g. Large Number Explorer" value="{{ game.title|default:'' }}" required oninput="autoSlug()" />
+        </div>
+
+        <div class="form-group">
+          <label>URL Slug</label>
+          <input type="text" id="gameSlug" name="slug" class="form-control" placeholder="e.g. large-number-explorer" value="{{ game.slug|default:'' }}" required />
+        </div>
+      </div>
+
+      <div class="form-grid-4">
+        <div class="form-group">
+          <label>Game Engine Type</label>
+          <select name="game_type" class="form-control">
+            <option value="interactive_activity" {% if game.game_type == 'interactive_activity' %}selected{% endif %}>Interactive Activity</option>
+            <option value="math_arithmetic" {% if game.game_type == 'math_arithmetic' %}selected{% endif %}>Math Arithmetic Engine</option>
+            <option value="puzzle" {% if game.game_type == 'puzzle' %}selected{% endif %}>Logic Puzzle</option>
+            <option value="quiz" {% if game.game_type == 'quiz' %}selected{% endif %}>Interactive Quiz</option>
+            <option value="arcade" {% if game.game_type == 'arcade' %}selected{% endif %}>Arcade Learner</option>
+            <option value="simulation" {% if game.game_type == 'simulation' %}selected{% endif %}>Science Simulation</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Difficulty Tier</label>
+          <select name="difficulty" class="form-control">
+            <option value="easy" {% if game.difficulty == 'easy' %}selected{% endif %}>Easy (Beginner)</option>
+            <option value="medium" {% if game.difficulty == 'medium' %}selected{% endif %}>Medium (Standard)</option>
+            <option value="hard" {% if game.difficulty == 'hard' %}selected{% endif %}>Hard (Mastery)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>XP Reward</label>
+          <input type="number" name="xp_reward" class="form-control" value="{{ game.xp_reward|default:50 }}" min="10" max="1000" />
+        </div>
+
+        <div class="form-group">
+          <label>Coin Reward</label>
+          <input type="number" name="coin_reward" class="form-control" value="{{ game.coin_reward|default:15 }}" min="1" max="500" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Game Objective & Instructions</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Explain the rules and educational purpose of this game...">{{ game.description|default:'' }}</textarea>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+        <input type="checkbox" id="isActive" name="is_active" style="width: 18px; height: 18px; cursor: pointer;" {% if not game or game.is_active %}checked{% endif %} />
+        <label for="isActive" style="font-size: 0.9rem; font-weight: 700; cursor: pointer; margin: 0;">
+          Publish immediately (Active in Student Hub)
+        </label>
+      </div>
+    </div>
+
+    <!-- 3. Source Code Package Uploader -->
+    <div class="admin-card">
+      <div class="form-section-title">
+        <i class="bi bi-file-earmark-zip-fill" style="color:var(--primary);"></i>
+        3. Game Source Code Package (Optional / ZIP)
+      </div>
+      
+      {% if game and game.game_path %}
+        <div style="background: #F1F5F9; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.85rem;">
+          <strong>Current Relative Storage Path:</strong>
+          <code style="color: var(--primary); display: block; margin-top: 4px;">games/{{ game.game_path }}/</code>
+        </div>
+      {% endif %}
+
+      <div class="upload-box" onclick="document.getElementById('zipInput').click()">
+        <div class="upload-icon">📦</div>
+        <strong style="font-size: 0.95rem; color: #1E293B; display: block;">Upload Game ZIP Package</strong>
+        <p style="font-size: 0.8rem; color: #64748B; margin-top: 4px;">
+          Click to select or drop your game bundle containing <code>index.html</code>, <code>game.js</code>, and assets.
+        </p>
+        <input type="file" id="zipInput" name="game_zip" accept=".zip" style="display: none;" onchange="updateZipLabel(this)" />
+        <div id="zipFileName" style="margin-top: 10px; font-size: 0.85rem; font-weight: 700; color: var(--primary);"></div>
+      </div>
+
+      <div class="security-pill">
+        <i class="bi bi-shield-lock-fill"></i>
+        <span>Security Sandbox: Only HTML, CSS, JS, audio, and images are extracted. Executables & Python scripts are rejected.</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 24px;">
+      <a href="{% url 'tezadmin:game_library' %}" class="btn-admin btn-admin-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 28px; font-size: 0.95rem;">
+        <i class="bi bi-check-circle-fill"></i> Save Game & Extract Code
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Initial state for edit mode
+  const initialClassId = "{{ game.concept.chapter.class_subject.student_class.id|default:'' }}";
+  const initialSubjectId = "{{ game.concept.chapter.class_subject.subject.id|default:'' }}";
+  const initialChapterId = "{{ game.concept.chapter.id|default:'' }}";
+  const initialTopicId = "{{ game.concept.id|default:'' }}";
+
+  function autoSlug() {
+    {% if not game %}
+      const title = document.getElementById('gameTitle').value;
+      document.getElementById('gameSlug').value = title.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-');
+    {% endif %}
+  }
+
+  function updateZipLabel(input) {
+    if (input.files && input.files[0]) {
+      document.getElementById('zipFileName').innerText = "Selected: " + input.files[0].name + " (" + (input.files[0].size / 1024).toFixed(1) + " KB)";
+    }
+  }
+
+  async function onClassChange(preserveNext = false) {
+    const classId = document.getElementById('classSelect').value;
+    const subjSelect = document.getElementById('subjectSelect');
+    subjSelect.innerHTML = '<option value="">Select Subject...</option>';
+    document.getElementById('chapterSelect').innerHTML = '<option value="">Select Chapter...</option>';
+    document.getElementById('topicSelect').innerHTML = '<option value="">Select Topic...</option>';
+
+    if (!classId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=subjects&class_id=${classId}`);
+      const result = await res.json();
+      if (result.success) {
+        result.data.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.subject_id;
+          opt.textContent = (s.icon_type ? s.icon_type + ' ' : '') + s.title;
+          if (preserveNext && s.subject_id == initialSubjectId) {
+            opt.selected = true;
+          }
+          subjSelect.appendChild(opt);
+        });
+
+        if (preserveNext && initialSubjectId) {
+          await onSubjectChange(true);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function onSubjectChange(preserveNext = false) {
+    const classId = document.getElementById('classSelect').value;
+    const subjectId = document.getElementById('subjectSelect').value;
+    const chSelect = document.getElementById('chapterSelect');
+    chSelect.innerHTML = '<option value="">Select Chapter...</option>';
+    document.getElementById('topicSelect').innerHTML = '<option value="">Select Topic...</option>';
+
+    if (!classId || !subjectId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=chapters&class_id=${classId}&subject_id=${subjectId}`);
+      const result = await res.json();
+      if (result.success) {
+        result.data.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `Ch ${c.order}: ${c.name}`;
+          if (preserveNext && c.id == initialChapterId) {
+            opt.selected = true;
+          }
+          chSelect.appendChild(opt);
+        });
+
+        if (preserveNext && initialChapterId) {
+          await onChapterChange(true);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function onChapterChange(preserveNext = false) {
+    const chapterId = document.getElementById('chapterSelect').value;
+    const topSelect = document.getElementById('topicSelect');
+    topSelect.innerHTML = '<option value="">Select Topic...</option>';
+
+    if (!chapterId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=topics&chapter_id=${chapterId}`);
+      const result = await res.json();
+      if (result.success) {
+        result.data.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = `${t.order}. ${t.name} (${t.difficulty})`;
+          if (preserveNext && t.id == initialTopicId) {
+            opt.selected = true;
+          }
+          topSelect.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Prepopulate on load if editing
+  document.addEventListener('DOMContentLoaded', () => {
+    if (initialClassId) {
+      onClassChange(true);
+    }
+  });
+</script>
+{% endblock %}

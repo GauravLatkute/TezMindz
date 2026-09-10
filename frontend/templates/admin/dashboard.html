@@ -1,0 +1,178 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+<!-- KPI METRICS GRID -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
+  <!-- Total Students -->
+  <div class="admin-card" style="margin-bottom: 0; padding: 20px;">
+    <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Total Students</div>
+    <div style="font-size: 1.9rem; font-weight: 900; color: var(--text-main); margin: 6px 0;">{{ total_students }}</div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: #10B981;">🟢 {{ active_students }} Active this month</div>
+  </div>
+
+  <!-- Total Games -->
+  <div class="admin-card" style="margin-bottom: 0; padding: 20px;">
+    <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Educational Games</div>
+    <div style="font-size: 1.9rem; font-weight: 900; color: var(--text-main); margin: 6px 0;">{{ total_games }}</div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: #6366F1;">🎮 {{ active_games }} Active Games</div>
+  </div>
+
+  <!-- Game Sessions Today -->
+  <div class="admin-card" style="margin-bottom: 0; padding: 20px;">
+    <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Plays Today</div>
+    <div style="font-size: 1.9rem; font-weight: 900; color: var(--text-main); margin: 6px 0;">{{ today_game_sessions }}</div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: #F59E0B;">⚡ {{ total_game_sessions }} All-Time Plays</div>
+  </div>
+
+  <!-- Academic Content -->
+  <div class="admin-card" style="margin-bottom: 0; padding: 20px;">
+    <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Curriculum Size</div>
+    <div style="font-size: 1.9rem; font-weight: 900; color: var(--text-main); margin: 6px 0;">{{ total_topics }}</div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: #8B5CF6;">📚 {{ total_classes }} Classes • {{ total_subjects }} Subjects</div>
+  </div>
+</div>
+
+<!-- CHARTS ROW -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 28px;">
+  <!-- Activity Trends Chart -->
+  <div class="admin-card" style="margin-bottom: 0;">
+    <div class="admin-card-header">
+      <div class="admin-card-title">📈 7-Day Activity & Registrations</div>
+      <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Real-time Telemetry</span>
+    </div>
+    <div style="height: 280px; position: relative;">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Subject Topics Breakdown -->
+  <div class="admin-card" style="margin-bottom: 0;">
+    <div class="admin-card-header">
+      <div class="admin-card-title">📊 Subject Distribution</div>
+    </div>
+    <div style="height: 280px; position: relative;">
+      <canvas id="subjectChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- POPULAR GAMES & RECENT ACTIVITY -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+  <!-- Popular Games Table -->
+  <div class="admin-card" style="margin-bottom: 0;">
+    <div class="admin-card-header">
+      <div class="admin-card-title">🏆 Most Played Games</div>
+      <a href="{% url 'tezadmin:game_library' %}" style="font-size: 0.82rem; font-weight: 800; color: var(--primary); text-decoration: none;">View Library →</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Game</th>
+          <th>Curriculum</th>
+          <th>Total Plays</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for g in popular_games %}
+        <tr>
+          <td><strong>{{ g.title }}</strong></td>
+          <td>{{ g.concept.chapter.class_subject.student_class.class_label }} • {{ g.concept.chapter.class_subject.subject.title }}</td>
+          <td><span class="status-pill active">{{ g.plays }} plays</span></td>
+          <td>
+            <a href="{% url 'tezadmin:game_analytics' g.id %}" class="btn-admin btn-admin-secondary" style="padding: 4px 10px; font-size: 0.76rem;">Analytics</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No games played yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recent Audit Logs -->
+  <div class="admin-card" style="margin-bottom: 0;">
+    <div class="admin-card-header">
+      <div class="admin-card-title">📝 System Activity Logs</div>
+      <a href="{% url 'tezadmin:audit_logs' %}" style="font-size: 0.82rem; font-weight: 800; color: var(--primary); text-decoration: none;">All Logs →</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Admin</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in recent_logs %}
+        <tr>
+          <td style="font-size: 0.78rem; color: var(--text-muted);">{{ log.created_at|date:"M d, H:i" }}</td>
+          <td><strong>{{ log.admin_user.username|default:"System" }}</strong></td>
+          <td>{{ log.action }} <small style="color: var(--text-muted);">({{ log.target_model }})</small></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No logs recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Activity Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: {{ registration_labels|safe }},
+        datasets: [
+          {
+            label: 'Game Plays',
+            data: {{ play_data|safe }},
+            borderColor: '#6366F1',
+            backgroundColor: 'rgba(99, 102, 241, 0.12)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3
+          },
+          {
+            label: 'New Registrations',
+            data: {{ registration_data|safe }},
+            borderColor: '#10B981',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            borderDash: [5, 5]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } }
+      }
+    });
+
+    // 2. Subject Topics Distribution Chart
+    const subCtx = document.getElementById('subjectChart').getContext('2d');
+    new Chart(subCtx, {
+      type: 'doughnut',
+      data: {
+        labels: {{ subject_names|safe }},
+        datasets: [{
+          data: {{ subject_topics_count|safe }},
+          backgroundColor: ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  });
+</script>
+{% endblock %}

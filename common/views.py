@@ -669,11 +669,12 @@ def game_page(request, game_id):
     Delegates to modular_game_runner_view for isolated game architecture.
     """
     from games.views import modular_game_runner_view as _runner
+    if str(game_id).lower() in ["none", "null", "undefined", "0"]:
+        return _runner(request, slug=None)
     profile = _get_profile(request)
-    game = get_object_or_404(
-        Game.objects.select_related("concept__chapter__class_subject__student_class"),
-        id=game_id
-    )
+    game = Game.objects.select_related("concept__chapter__class_subject__student_class").filter(id=game_id).first()
+    if not game:
+        return _runner(request, slug=None)
     if not _class_owns_game(profile, game):
         return redirect("common:games")
 

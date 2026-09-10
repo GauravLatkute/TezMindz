@@ -1,0 +1,260 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-bar-chart-fill" style="color:#6366F1;"></i>
+  Analytics • {{ game.title }}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .game-hero-card {
+    background: linear-gradient(135deg, #1E293B, #0F172A);
+    color: #FFFFFF;
+    border-radius: 20px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  }
+  .game-hero-meta h1 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 6px;
+  }
+  .game-hero-meta p {
+    font-size: 0.88rem;
+    color: #94A3B8;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+  }
+  .kpi-label {
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .kpi-val {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text-main);
+  }
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Game Hero Summary -->
+<div class="game-hero-card">
+  <div class="game-hero-meta">
+    <h1>{{ game.title }}</h1>
+    <p>
+      Class {{ game.concept.chapter.class_subject.student_class.grade_number }} • 
+      {{ game.concept.chapter.class_subject.subject.title }} → 
+      Ch {{ game.concept.chapter.order }}: {{ game.concept.chapter.name }} → 
+      {{ game.concept.name }}
+    </p>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
+      <span class="status-pill {% if game.is_active %}active{% else %}draft{% endif %}">
+        {% if game.is_active %}● Active{% else %}○ Draft{% endif %}
+      </span>
+      <span class="status-pill active" style="background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid #6366F1;">
+        {{ game.game_type }}
+      </span>
+      <span style="font-size: 0.8rem; color: #CBD5E1; font-weight: 700;">
+        ✨ {{ game.xp_reward }} XP • 🪙 {{ game.coin_reward }} Coins
+      </span>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <a href="{% url 'common:game_play_by_slug' game.slug %}" class="btn-admin btn-admin-primary" target="_blank">
+      <i class="bi bi-play-fill"></i> Play Preview ↗
+    </a>
+    <a href="{% url 'tezadmin:game_edit' game.id %}" class="btn-admin btn-admin-secondary" style="background: rgba(255,255,255,0.1); color: #FFFFFF; border-color: rgba(255,255,255,0.2);">
+      <i class="bi bi-pencil-fill"></i> Edit
+    </a>
+    <a href="{% url 'tezadmin:game_library' %}" class="btn-admin btn-admin-secondary" style="background: rgba(255,255,255,0.1); color: #FFFFFF; border-color: rgba(255,255,255,0.2);">
+      ← Back
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Plays</div>
+    <div class="kpi-val">{{ total_plays }}</div>
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">{{ unique_students }} unique students</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-label">Completion Rate</div>
+    <div class="kpi-val" style="color: #10B981;">{{ completion_rate }}%</div>
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Finished full game loop</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-label">Accuracy Rate</div>
+    <div class="kpi-val" style="color: #6366F1;">{{ accuracy }}%</div>
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Correct student inputs</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-label">Avg Time / Attempt</div>
+    <div class="kpi-val" style="color: #F59E0B;">{{ avg_time_seconds }}s</div>
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Avg score: {{ avg_score }} pts</div>
+  </div>
+</div>
+
+<!-- Telemetry Charts -->
+<div class="charts-grid">
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <div class="admin-card-title">
+        <i class="bi bi-pie-chart-fill" style="color:#6366F1;"></i>
+        Difficulty Distribution
+      </div>
+    </div>
+    <div style="height: 240px; position: relative;">
+      <canvas id="diffChart"></canvas>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <div class="admin-card-title">
+        <i class="bi bi-shield-check" style="color:#10B981;"></i>
+        Performance & Mastery Benchmark
+      </div>
+    </div>
+    <div style="padding: 16px 0; display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">
+          <span>Completion Health</span>
+          <span>{{ completion_rate }}%</span>
+        </div>
+        <div style="height: 10px; background: #F1F5F9; border-radius: 6px; overflow: hidden;">
+          <div style="height: 100%; width: {{ completion_rate }}%; background: #10B981; border-radius: 6px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">
+          <span>Student Accuracy</span>
+          <span>{{ accuracy }}%</span>
+        </div>
+        <div style="height: 10px; background: #F1F5F9; border-radius: 6px; overflow: hidden;">
+          <div style="height: 100%; width: {{ accuracy }}%; background: #6366F1; border-radius: 6px;"></div>
+        </div>
+      </div>
+
+      <div style="background: #F8FAFC; border-radius: 12px; padding: 14px; margin-top: 8px; font-size: 0.82rem; color: #64748B;">
+        💡 <strong>Learning Insight:</strong> High accuracy combined with high completion rate indicates strong concept retention for <em>{{ game.concept.name }}</em>.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Player Sessions Table -->
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+  <div class="admin-card-header" style="padding: 20px 24px; margin: 0;">
+    <div class="admin-card-title">
+      <i class="bi bi-clock-history" style="color:#6366F1;"></i>
+      Recent Student Play Sessions
+    </div>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Played At</th>
+        <th>Difficulty</th>
+        <th>Score</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in recent_sessions %}
+        <tr>
+          <td>
+            <strong style="color: #1E293B;">{{ s.student.user.username }}</strong>
+          </td>
+          <td>
+            <span style="font-size: 0.82rem; color: #64748B;">{{ s.started_at|date:"M d, Y H:i" }}</span>
+          </td>
+          <td>
+            <span class="diff-pill diff-{{ s.difficulty }}">{{ s.difficulty }}</span>
+          </td>
+          <td>
+            <strong style="color: #6366F1;">{{ s.score }} pts</strong>
+          </td>
+          <td>
+            <span class="status-pill {% if s.status == 'COMPLETED' %}active{% else %}draft{% endif %}">
+              {{ s.status }}
+            </span>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 32px; color: #94A3B8;">
+            No student play sessions recorded for this game yet.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const diffCtx = document.getElementById('diffChart').getContext('2d');
+  new Chart(diffCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Easy', 'Medium', 'Hard'],
+      datasets: [{
+        data: [
+          {{ difficulty_counts.easy|default:0 }},
+          {{ difficulty_counts.medium|default:0 }},
+          {{ difficulty_counts.hard|default:0 }}
+        ],
+        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+{% endblock %}

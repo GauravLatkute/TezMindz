@@ -1,0 +1,288 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-controller" style="color:#6366F1;"></i>
+  Educational Game Library
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .library-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    padding: 10px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: var(--text-main);
+    width: 260px;
+    outline: none;
+  }
+  .search-input:focus {
+    border-color: var(--primary);
+  }
+  .filter-select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+  }
+  .game-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #EEF2FF;
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .status-badge-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+  .status-badge-toggle:hover {
+    transform: scale(1.05);
+  }
+  .action-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid var(--border);
+    display: inline-grid;
+    place-items: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .action-btn:hover {
+    background: var(--primary);
+    color: #FFFFFF;
+    border-color: var(--primary);
+  }
+  .diff-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+  .diff-easy { background: #DCFCE7; color: #166534; }
+  .diff-medium { background: #FEF3C7; color: #92400E; }
+  .diff-hard { background: #FEE2E2; color: #991B1B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="library-toolbar">
+  <div class="filter-group">
+    <input type="text" id="gameSearch" class="search-input" placeholder="🔍 Search games..." onkeyup="filterGames()" />
+    <select id="classFilter" class="filter-select" onchange="filterGames()">
+      <option value="">All Classes</option>
+      {% for cls in classes %}
+        <option value="Class {{ cls.grade_number }}">{{ cls.class_label|default:cls.name }}</option>
+      {% endfor %}
+    </select>
+    <select id="diffFilter" class="filter-select" onchange="filterGames()">
+      <option value="">All Difficulties</option>
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <div>
+    <a href="{% url 'tezadmin:game_add' %}" class="btn-admin btn-admin-primary">
+      <i class="bi bi-plus-circle-fill"></i> + Add New Game
+    </a>
+  </div>
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+  <table class="admin-table" id="gamesTable">
+    <thead>
+      <tr>
+        <th>Game Name & Type</th>
+        <th>Curriculum Hierarchy</th>
+        <th>Difficulty</th>
+        <th>Rewards</th>
+        <th>Plays</th>
+        <th>Status</th>
+        <th style="text-align: right; padding-right: 24px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for game in games %}
+        <tr class="game-row" data-title="{{ game.title|lower }}" data-class="Class {{ game.concept.chapter.class_subject.student_class.grade_number }}" data-diff="{{ game.difficulty }}">
+          <td>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="game-icon-box">
+                {% if game.game_type == 'math_arithmetic' %}🔢
+                {% elif game.game_type == 'interactive_activity' %}🎮
+                {% elif game.game_type == 'puzzle' %}🧩
+                {% else %}🕹️{% endif %}
+              </div>
+              <div>
+                <strong style="font-size: 0.95rem; color: #1E293B; display: block;">{{ game.title }}</strong>
+                <code style="font-size: 0.75rem; color: #64748B;">{{ game.slug }}</code>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #334155;">
+              Class {{ game.concept.chapter.class_subject.student_class.grade_number }} • {{ game.concept.chapter.class_subject.subject.title }}
+            </div>
+            <div style="font-size: 0.75rem; color: #64748B;">
+              Ch {{ game.concept.chapter.order }}: {{ game.concept.chapter.name }} → {{ game.concept.name }}
+            </div>
+          </td>
+          <td>
+            <span class="diff-pill diff-{{ game.difficulty }}">{{ game.difficulty }}</span>
+          </td>
+          <td>
+            <div style="font-size: 0.8rem; font-weight: 700; color: #475569;">
+              <span style="color: #6366F1;">✨ {{ game.xp_reward }} XP</span> • 
+              <span style="color: #F59E0B;">🪙 {{ game.coin_reward }} Coins</span>
+            </div>
+          </td>
+          <td>
+            <strong style="font-size: 0.9rem; color: #1E293B;">{{ game.play_count }}</strong>
+            <span style="font-size: 0.72rem; color: #64748B;">plays</span>
+          </td>
+          <td>
+            <span class="status-pill status-badge-toggle {% if game.is_active %}active{% else %}draft{% endif %}" id="status-badge-{{ game.id }}" onclick="toggleGameStatus('{{ game.id }}')">
+              {% if game.is_active %}● Active{% else %}○ Draft{% endif %}
+            </span>
+          </td>
+          <td style="text-align: right; padding-right: 24px;">
+            <div class="action-btns" style="justify-content: flex-end;">
+              <a href="{% url 'common:game_play_by_slug' game.slug %}" class="action-btn" target="_blank" title="Play / Preview Game">
+                <i class="bi bi-play-fill"></i>
+              </a>
+              <a href="{% url 'tezadmin:game_analytics' game.id %}" class="action-btn" title="View Telemetry Analytics">
+                <i class="bi bi-bar-chart-fill"></i>
+              </a>
+              <a href="{% url 'tezadmin:game_edit' game.id %}" class="action-btn" title="Edit Game Metadata & Code">
+                <i class="bi bi-pencil-fill"></i>
+              </a>
+              <button type="button" class="action-btn" onclick="duplicateGame('{{ game.id }}')" title="Duplicate Game Clone">
+                <i class="bi bi-copy"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 48px; color: #94A3B8;">
+            No games found. Click <strong>+ Add New Game</strong> to upload or register your first educational game.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function filterGames() {
+    const query = document.getElementById('gameSearch').value.toLowerCase().trim();
+    const selectedClass = document.getElementById('classFilter').value;
+    const selectedDiff = document.getElementById('diffFilter').value;
+
+    const rows = document.querySelectorAll('.game-row');
+    rows.forEach(row => {
+      const title = row.getAttribute('data-title') || '';
+      const cls = row.getAttribute('data-class') || '';
+      const diff = row.getAttribute('data-diff') || '';
+
+      const matchQuery = !query || title.includes(query);
+      const matchClass = !selectedClass || cls === selectedClass;
+      const matchDiff = !selectedDiff || diff === selectedDiff;
+
+      if (matchQuery && matchClass && matchDiff) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  async function toggleGameStatus(gameId) {
+    try {
+      const res = await fetch(`/tezadmin/games/${gameId}/toggle-status/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRF()
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        const badge = document.getElementById('status-badge-' + gameId);
+        if (data.is_active) {
+          badge.className = 'status-pill status-badge-toggle active';
+          badge.innerText = '● Active';
+        } else {
+          badge.className = 'status-pill status-badge-toggle draft';
+          badge.innerText = '○ Draft';
+        }
+      } else {
+        alert('Failed to update game status.');
+      }
+    } catch(err) {
+      alert('Error: ' + err);
+    }
+  }
+
+  async function duplicateGame(gameId) {
+    if (!confirm('Are you sure you want to duplicate this game?')) return;
+    try {
+      const res = await fetch(`/tezadmin/games/${gameId}/duplicate/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRF()
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert('Failed to duplicate game.');
+      }
+    } catch(err) {
+      alert('Error: ' + err);
+    }
+  }
+</script>
+{% endblock %}

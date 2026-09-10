@@ -282,3 +282,248 @@ class DedicatedPagesTests(TestCase):
         self.assertRedirects(res_hiw, "/how-it-works/", status_code=301)
 
 
+class TezMindzAdminPanelTests(TestCase):
+    def setUp(self):
+        import io
+        import zipfile
+        self.client = Client()
+
+        # Create normal student user
+        self.student_user = User.objects.create_user(
+            username="regular_student",
+            email="student@tezmindz.com",
+            password="password123"
+        )
+
+        # Create staff admin user
+        self.admin_user = User.objects.create_user(
+            username="head_admin",
+            email="admin@tezmindz.com",
+            password="adminpassword123",
+            is_staff=True,
+            is_superuser=True
+        )
+
+        # Create sample academic hierarchy
+        self.cls5 = Class.objects.create(
+            grade_number=5,
+            name="Grade 5",
+            class_label="Class 5",
+            stage="Primary",
+            age_group="Age 10-11",
+            category="primary"
+        )
+        self.math = Subject.objects.create(
+            title="Mathematics",
+            subtitle="Explore Numbers & Logic",
+            olympiad_code="IMO",
+            icon_type="math",
+            color_theme={"accent": "#6366F1"}
+        )
+        self.cs = ClassSubject.objects.create(student_class=self.cls5, subject=self.math)
+        self.ch = Chapter.objects.create(class_subject=self.cs, name="Large Numbers", order=1, slug="large-numbers")
+        self.top = Concept.objects.create(chapter=self.ch, name="Place Value", order=1, slug="place-value", difficulty="easy")
+
+        # Create sample game
+        self.game = Game.objects.create(
+            title="Place Value Builder",
+            slug="place-value-builder",
+            concept=self.top,
+            game_type="interactive_activity",
+            difficulty="easy",
+            xp_reward=50,
+            coin_reward=15,
+            is_active=True,
+            game_path="class_5/mathematics/chapter_01_large-numbers/topic_01_place-value/place-value-builder"
+        )
+
+        # Create StudentProfile
+        self.profile = StudentProfile.objects.create(
+            user=self.student_user,
+            student_class=self.cls5,
+            xp=250,
+            coins=60,
+            streak=4
+        )
+
+    def test_unauthenticated_and_non_staff_access_blocked(self):
+        """Unauthenticated or regular student is denied access to /tezadmin/."""
+        # Unauthenticated
+        res = self.client.get("/tezadmin/")
+        self.assertRedirects(res, "/login/?next=/tezadmin/")
+
+        # Regular non-staff student
+        self.client.login(username="regular_student", password="password123")
+        res2 = self.client.get("/tezadmin/")
+        self.assertEqual(res2.status_code, 302)
+        self.assertIn("/login/", res2["Location"])
+
+    def test_admin_dashboard_renders_for_staff(self):
+        """Staff admin can access executive dashboard with live metrics."""
+        self.client.login(username="head_admin", password="adminpassword123")
+        res = self.client.get("/tezadmin/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Executive Dashboard")
+        self.assertContains(res, "Place Value Builder")
+
+    def test_academic_hierarchy_view_and_cascading_api(self):
+        """Academic hierarchy view and cascading dropdown JSON API work correctly."""
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        # View page
+        res = self.client.get("/tezadmin/academic/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Academic Content Hierarchy")
+        self.assertContains(res, "Large Numbers")
+
+        # Cascading API: classes
+        api_cls = self.client.get("/tezadmin/api/hierarchy/?level=classes")
+        self.assertEqual(api_cls.status_code, 200)
+        self.assertEqual(len(api_cls.json()["data"]), 1)
+
+        # Cascading API: subjects
+        api_sub = self.client.get(f"/tezadmin/api/hierarchy/?level=subjects&class_id={self.cls5.id}")
+        self.assertEqual(api_sub.status_code, 200)
+        self.assertEqual(api_sub.json()["data"][0]["title"], "Mathematics")
+
+        # Cascading API: chapters
+        api_ch = self.client.get(f"/tezadmin/api/hierarchy/?level=chapters&class_id={self.cls5.id}&subject_id={self.math.id}")
+        self.assertEqual(api_ch.status_code, 200)
+        self.assertEqual(api_ch.json()["data"][0]["name"], "Large Numbers")
+
+        # Cascading API: topics
+        api_top = self.client.get(f"/tezadmin/api/hierarchy/?level=topics&chapter_id={self.ch.id}")
+        self.assertEqual(api_top.status_code, 200)
+        self.assertEqual(api_top.json()["data"][0]["name"], "Place Value")
+
+    def test_hierarchy_crud_apis(self):
+        """CRUD save endpoints for Class, Chapter, and Topic."""
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        # Create new Class 6
+        res_c = self.client.post("/tezadmin/api/classes/save/", {
+            "grade_number": 6,
+            "name": "Grade 6",
+            "class_label": "Class 6",
+            "stage": "Middle",
+            "age_group": "Age 11-12"
+        }, content_type="application/json")
+        self.assertEqual(res_c.status_code, 200)
+        self.assertTrue(Class.objects.filter(grade_number=6).exists())
+
+        # Create new Chapter
+        res_ch = self.client.post("/tezadmin/api/chapters/save/", {
+            "class_subject_id": self.cs.id,
+            "name": "Roman Numerals",
+            "order": 2,
+            "description": "Learning Roman numerals"
+        }, content_type="application/json")
+        self.assertEqual(res_ch.status_code, 200)
+        self.assertTrue(Chapter.objects.filter(name="Roman Numerals").exists())
+
+        # Create new Topic
+        new_ch = Chapter.objects.get(name="Roman Numerals")
+        res_top = self.client.post("/tezadmin/api/topics/save/", {
+            "chapter_id": new_ch.id,
+            "name": "Rules of Roman Numerals",
+            "order": 1,
+            "difficulty": "medium",
+            "description": "Rules"
+        }, content_type="application/json")
+        self.assertEqual(res_top.status_code, 200)
+        self.assertTrue(Concept.objects.filter(name="Rules of Roman Numerals").exists())
+
+    def test_game_library_and_actions(self):
+        """Game library view, toggle status, and clone duplication."""
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        # View library
+        res = self.client.get("/tezadmin/games/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Place Value Builder")
+
+        # Toggle status
+        res_toggle = self.client.post(f"/tezadmin/games/{self.game.id}/toggle-status/")
+        self.assertEqual(res_toggle.status_code, 200)
+        self.assertFalse(res_toggle.json()["is_active"])
+
+        # Duplicate game
+        res_dup = self.client.post(f"/tezadmin/games/{self.game.id}/duplicate/")
+        self.assertEqual(res_dup.status_code, 200)
+        self.assertTrue(Game.objects.filter(title="Place Value Builder (Copy)").exists())
+
+    def test_game_form_and_secure_zip_upload(self):
+        """Add new game with ZIP file and verify safe extraction & audit logging."""
+        import io
+        import zipfile
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        # Create in-memory zip archive containing safe assets
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w") as zf:
+            zf.writestr("index.html", "<!DOCTYPE html><html><body><h1>Game Test</h1></body></html>")
+            zf.writestr("game.js", "console.log('Game running');")
+            zf.writestr("style.css", "body { background: #000; }")
+        zip_buffer.seek(0)
+
+        uploaded_zip = SimpleUploadedFile("test_game.zip", zip_buffer.getvalue(), content_type="application/zip")
+
+        res_create = self.client.post("/tezadmin/games/add/", {
+            "title": "Abacus Master",
+            "slug": "abacus-master",
+            "topic_id": self.top.id,
+            "game_type": "math_arithmetic",
+            "difficulty": "medium",
+            "xp_reward": 75,
+            "coin_reward": 25,
+            "is_active": "on",
+            "game_zip": uploaded_zip
+        }, follow=True)
+
+        self.assertEqual(res_create.status_code, 200)
+        self.assertTrue(Game.objects.filter(slug="abacus-master").exists())
+
+    def test_game_analytics_view(self):
+        """Deep analytics view for an educational game."""
+        self.client.login(username="head_admin", password="adminpassword123")
+        res = self.client.get(f"/tezadmin/games/{self.game.id}/analytics/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Place Value Builder")
+        self.assertContains(res, "Completion Rate")
+
+    def test_student_management_and_toggle(self):
+        """Student directory listing, detail inspector, and active toggle."""
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        # Student list
+        res_list = self.client.get("/tezadmin/students/")
+        self.assertEqual(res_list.status_code, 200)
+        self.assertContains(res_list, "regular_student")
+
+        # Student detail
+        res_detail = self.client.get(f"/tezadmin/students/{self.profile.id}/")
+        self.assertEqual(res_detail.status_code, 200)
+        self.assertContains(res_detail, "regular_student")
+
+        # Toggle student active
+        res_toggle = self.client.post(f"/tezadmin/students/{self.profile.id}/toggle-active/")
+        self.assertEqual(res_toggle.status_code, 200)
+        self.student_user.refresh_from_db()
+        self.assertFalse(self.student_user.is_active)
+
+    def test_gamification_and_audit_logs_views(self):
+        """Gamification engine and audit logs views render successfully."""
+        self.client.login(username="head_admin", password="adminpassword123")
+
+        res_gam = self.client.get("/tezadmin/gamification/")
+        self.assertEqual(res_gam.status_code, 200)
+        self.assertContains(res_gam, "Gamification")
+
+        res_logs = self.client.get("/tezadmin/audit-logs/")
+        self.assertEqual(res_logs.status_code, 200)
+        self.assertContains(res_logs, "System Governance & Audit Logs")
+
+
+

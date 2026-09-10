@@ -1,0 +1,822 @@
+{% extends "admin/base_admin.html" %}
+
+{% block header_title %}
+  <i class="bi bi-diagram-3-fill" style="color:#6366F1;"></i>
+  Academic Content Hierarchy
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hierarchy-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .hierarchy-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .class-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .class-node {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s ease;
+  }
+  .class-node:hover {
+    border-color: #CBD5E1;
+  }
+  .class-node-header {
+    padding: 20px 24px;
+    background: #F8FAFC;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1.5px solid transparent;
+  }
+  .class-node.open .class-node-header {
+    border-bottom-color: var(--border);
+    background: #F1F5F9;
+  }
+  .class-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .class-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+  .class-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .class-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .class-node-body {
+    display: none;
+    padding: 24px;
+  }
+  .class-node.open .class-node-body {
+    display: block;
+  }
+  
+  /* Subject cards inside Class */
+  .subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+  }
+  .subject-box {
+    background: #FAFAFA;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .subject-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #F1F5F9;
+  }
+  .subject-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1E293B;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Chapter list & Collapsible Dropdowns */
+  .chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chapter-item {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .chapter-item:hover {
+    border-color: #CBD5E1;
+  }
+  .chapter-item-head {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    background: #FFFFFF;
+    transition: background 0.15s ease;
+  }
+  .chapter-item.open .chapter-item-head {
+    background: #F8FAFC;
+    border-bottom: 1.5px solid #F1F5F9;
+  }
+  .chapter-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #1E293B;
+  }
+  .chapter-chevron {
+    font-size: 0.8rem;
+    color: #94A3B8;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+  .chapter-item.open .chapter-chevron {
+    transform: rotate(90deg);
+    color: var(--primary);
+  }
+  .topic-count-pill {
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: #F1F5F9;
+    color: #64748B;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 4px;
+  }
+  .chapter-item.open .topic-count-pill {
+    background: #EEF2FF;
+    color: var(--primary);
+  }
+  .topics-list {
+    display: none;
+    padding: 14px 16px;
+    background: #FFFFFF;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chapter-item.open .topics-list {
+    display: flex;
+  }
+  .topic-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.84rem;
+    color: #475569;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+  }
+  .topic-item:hover {
+    background: #F8FAFC;
+    color: var(--primary);
+  }
+  .diff-pill {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+  }
+  .diff-easy { background: #DCFCE7; color: #166534; }
+  .diff-medium { background: #FEF3C7; color: #92400E; }
+  .diff-hard { background: #FEE2E2; color: #991B1B; }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748B;
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: #F8FAFC;
+    color: var(--text-main);
+    outline: none;
+  }
+  .form-control:focus {
+    border-color: var(--primary);
+    background: #FFFFFF;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hierarchy-toolbar">
+  <div>
+    <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 4px;">Curriculum & Structure</h2>
+    <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+      Organize educational modules across Class → Subject → Chapter → Topic hierarchy.
+    </p>
+  </div>
+  <div class="hierarchy-actions">
+    <button class="btn-admin btn-admin-secondary" onclick="openClassModal()">
+      <i class="bi bi-plus-lg"></i> Add Class
+    </button>
+    <button class="btn-admin btn-admin-secondary" onclick="openChapterModal()">
+      <i class="bi bi-folder-plus"></i> Add Chapter
+    </button>
+    <button class="btn-admin btn-admin-primary" onclick="openTopicModal()">
+      <i class="bi bi-file-earmark-plus"></i> Add Topic
+    </button>
+  </div>
+</div>
+
+<!-- Hierarchy Tree Accordions -->
+<div class="class-accordion">
+  {% for cls in classes %}
+    <div class="class-node {% if forloop.first %}open{% endif %}" id="class-node-{{ cls.id }}">
+      <div class="class-node-header" onclick="toggleClassNode('{{ cls.id }}')">
+        <div class="class-meta">
+          <div class="class-badge">{{ cls.grade_number }}</div>
+          <div>
+            <div class="class-title">{{ cls.class_label|default:cls.name }} ({{ cls.name }})</div>
+            <div class="class-subtitle">{{ cls.stage }} • {{ cls.age_group }} • {{ cls.class_subjects.count }} Subjects</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="btn-admin btn-admin-secondary" style="padding: 6px 12px; font-size: 0.78rem;" onclick="event.stopPropagation(); editClass('{{ cls.id }}', '{{ cls.grade_number }}', '{{ cls.name }}', '{{ cls.class_label }}', '{{ cls.stage }}', '{{ cls.age_group }}')">
+            <i class="bi bi-pencil-fill"></i> Edit Class
+          </button>
+          <i class="bi bi-chevron-down" id="chevron-{{ cls.id }}"></i>
+        </div>
+      </div>
+
+      <div class="class-node-body">
+        {% if cls.class_subjects.all %}
+          <div class="subjects-grid">
+            {% for cs in cls.class_subjects.all %}
+              <div class="subject-box" id="subject-box-{{ cs.id }}">
+                <div class="subject-header">
+                  <div class="subject-title">
+                    <span>
+                      {% if cs.subject.icon_type == 'math' %}🧮
+                      {% elif cs.subject.icon_type == 'science' %}🔬
+                      {% elif cs.subject.icon_type == 'english' %}📚
+                      {% else %}📖{% endif %}
+                    </span>
+                    <span>{{ cs.subject.title }}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <button class="btn-admin btn-admin-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="toggleAllSubjectChapters('{{ cs.id }}')" title="Expand / Collapse all chapters">
+                      <i class="bi bi-arrows-expand"></i> Toggle
+                    </button>
+                    <button class="btn-admin btn-admin-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openChapterModal('{{ cs.id }}', '{{ cls.class_label|default:cls.name }} • {{ cs.subject.title }}')">
+                      <i class="bi bi-plus"></i> Chapter
+                    </button>
+                  </div>
+                </div>
+
+                <div class="chapters-list">
+                  {% for ch in cs.chapters.all %}
+                    <div class="chapter-item {% if forloop.first %}open{% endif %}" id="chapter-item-{{ ch.id }}">
+                      <div class="chapter-item-head" onclick="toggleChapter('{{ ch.id }}')">
+                        <div class="chapter-title-group">
+                          <i class="bi bi-chevron-right chapter-chevron" id="chapter-chevron-{{ ch.id }}"></i>
+                          <span><strong>Ch {{ ch.order }}.</strong> {{ ch.name }}</span>
+                          <span class="topic-count-pill">{{ ch.concepts.count }} Topics</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;" onclick="event.stopPropagation()">
+                          <button class="btn-admin btn-admin-secondary" style="padding: 3px 8px; font-size: 0.7rem;" onclick="openTopicModal('{{ ch.id }}', '{{ cls.class_label|default:cls.name }} • {{ cs.subject.title }} → Ch {{ ch.order }}: {{ ch.name }}')" title="Add Topic to Chapter">
+                            + Topic
+                          </button>
+                          <button class="btn-admin btn-admin-secondary" style="padding: 3px 7px; font-size: 0.7rem;" onclick="editChapter('{{ ch.id }}', '{{ cs.id }}', '{{ ch.name|escapejs }}', '{{ ch.order }}', '{{ ch.description|escapejs }}', '{{ cls.class_label|default:cls.name }} • {{ cs.subject.title }}')" title="Edit Chapter">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="topics-list">
+                        {% for top in ch.concepts.all %}
+                          <div class="topic-item">
+                            <span>• {{ top.order }}. {{ top.name }}</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                              <span class="diff-pill diff-{{ top.difficulty }}">{{ top.difficulty }}</span>
+                              <button class="btn-admin btn-admin-secondary" style="padding: 2px 6px; font-size: 0.65rem;" onclick="editTopic('{{ top.id }}', '{{ ch.id }}', '{{ top.name|escapejs }}', '{{ top.order }}', '{{ top.difficulty }}', '{{ top.description|escapejs }}', '{{ cls.class_label|default:cls.name }} • {{ cs.subject.title }} → Ch {{ ch.order }}: {{ ch.name }}')" title="Edit Topic">
+                                <i class="bi bi-pencil"></i>
+                              </button>
+                            </div>
+                          </div>
+                        {% empty %}
+                          <div style="font-size: 0.75rem; color: #94A3B8; text-align: center; padding: 6px;">No topics created yet. Click "+ Topic" above.</div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% empty %}
+                    <div style="font-size: 0.8rem; color: #94A3B8; text-align: center; padding: 16px; border: 1px dashed var(--border); border-radius: 12px;">
+                      No chapters found. Click "+ Chapter" to create one.
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="text-align: center; padding: 24px; color: #94A3B8;">
+            No subjects configured for this class yet.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="admin-card" style="text-align: center; padding: 48px;">
+      <p style="font-size: 1.1rem; font-weight: 700; color: #64748B;">No classes found in the system.</p>
+      <button class="btn-admin btn-admin-primary" style="margin-top: 16px;" onclick="openClassModal()">
+        + Create First Class
+      </button>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- ── MODALS ── -->
+
+<!-- 1. Class Modal -->
+<div class="admin-modal-backdrop" id="classModal">
+  <div class="admin-modal">
+    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 20px;" id="classModalTitle">Add / Edit Class</h3>
+    <form id="classForm" onsubmit="submitClassForm(event)">
+      <input type="hidden" id="class_id" name="id" value="" />
+      <div class="form-group">
+        <label>Grade Number (e.g. 5)</label>
+        <input type="number" id="class_grade" class="form-control" required min="1" max="12" />
+      </div>
+      <div class="form-group">
+        <label>Class Label (e.g. Class 5)</label>
+        <input type="text" id="class_label" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Display Name (e.g. Grade 5)</label>
+        <input type="text" id="class_name" class="form-control" required />
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label>Stage</label>
+          <select id="class_stage" class="form-control">
+            <option value="Primary">Primary</option>
+            <option value="Middle">Middle</option>
+            <option value="Secondary">Secondary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Age Group</label>
+          <input type="text" id="class_age" class="form-control" placeholder="e.g. Age 10-11" />
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button type="button" class="btn-admin btn-admin-secondary" onclick="closeModal('classModal')">Cancel</button>
+        <button type="submit" class="btn-admin btn-admin-primary">Save Class</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. Chapter Modal -->
+<div class="admin-modal-backdrop" id="chapterModal">
+  <div class="admin-modal">
+    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 20px;" id="chapterModalTitle">Add / Edit Chapter</h3>
+    <form id="chapterForm" onsubmit="submitChapterForm(event)">
+      <input type="hidden" id="chapter_id" name="id" value="" />
+      <input type="hidden" id="chapter_cs_id" name="class_subject_id" value="" />
+
+      <!-- Targeted Context Banner (when opened from a specific Subject) -->
+      <div id="chapter_target_banner" style="background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; display: none;">
+        <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: #4338CA; letter-spacing: 0.05em;">Selected Subject</div>
+        <strong id="chapter_target_label" style="font-size: 0.95rem; color: #1E293B; display: block; margin-top: 2px;"></strong>
+      </div>
+
+      <!-- Cascading Selectors (only when opened from top global toolbar) -->
+      <div id="chapter_cascading_selectors" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Class</label>
+          <select id="chapter_modal_class" class="form-control" onchange="onChapterModalClassChange()">
+            <option value="">Select Class...</option>
+            {% for cls in classes %}
+              <option value="{{ cls.id }}">{{ cls.class_label|default:cls.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Subject</label>
+          <select id="chapter_modal_subject" class="form-control" onchange="document.getElementById('chapter_cs_id').value = this.value">
+            <option value="">Select Class first...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Chapter Name</label>
+        <input type="text" id="chapter_name" class="form-control" placeholder="e.g. Large Numbers & Operations" required />
+      </div>
+      <div class="form-group">
+        <label>Order Number</label>
+        <input type="number" id="chapter_order" class="form-control" value="1" min="1" required />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="chapter_desc" class="form-control" rows="3" placeholder="Brief chapter syllabus..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button type="button" class="btn-admin btn-admin-secondary" onclick="closeModal('chapterModal')">Cancel</button>
+        <button type="submit" class="btn-admin btn-admin-primary">Save Chapter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 3. Topic Modal -->
+<div class="admin-modal-backdrop" id="topicModal">
+  <div class="admin-modal">
+    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 20px;" id="topicModalTitle">Add / Edit Topic (Concept)</h3>
+    <form id="topicForm" onsubmit="submitTopicForm(event)">
+      <input type="hidden" id="topic_id" name="id" value="" />
+      <input type="hidden" id="topic_chapter_id" name="chapter_id" value="" />
+
+      <!-- Targeted Context Banner (when opened from a specific Chapter) -->
+      <div id="topic_target_banner" style="background: #EEF2FF; border: 1.5px solid #C7D2FE; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; display: none;">
+        <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: #4338CA; letter-spacing: 0.05em;">Selected Chapter</div>
+        <strong id="topic_target_label" style="font-size: 0.95rem; color: #1E293B; display: block; margin-top: 2px;"></strong>
+      </div>
+
+      <!-- Cascading Selectors (only when opened from top global toolbar) -->
+      <div id="topic_cascading_selectors" style="display: none; margin-bottom: 18px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Class</label>
+            <select id="topic_modal_class" class="form-control" onchange="onTopicModalClassChange()">
+              <option value="">Select Class...</option>
+              {% for cls in classes %}
+                <option value="{{ cls.id }}">{{ cls.class_label|default:cls.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Subject</label>
+            <select id="topic_modal_subject" class="form-control" onchange="onTopicModalSubjectChange()">
+              <option value="">Select Class first...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Chapter</label>
+          <select id="topic_modal_chapter" class="form-control" onchange="document.getElementById('topic_chapter_id').value = this.value">
+            <option value="">Select Subject first...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Topic / Concept Title</label>
+        <input type="text" id="topic_name" class="form-control" placeholder="e.g. Reading and Writing Large Numbers" required />
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label>Order Number</label>
+          <input type="number" id="topic_order" class="form-control" value="1" min="1" required />
+        </div>
+        <div class="form-group">
+          <label>Difficulty</label>
+          <select id="topic_diff" class="form-control">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description & Objectives</label>
+        <textarea id="topic_desc" class="form-control" rows="3" placeholder="Learning objectives and concept summary..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button type="button" class="btn-admin btn-admin-secondary" onclick="closeModal('topicModal')">Cancel</button>
+        <button type="submit" class="btn-admin btn-admin-primary">Save Topic</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleClassNode(classId) {
+    const node = document.getElementById('class-node-' + classId);
+    if (node) {
+      node.classList.toggle('open');
+    }
+  }
+
+  function toggleChapter(chapterId) {
+    const el = document.getElementById('chapter-item-' + chapterId);
+    if (el) {
+      el.classList.toggle('open');
+    }
+  }
+
+  function toggleAllSubjectChapters(csId) {
+    const box = document.getElementById('subject-box-' + csId);
+    if (!box) return;
+    const items = box.querySelectorAll('.chapter-item');
+    const hasClosed = Array.from(items).some(i => !i.classList.contains('open'));
+    items.forEach(i => {
+      if (hasClosed) {
+        i.classList.add('open');
+      } else {
+        i.classList.remove('open');
+      }
+    });
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  // Class Modal Handlers
+  function openClassModal() {
+    document.getElementById('classModalTitle').innerText = 'Add New Class';
+    document.getElementById('class_id').value = '';
+    document.getElementById('classForm').reset();
+    openModal('classModal');
+  }
+  function editClass(id, grade, name, label, stage, age) {
+    document.getElementById('classModalTitle').innerText = 'Edit Class ' + grade;
+    document.getElementById('class_id').value = id;
+    document.getElementById('class_grade').value = grade;
+    document.getElementById('class_name').value = name;
+    document.getElementById('class_label').value = label;
+    document.getElementById('class_stage').value = stage;
+    document.getElementById('class_age').value = age;
+    openModal('classModal');
+  }
+  async function submitClassForm(e) {
+    e.preventDefault();
+    const payload = {
+      id: document.getElementById('class_id').value || null,
+      grade_number: document.getElementById('class_grade').value,
+      name: document.getElementById('class_name').value,
+      class_label: document.getElementById('class_label').value,
+      stage: document.getElementById('class_stage').value,
+      age_group: document.getElementById('class_age').value
+    };
+    try {
+      const res = await fetch("{% url 'tezadmin:api_class_save' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert("Error: " + (data.message || "Failed to save class"));
+      }
+    } catch(err) {
+      alert("Network error: " + err);
+    }
+  }
+
+  // Chapter Modal Handlers
+  function openChapterModal(csId = '', targetLabel = '') {
+    document.getElementById('chapterModalTitle').innerText = 'Add New Chapter';
+    document.getElementById('chapter_id').value = '';
+    document.getElementById('chapterForm').reset();
+    document.getElementById('chapter_cs_id').value = csId || '';
+
+    if (csId && targetLabel) {
+      document.getElementById('chapter_target_banner').style.display = 'block';
+      document.getElementById('chapter_target_label').innerText = targetLabel;
+      document.getElementById('chapter_cascading_selectors').style.display = 'none';
+    } else {
+      document.getElementById('chapter_target_banner').style.display = 'none';
+      document.getElementById('chapter_cascading_selectors').style.display = 'grid';
+    }
+    openModal('chapterModal');
+  }
+
+  function editChapter(id, csId, name, order, desc, targetLabel = '') {
+    document.getElementById('chapterModalTitle').innerText = 'Edit Chapter';
+    document.getElementById('chapter_id').value = id;
+    document.getElementById('chapter_cs_id').value = csId;
+    document.getElementById('chapter_name').value = name;
+    document.getElementById('chapter_order').value = order;
+    document.getElementById('chapter_desc').value = desc;
+
+    if (targetLabel) {
+      document.getElementById('chapter_target_banner').style.display = 'block';
+      document.getElementById('chapter_target_label').innerText = targetLabel;
+      document.getElementById('chapter_cascading_selectors').style.display = 'none';
+    } else {
+      document.getElementById('chapter_target_banner').style.display = 'none';
+      document.getElementById('chapter_cascading_selectors').style.display = 'grid';
+    }
+    openModal('chapterModal');
+  }
+
+  async function onChapterModalClassChange() {
+    const classId = document.getElementById('chapter_modal_class').value;
+    const subjSelect = document.getElementById('chapter_modal_subject');
+    subjSelect.innerHTML = '<option value="">Select Subject...</option>';
+    document.getElementById('chapter_cs_id').value = '';
+    if (!classId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=subjects&class_id=${classId}`);
+      const data = await res.json();
+      if (data.success) {
+        data.data.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.class_subject_id;
+          opt.textContent = s.title;
+          subjSelect.appendChild(opt);
+        });
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  async function submitChapterForm(e) {
+    e.preventDefault();
+    const csId = document.getElementById('chapter_cs_id').value;
+    if (!csId) {
+      alert("Please select a valid subject for this chapter.");
+      return;
+    }
+    const payload = {
+      id: document.getElementById('chapter_id').value || null,
+      class_subject_id: csId,
+      name: document.getElementById('chapter_name').value,
+      order: document.getElementById('chapter_order').value,
+      description: document.getElementById('chapter_desc').value
+    };
+    try {
+      const res = await fetch("{% url 'tezadmin:api_chapter_save' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert("Error: " + (data.message || "Failed to save chapter"));
+      }
+    } catch(err) {
+      alert("Network error: " + err);
+    }
+  }
+
+  // Topic Modal Handlers
+  function openTopicModal(chId = '', targetLabel = '') {
+    document.getElementById('topicModalTitle').innerText = 'Add New Topic';
+    document.getElementById('topic_id').value = '';
+    document.getElementById('topicForm').reset();
+    document.getElementById('topic_chapter_id').value = chId || '';
+
+    if (chId && targetLabel) {
+      document.getElementById('topic_target_banner').style.display = 'block';
+      document.getElementById('topic_target_label').innerText = targetLabel;
+      document.getElementById('topic_cascading_selectors').style.display = 'none';
+    } else {
+      document.getElementById('topic_target_banner').style.display = 'none';
+      document.getElementById('topic_cascading_selectors').style.display = 'block';
+    }
+    openModal('topicModal');
+  }
+
+  function editTopic(id, chId, name, order, diff, desc, targetLabel = '') {
+    document.getElementById('topicModalTitle').innerText = 'Edit Topic';
+    document.getElementById('topic_id').value = id;
+    document.getElementById('topic_chapter_id').value = chId;
+    document.getElementById('topic_name').value = name;
+    document.getElementById('topic_order').value = order;
+    document.getElementById('topic_diff').value = diff;
+    document.getElementById('topic_desc').value = desc;
+
+    if (targetLabel) {
+      document.getElementById('topic_target_banner').style.display = 'block';
+      document.getElementById('topic_target_label').innerText = targetLabel;
+      document.getElementById('topic_cascading_selectors').style.display = 'none';
+    } else {
+      document.getElementById('topic_target_banner').style.display = 'none';
+      document.getElementById('topic_cascading_selectors').style.display = 'block';
+    }
+    openModal('topicModal');
+  }
+
+  async function onTopicModalClassChange() {
+    const classId = document.getElementById('topic_modal_class').value;
+    const subjSelect = document.getElementById('topic_modal_subject');
+    const chSelect = document.getElementById('topic_modal_chapter');
+    subjSelect.innerHTML = '<option value="">Select Subject...</option>';
+    chSelect.innerHTML = '<option value="">Select Chapter...</option>';
+    document.getElementById('topic_chapter_id').value = '';
+    if (!classId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=subjects&class_id=${classId}`);
+      const data = await res.json();
+      if (data.success) {
+        data.data.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.subject_id;
+          opt.textContent = s.title;
+          subjSelect.appendChild(opt);
+        });
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  async function onTopicModalSubjectChange() {
+    const classId = document.getElementById('topic_modal_class').value;
+    const subjSelect = document.getElementById('topic_modal_subject');
+    const subjectId = subjSelect.value;
+    const chSelect = document.getElementById('topic_modal_chapter');
+    chSelect.innerHTML = '<option value="">Select Chapter...</option>';
+    document.getElementById('topic_chapter_id').value = '';
+    if (!classId || !subjectId) return;
+
+    try {
+      const res = await fetch(`/tezadmin/api/hierarchy/?level=chapters&class_id=${classId}&subject_id=${subjectId}`);
+      const data = await res.json();
+      if (data.success) {
+        data.data.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `Ch ${c.order}: ${c.name}`;
+          chSelect.appendChild(opt);
+        });
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  async function submitTopicForm(e) {
+    e.preventDefault();
+    const chId = document.getElementById('topic_chapter_id').value;
+    if (!chId) {
+      alert("Please select a valid chapter for this topic.");
+      return;
+    }
+    const payload = {
+      id: document.getElementById('topic_id').value || null,
+      chapter_id: chId,
+      name: document.getElementById('topic_name').value,
+      order: document.getElementById('topic_order').value,
+      difficulty: document.getElementById('topic_diff').value,
+      description: document.getElementById('topic_desc').value
+    };
+    try {
+      const res = await fetch("{% url 'tezadmin:api_topic_save' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRF() },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert("Error: " + (data.message || "Failed to save topic"));
+      }
+    } catch(err) {
+      alert("Network error: " + err);
+    }
+  }
+</script>
+{% endblock %}
