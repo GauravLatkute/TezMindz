@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Subjects &amp; Curriculum — Tezz-Mindz Olympiad Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+      :root {
+        --tm-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --tm-ink: #0F172A;
+        --tm-slate: #334155;
+        --tm-muted: #64748B;
+        --tm-bg: #FAFAFC;
+        --tm-brand: #4F46E5;
+        --tm-brand-light: #6366F1;
+        --tm-brand-soft: #EEF2FF;
+        --tm-emerald: #059669;
+        --tm-emerald-soft: #ECFDF5;
+        --tm-purple: #7C3AED;
+        --tm-purple-soft: #FAF5FF;
+        --tm-rose: #E11D48;
+        --tm-rose-soft: #FFF1F2;
+        --tm-amber: #D97706;
+        --tm-amber-soft: #FFFBEB;
+        --tm-cyan: #0891B2;
+        --tm-cyan-soft: #ECFEFF;
+        --tm-card-radius: 22px;
+        --tm-shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.04);
+        --tm-shadow-md: 0 12px 30px rgba(15, 23, 42, 0.06);
+        --tm-shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.09);
+        --tm-border: #F1F5F9;
+      }
+
+      * { box-sizing: border-box; }
+
+      body.page.subjects-page {
+        background-color: var(--tm-bg);
+        font-family: var(--tm-font);
+        color: var(--tm-ink);
+        overflow-x: hidden;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── BACKGROUND ORBS ── */
+      .bg-ambient-orb {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .orb-top-right {
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, rgba(238, 220, 255, 0.7) 0%, rgba(224, 231, 255, 0.2) 60%, transparent 80%);
+        top: -120px;
+        right: -100px;
+        filter: blur(60px);
+      }
+      .orb-mid-left {
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(224, 242, 254, 0.8) 0%, rgba(254, 243, 199, 0.3) 60%, transparent 80%);
+        top: 600px;
+        left: -120px;
+        filter: blur(50px);
+      }
+
+      /* ── NAVBAR ── */
+      .public-nav-v2 {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.25s ease;
+      }
+      .public-nav-v2.scrolled {
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      }
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1260px;
+        margin: 0 auto;
+        padding: 16px 24px;
+      }
+      .landing-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+      .landing-logo-mark {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        box-shadow: 0 8px 18px rgba(99, 102, 241, 0.3);
+        transition: transform 0.25s ease;
+      }
+      .landing-logo:hover .landing-logo-mark {
+        transform: scale(1.05) rotate(3deg);
+      }
+      .landing-logo-text strong {
+        display: block;
+        font-size: 1.38rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+      .landing-logo-text span {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--tm-muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .landing-nav-links {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      .landing-nav-links a {
+        text-decoration: none;
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--tm-slate);
+        transition: color 0.2s ease;
+        position: relative;
+        padding: 6px 0;
+      }
+      .landing-nav-links a:hover {
+        color: var(--tm-brand);
+      }
+      .landing-nav-links a.active {
+        color: var(--tm-brand);
+      }
+      .landing-nav-links a.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        border-radius: 99px;
+        background: var(--tm-brand);
+      }
+      .landing-nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-nav-login {
+        border-radius: 99px;
+        padding: 10px 22px;
+        font-weight: 700;
+        font-size: 0.94rem;
+        border: 1.5px solid var(--tm-brand-light);
+        background: #FFFFFF;
+        color: var(--tm-brand);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      .btn-nav-login:hover {
+        background: var(--tm-brand-soft);
+        border-color: var(--tm-brand);
+      }
+      .btn-nav-register {
+        border-radius: 99px;
+        padding: 10px 24px;
+        font-weight: 800;
+        font-size: 0.94rem;
+        background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+        color: #FFFFFF;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+        transition: all 0.2s ease;
+      }
+      .btn-nav-register:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+      }
+
+      /* Student HUD */
+      .hud-profile-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px 4px 14px;
+        background: #FFFFFF;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 100px;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .hud-profile-pill:hover {
+        border-color: #A78BFA;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.14);
+        transform: translateY(-1px);
+      }
+      .hud-profile-meta {
+        text-align: right;
+        line-height: 1.15;
+      }
+      .hud-profile-meta strong {
+        display: block;
+        font-size: 0.84rem;
+        font-weight: 900;
+        color: #0F172A;
+        white-space: nowrap;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hud-profile-meta small {
+        font-size: 0.66rem;
+        font-weight: 800;
+        color: #6366F1;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+      .hud-avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+        border: 2px solid #A78BFA;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .hud-avatar-circle::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 9px;
+        height: 9px;
+        background: #10B981;
+        border: 1.5px solid #FFFFFF;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #10B981;
+      }
+
+      /* ── HERO SECTION ── */
+      .page-hero-section {
+        max-width: 1260px;
+        margin: 0 auto;
+        padding: 60px 24px 40px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .section-tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: var(--tm-brand-soft);
+        color: var(--tm-brand);
+        border: 1px solid #C7D2FE;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+      }
+      .page-hero-title {
+        font-size: 3.2rem;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.035em;
+        margin: 0 0 16px;
+        color: var(--tm-ink);
+      }
+      .page-hero-title span {
+        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .page-hero-subtitle {
+        font-size: 1.18rem;
+        line-height: 1.6;
+        color: var(--tm-muted);
+        max-width: 760px;
+        margin: 0 auto 30px;
+        font-weight: 500;
+      }
+
+      /* ── CLASS SELECTOR TABS ── */
+      .class-tabs-container {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        max-width: 900px;
+        margin: 0 auto 48px;
+      }
+      .class-tab-btn {
+        padding: 10px 20px;
+        border-radius: 99px;
+        border: 1.5px solid var(--tm-border);
+        background: #FFFFFF;
+        color: var(--tm-slate);
+        font-weight: 800;
+        font-size: 0.94rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--tm-shadow-sm);
+      }
+      .class-tab-btn:hover {
+        border-color: var(--tm-brand-light);
+        color: var(--tm-brand);
+        transform: translateY(-2px);
+      }
+      .class-tab-btn.active {
+        background: var(--tm-brand);
+        color: #FFFFFF;
+        border-color: var(--tm-brand);
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+      }
+
+      /* ── 3 CORE SUBJECT PILLARS ── */
+      .subjects-overview-section {
+        max-width: 1260px;
+        margin: 0 auto 70px;
+        padding: 0 24px;
+      }
+      .subjects-hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+      }
+      .subject-hero-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 34px 28px;
+        box-shadow: var(--tm-shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .subject-hero-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--tm-shadow-md);
+      }
+      .subject-hero-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+      }
+      .s-card-math::before { background: linear-gradient(90deg, #4F46E5, #6366F1); }
+      .s-card-science::before { background: linear-gradient(90deg, #059669, #10B981); }
+      .s-card-english::before { background: linear-gradient(90deg, #7C3AED, #A855F7); }
+
+      .subject-icon-box {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .s-card-math .subject-icon-box { background: #EEF2FF; color: #4F46E5; border: 1.5px solid #C7D2FE; }
+      .s-card-science .subject-icon-box { background: #ECFDF5; color: #059669; border: 1.5px solid #A7F3D0; }
+      .s-card-english .subject-icon-box { background: #FAF5FF; color: #7C3AED; border: 1.5px solid #DDD6FE; }
+
+      .subject-hero-card h3 {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 10px;
+        letter-spacing: -0.02em;
+      }
+      .subject-hero-card p {
+        font-size: 0.98rem;
+        color: var(--tm-muted);
+        line-height: 1.6;
+        margin: 0 0 20px;
+        font-weight: 500;
+      }
+      .subject-highlights-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .subject-highlights-list li {
+        font-size: 0.90rem;
+        color: var(--tm-slate);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .subject-highlights-list li svg {
+        flex-shrink: 0;
+      }
+      .btn-subject-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.94rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+      .s-card-math .btn-subject-cta { background: #EEF2FF; color: #4F46E5; }
+      .s-card-math .btn-subject-cta:hover { background: #4F46E5; color: #FFFFFF; }
+      .s-card-science .btn-subject-cta { background: #ECFDF5; color: #059669; }
+      .s-card-science .btn-subject-cta:hover { background: #059669; color: #FFFFFF; }
+      .s-card-english .btn-subject-cta { background: #FAF5FF; color: #7C3AED; }
+      .s-card-english .btn-subject-cta:hover { background: #7C3AED; color: #FFFFFF; }
+
+      /* ── CLASS SYLLABUS GRID ── */
+      .class-grid-section {
+        max-width: 1260px;
+        margin: 0 auto 80px;
+        padding: 0 24px;
+      }
+      .section-heading-block {
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 40px;
+      }
+      .section-heading-block h2 {
+        font-size: 2.35rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        letter-spacing: -0.03em;
+        margin: 0 0 12px;
+      }
+      .section-heading-block p {
+        font-size: 1.05rem;
+        color: var(--tm-muted);
+        line-height: 1.6;
+        margin: 0;
+      }
+      .all-classes-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      .class-directory-card {
+        background: #FFFFFF;
+        border: 1.5px solid var(--tm-border);
+        border-radius: var(--tm-card-radius);
+        padding: 28px 22px;
+        box-shadow: var(--tm-shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        position: relative;
+      }
+      .class-directory-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--tm-shadow-md);
+        border-color: #C7D2FE;
+      }
+      .class-dir-badge {
+        font-size: 0.76rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 10px;
+        border-radius: 99px;
+        background: #EEF2FF;
+        color: #4F46E5;
+        align-self: flex-start;
+        margin-bottom: 12px;
+      }
+      .class-directory-card h4 {
+        font-size: 1.32rem;
+        font-weight: 900;
+        color: var(--tm-ink);
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .class-directory-card p {
+        font-size: 0.90rem;
+        color: var(--tm-muted);
+        line-height: 1.55;
+        margin: 0 0 16px;
+        font-weight: 500;
+      }
+      .class-dir-topics {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .class-dir-topics li {
+        font-size: 0.82rem;
+        color: var(--tm-slate);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .class-dir-topics li svg {
+        flex-shrink: 0;
+        color: #10B981;
+      }
+      .btn-class-explore {
+        background: #F8FAFC;
+        border: 1.5px solid var(--tm-border);
+        border-radius: 12px;
+        padding: 10px 16px;
+        color: var(--tm-brand);
+        font-weight: 800;
+        font-size: 0.88rem;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s ease;
+      }
+      .class-directory-card:hover .btn-class-explore {
+        background: var(--tm-brand);
+        color: #FFFFFF;
+        border-color: var(--tm-brand);
+      }
+
+      /* ── 3D GAMES FEATURED BANNER ── */
+      .games-spotlight-section {
+        max-width: 1260px;
+        margin: 0 auto 80px;
+        padding: 0 24px;
+      }
+      .games-spotlight-card {
+        background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+        border-radius: 28px;
+        padding: 48px;
+        color: #FFFFFF;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+        align-items: center;
+        box-shadow: var(--tm-shadow-lg);
+      }
+      .games-spotlight-card h3 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin: 0 0 14px;
+        letter-spacing: -0.03em;
+      }
+      .games-spotlight-card p {
+        font-size: 1.05rem;
+        color: #C7D2FE;
+        line-height: 1.6;
+        margin: 0 0 24px;
+      }
+      .games-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .game-tile {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 18px;
+        backdrop-filter: blur(10px);
+      }
+      .game-tile strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .game-tile span {
+        font-size: 0.82rem;
+        color: #A5B4FC;
+      }
+
+      /* ── FOOTER ── */
+      .site-footer-v2 {
+        background: #FFFFFF;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        padding: 60px 24px 32px;
+      }
+      .footer-inner-grid {
+        max-width: 1260px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+      }
+      .footer-col h5 {
+        font-size: 0.92rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--tm-ink);
+        margin: 0 0 16px;
+      }
+      .footer-col a {
+        display: block;
+        color: var(--tm-muted);
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        transition: color 0.2s ease;
+      }
+      .footer-col a:hover {
+        color: var(--tm-brand);
+      }
+      .footer-bottom-bar {
+        max-width: 1260px;
+        margin: 40px auto 0;
+        padding-top: 24px;
+        border-top: 1px solid var(--tm-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--tm-muted);
+        font-weight: 600;
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 1024px) {
+        .subjects-hero-grid { grid-template-columns: 1fr; }
+        .all-classes-grid { grid-template-columns: repeat(2, 1fr); }
+        .games-spotlight-card { grid-template-columns: 1fr; }
+        .footer-inner-grid { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 640px) {
+        .landing-nav-links { display: none; }
+        .page-hero-title { font-size: 2.2rem; }
+        .all-classes-grid { grid-template-columns: 1fr; }
+        .games-preview-grid { grid-template-columns: 1fr; }
+        .footer-inner-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body class="page subjects-page">
+    <!-- Ambient glowing backdrop orbs -->
+    <div class="bg-ambient-orb orb-top-right"></div>
+    <div class="bg-ambient-orb orb-mid-left"></div>
+
+    <!-- NAVBAR -->
+    <header class="public-nav-v2" id="main-navbar">
+      <div class="nav-container">
+        <!-- Logo -->
+        <a class="landing-logo" href="/">
+          <div class="landing-logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5" />
+              <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z" />
+              <path d="M9 15l-3-3" />
+            </svg>
+          </div>
+          <div class="landing-logo-text">
+            <strong>Tezz-Mindz</strong>
+            <span>Learn • Play • Master</span>
+          </div>
+        </a>
+        
+        <!-- Center Nav Links -->
+        <nav class="landing-nav-links" aria-label="Main Navigation">
+          <a href="/">Home</a>
+          <a href="/subjects/" class="active">Subjects</a>
+          <a href="/how-it-works/">How It Works</a>
+          <a href="/about/">About</a>
+        </nav>
+
+        <!-- Right Action Controls -->
+        <div class="landing-nav-actions">
+          {% if request.user.is_authenticated %}
+            <a class="hud-profile-pill" href="/profile/" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }} ({{ profile.student_class.class_label|default:'Class 5' }})">
+              <div class="hud-profile-meta">
+                <strong>{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}</strong>
+                <small>{{ profile.student_class.class_label|default:"Class 5" }}</small>
+              </div>
+              <div class="hud-avatar-circle">
+                <svg viewBox="0 0 36 36" width="30" height="30">
+                  <defs>
+                    <linearGradient id="hudAvatarBgHome" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#818CF8"/>
+                      <stop offset="100%" stop-color="#4F46E5"/>
+                    </linearGradient>
+                    <linearGradient id="hudVisorHome" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38BDF8"/>
+                      <stop offset="100%" stop-color="#0284C7"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="18" cy="18" r="17" fill="url(#hudAvatarBgHome)"/>
+                  <ellipse cx="18" cy="19" rx="10" ry="11" fill="#FFFFFF"/>
+                  <path d="M10 16 C10 13 26 13 26 16 C26 19 23 20 18 20 C13 20 10 19 10 16 Z" fill="url(#hudVisorHome)"/>
+                  <ellipse cx="15" cy="15.5" rx="3" ry="1.2" fill="#FFFFFF" opacity="0.8"/>
+                  <path d="M11 28 C13 25 23 25 25 28 L27 34 C23 36 13 36 9 34 Z" fill="#312E81"/>
+                  <circle cx="18" cy="27" r="2" fill="#F59E0B"/>
+                </svg>
+              </div>
+            </a>
+            <a class="btn-nav-register" href="/dashboard/">Dashboard →</a>
+          {% else %}
+            <a class="btn-nav-login" href="/login/">Student Login</a>
+            <a class="btn-nav-register" href="/register/">Start Free</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="page-hero-section">
+      <span class="section-tag-pill">Comprehensive Curriculum Directory</span>
+      <h1 class="page-hero-title">Explore <span>Class 1 to 8</span> Syllabus</h1>
+      <p class="page-hero-subtitle">
+        Structured NCERT-aligned curriculum pathways with applied 3D games, adaptive quizzes, and Olympiad mastery for IMO, NSO, and IEO competitions.
+      </p>
+
+      <!-- Filter Tabs -->
+      <div class="class-tabs-container">
+        <button class="class-tab-btn active" onclick="filterClassTab(this, 'all')">All Classes</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-1')">Class 1</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-2')">Class 2</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-3')">Class 3</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-4')">Class 4</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-5')">Class 5</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-6')">Class 6</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-7')">Class 7</button>
+        <button class="class-tab-btn" onclick="filterClassTab(this, 'class-8')">Class 8</button>
+      </div>
+    </section>
+
+    <!-- 3 CORE SUBJECT PILLARS -->
+    <section class="subjects-overview-section">
+      <div class="subjects-hero-grid">
+        <!-- Mathematics IMO -->
+        <div class="subject-hero-card s-card-math">
+          <div>
+            <div class="subject-icon-box">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <line x1="5" y1="19" x2="19" y2="5"></line>
+              </svg>
+            </div>
+            <h3>Mathematics (IMO)</h3>
+            <p>From number patterns to fractions, geometry, measurement, and competitive Olympiad mental problem solving.</p>
+            <ul class="subject-highlights-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Place Values, Large Numbers &amp; Roman Numerals</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Visual Fractions, Decimals &amp; Percentages</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Spatial 2D/3D Shapes, Angles &amp; Perimeter</span>
+              </li>
+            </ul>
+          </div>
+          <a class="btn-subject-cta" href="/subject/1/">Explore Math Syllabus →</a>
+        </div>
+
+        <!-- Science NSO -->
+        <div class="subject-hero-card s-card-science">
+          <div>
+            <div class="subject-icon-box">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/>
+                <path d="M8.5 2h7"/>
+              </svg>
+            </div>
+            <h3>Science (NSO)</h3>
+            <p>Interactive virtual experiments covering living organisms, states of matter, light, forces, and space systems.</p>
+            <ul class="subject-highlights-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Plant Biology, Photosynthesis &amp; Habitats</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Force, Work, Energy &amp; Simple Machines</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Matter, Solutions, Air &amp; Water Cycles</span>
+              </li>
+            </ul>
+          </div>
+          <a class="btn-subject-cta" href="/subject/2/">Explore Science Syllabus →</a>
+        </div>
+
+        <!-- English IEO -->
+        <div class="subject-hero-card s-card-english">
+          <div>
+            <div class="subject-icon-box">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                <path d="M6 6h10"></path>
+                <path d="M6 10h10"></path>
+              </svg>
+            </div>
+            <h3>English (IEO)</h3>
+            <p>Mastering grammar rules, vocabulary expansion, contextual idioms, and reading comprehension passages.</p>
+            <ul class="subject-highlights-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Parts of Speech &amp; Tenses Mastery</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Vocabulary, Synonyms, Antonyms &amp; Idioms</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Active Reading Comprehension &amp; Inferences</span>
+              </li>
+            </ul>
+          </div>
+          <a class="btn-subject-cta" href="/subject/3/">Explore English Syllabus →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALL 8 CLASSES DIRECTORY -->
+    <section class="class-grid-section">
+      <div class="section-heading-block">
+        <span class="section-tag-pill">Grade Directory</span>
+        <h2>Class 1 to Class 8 Pathways</h2>
+        <p>Choose your grade level to access curated chapters, games, and quizzes.</p>
+      </div>
+
+      <div class="all-classes-grid" id="classesGrid">
+        <!-- Class 1 -->
+        <div class="class-directory-card" data-class="class-1">
+          <div>
+            <span class="class-dir-badge">Class 1 • Primary</span>
+            <h4>Class 1</h4>
+            <p>Foundations of numbers, addition, 2D shapes, plants, living things, and basic phonics.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Counting &amp; Patterns</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> My Body &amp; Surroundings</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Sight Words &amp; Nouns</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 1</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 2 -->
+        <div class="class-directory-card" data-class="class-2">
+          <div>
+            <span class="class-dir-badge">Class 2 • Primary</span>
+            <h4>Class 2</h4>
+            <p>2-digit arithmetic, money calculations, animals, seasons, verbs, and sentence building.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Addition &amp; Subtraction</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Air, Water &amp; Weather</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Pronouns &amp; Adjectives</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 2</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 3 -->
+        <div class="class-directory-card" data-class="class-3">
+          <div>
+            <span class="class-dir-badge">Class 3 • Primary</span>
+            <h4>Class 3</h4>
+            <p>3-digit numbers, intro to multiplication, plants, matter states, tenses, and reading stories.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Multiplication &amp; Division</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Birds, Animals &amp; Food</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Simple Tenses &amp; Synonyms</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 3</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 4 -->
+        <div class="class-directory-card" data-class="class-4">
+          <div>
+            <span class="class-dir-badge">Class 4 • Primary</span>
+            <h4>Class 4</h4>
+            <p>Fractions intro, perimeter &amp; area, human body systems, forces, prepositions, and paragraphs.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Unit Fractions &amp; Decimals</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Digestive &amp; Skeletal Systems</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Prepositions &amp; Conjunctions</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 4</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 5 -->
+        <div class="class-directory-card" data-class="class-5">
+          <div>
+            <span class="class-dir-badge" style="background:#ECFDF5;color:#059669;">Class 5 • Flagship</span>
+            <h4>Class 5</h4>
+            <p>Indian place value, fraction operations, photosynthesis, simple machines, advanced grammar.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Number Builder 3D &amp; Fractions</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Photosynthesis &amp; Bio-Lab</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Modals &amp; Active/Passive Voice</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 5</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 6 -->
+        <div class="class-directory-card" data-class="class-6">
+          <div>
+            <span class="class-dir-badge">Class 6 • Middle</span>
+            <h4>Class 6</h4>
+            <p>Integers, ratio &amp; proportion, food components, electricity, circuits, and voice transformation.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Integers &amp; Algebra Intro</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Electric Circuits &amp; Magnets</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Clauses &amp; Direct/Indirect</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 6</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 7 -->
+        <div class="class-directory-card" data-class="class-7">
+          <div>
+            <span class="class-dir-badge">Class 7 • Middle</span>
+            <h4>Class 7</h4>
+            <p>Rational numbers, algebraic expressions, nutrition in animals, heat, acids, and vocabulary.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Lines, Angles &amp; Triangles</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Heat, Respiration &amp; Motion</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Idioms, Phrasal Verbs &amp; Essays</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 7</span> <span>→</span></a>
+        </div>
+
+        <!-- Class 8 -->
+        <div class="class-directory-card" data-class="class-8">
+          <div>
+            <span class="class-dir-badge">Class 8 • Middle</span>
+            <h4>Class 8</h4>
+            <p>Linear equations, exponents, square roots, force &amp; pressure, chemical effects of current.</p>
+            <ul class="class-dir-topics">
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Linear Equations &amp; Exponents</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Force, Friction &amp; Sound</li>
+              <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Advanced Synthesis &amp; Logic</li>
+            </ul>
+          </div>
+          <a class="btn-class-explore" href="/learn/"><span>Start Class 8</span> <span>→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D GAMES SPOTLIGHT -->
+    <section class="games-spotlight-section">
+      <div class="games-spotlight-card">
+        <div>
+          <span style="background: rgba(245, 158, 11, 0.25); color: #FDE68A; border: 1px solid rgba(245, 158, 11, 0.4); padding: 5px 14px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase;">Gamified Learning</span>
+          <h3>Connected 3D Games for Every Subject</h3>
+          <p>We don't just teach theory—every major concept is connected to an interactive 3D challenge where students apply their knowledge to solve visual puzzles.</p>
+          <a class="btn-nav-register" href="/games/" style="display:inline-block;">Enter 3D Games Arena →</a>
+        </div>
+        <div class="games-preview-grid">
+          <div class="game-tile">
+            <strong>Dream House Builder 3D</strong>
+            <span>Place Values • Mathematics</span>
+          </div>
+          <div class="game-tile">
+            <strong>Pizza Master Quest</strong>
+            <span>Visual Fractions • Mathematics</span>
+          </div>
+          <div class="game-tile">
+            <strong>Bio-Reactor Lab</strong>
+            <span>Photosynthesis • Science</span>
+          </div>
+          <div class="game-tile">
+            <strong>Cosmic Word Rocket</strong>
+            <span>Spelling &amp; Vocabulary • English</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer-v2">
+      <div class="footer-inner-grid">
+        <div class="footer-col">
+          <a class="landing-logo" href="/" style="margin-bottom: 14px;">
+            <div class="landing-logo-mark">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5" />
+                <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z" />
+                <path d="M9 15l-3-3" />
+              </svg>
+            </div>
+            <div class="landing-logo-text">
+              <strong>Tezz-Mindz</strong>
+              <span>Learn • Play • Master</span>
+            </div>
+          </a>
+          <p style="font-size: 0.88rem; color: var(--tm-muted); line-height: 1.6; margin-top: 10px;">
+            India's next-generation gamified Olympiad learning platform combining NCERT syllabus curriculum with interactive 3D games and adaptive quizzes.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Subjects</h5>
+          <a href="/subject/1/">Mathematics (IMO)</a>
+          <a href="/subject/2/">Science (NSO)</a>
+          <a href="/subject/3/">English (IEO)</a>
+          <a href="/games/dream-house-builder/">3D Games Arena</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Platform</h5>
+          <a href="/subjects/">Class 1 – Class 8</a>
+          <a href="/how-it-works/">How It Works</a>
+          <a href="/about/">About Us</a>
+          <a href="/leaderboard/">National Leaderboard</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Support &amp; Legal</h5>
+          <a href="/login/">Student Login</a>
+          <a href="/register/">Create Free Account</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>© 2026 Tezz-Mindz EdTech Platform. All rights reserved.</span>
+        <span>Built for Young Champions Across India</span>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+      {% if user_data_js %}
+      window.USER_DATA = {{ user_data_js|safe }};
+      {% endif %}
+
+      window.addEventListener('scroll', function() {
+        var nav = document.getElementById('main-navbar');
+        if (window.scrollY > 20) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      });
+
+      function filterClassTab(btn, targetClass) {
+        document.querySelectorAll('.class-tab-btn').forEach(function(b) {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+
+        var cards = document.querySelectorAll('.class-directory-card');
+        cards.forEach(function(card) {
+          if (targetClass === 'all' || card.getAttribute('data-class') === targetClass) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

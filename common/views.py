@@ -198,6 +198,28 @@ def landing_page(request):
     return render(request, "index.html", get_user_data_context(request))
 
 
+def about_page(request):
+    return render(request, "about.html", get_user_data_context(request))
+
+
+def subjects_page(request):
+    context = get_user_data_context(request)
+    classes = Class.objects.filter(is_active=True).order_by("grade_number")
+    class_subjects = (
+        ClassSubject.objects.filter(student_class__is_active=True, subject__is_active=True)
+        .select_related("student_class", "subject")
+        .prefetch_related("chapters__concepts")
+        .order_by("student_class__grade_number", "subject__title")
+    )
+    context["classes"] = classes
+    context["class_subjects"] = class_subjects
+    return render(request, "subjects.html", context)
+
+
+def how_it_works_page(request):
+    return render(request, "how_it_works.html", get_user_data_context(request))
+
+
 def login_page(request):
     if request.user.is_authenticated:
         return redirect("common:dashboard")

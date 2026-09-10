@@ -1,4 +1,4 @@
-﻿"""
+"""
 Context processors for TezMindz platform.
 Injects student profile and authentication data across all templates.
 """

@@ -7,6 +7,9 @@ app_name = "common"
 urlpatterns = [
     # ── Public ────────────────────────────────────────────────────────────────
     path("", views.landing_page, name="landing"),
+    path("about/", views.about_page, name="about"),
+    path("subjects/", views.subjects_page, name="subjects"),
+    path("how-it-works/", views.how_it_works_page, name="how_it_works"),
     path("login/", views.login_page, name="login"),
     path("register/", views.register_page, name="register"),
     path("logout/", views.logout_page, name="logout"),
@@ -47,6 +50,9 @@ urlpatterns = [
 
     # ── Legacy HTML redirect fallbacks ────────────────────────────────────────
     re_path(r".*index\.html$", RedirectView.as_view(url="/", permanent=True)),
+    re_path(r".*about\.html$", RedirectView.as_view(url="/about/", permanent=True)),
+    re_path(r".*subjects\.html$", RedirectView.as_view(url="/subjects/", permanent=True)),
+    re_path(r".*how-it-works\.html$", RedirectView.as_view(url="/how-it-works/", permanent=True)),
     re_path(r".*login\.html$", RedirectView.as_view(url="/login/", permanent=True)),
     re_path(r".*register\.html$", RedirectView.as_view(url="/register/", permanent=True)),
     re_path(r".*class\.html$", RedirectView.as_view(url="/class/", permanent=True)),

@@ -38,6 +38,10 @@
 
       * { box-sizing: border-box; }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body.page.landing {
         background-color: var(--tm-bg);
         font-family: var(--tm-font);
@@ -47,7 +51,8 @@
         -webkit-font-smoothing: antialiased;
       }
 
-      /* ── BACKGROUND ORBS ── */
+
+      /* ── BACKGROUND ORBS ANIMATION ── */
       .bg-ambient-orb {
         position: absolute;
         border-radius: 50%;
@@ -55,21 +60,45 @@
         z-index: 0;
       }
       .orb-top-right {
-        width: 450px;
-        height: 450px;
-        background: radial-gradient(circle, rgba(238, 220, 255, 0.7) 0%, rgba(224, 231, 255, 0.2) 60%, transparent 80%);
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(circle, rgba(238, 220, 255, 0.75) 0%, rgba(224, 231, 255, 0.3) 60%, transparent 80%);
         top: -120px;
         right: -100px;
-        filter: blur(60px);
+        filter: blur(65px);
+        animation: floatOrbTop 12s ease-in-out infinite alternate;
       }
       .orb-mid-left {
-        width: 380px;
-        height: 380px;
-        background: radial-gradient(circle, rgba(224, 242, 254, 0.8) 0%, rgba(254, 243, 199, 0.3) 60%, transparent 80%);
-        top: 600px;
-        left: -120px;
-        filter: blur(50px);
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, rgba(224, 242, 254, 0.85) 0%, rgba(254, 243, 199, 0.35) 60%, transparent 80%);
+        top: 550px;
+        left: -140px;
+        filter: blur(55px);
+        animation: floatOrbMid 14s ease-in-out infinite alternate;
       }
+      @keyframes floatOrbTop {
+        0% { transform: translateY(0) scale(1); }
+        100% { transform: translateY(40px) scale(1.08); }
+      }
+      @keyframes floatOrbMid {
+        0% { transform: translateY(0) scale(1); }
+        100% { transform: translateY(-35px) scale(1.06); }
+      }
+
+      /* ── SCROLL REVEAL ANIMATIONS ── */
+      .reveal-init {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal-init.is-revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal-delay-1 { transition-delay: 0.1s; }
+      .reveal-delay-2 { transition-delay: 0.2s; }
+      .reveal-delay-3 { transition-delay: 0.3s; }
 
       /* ── NAVBAR ── */
       .public-nav-v2 {
@@ -110,10 +139,10 @@
         justify-content: center;
         color: #FFFFFF;
         box-shadow: 0 8px 18px rgba(99, 102, 241, 0.3);
-        transition: transform 0.25s ease;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
       .landing-logo:hover .landing-logo-mark {
-        transform: scale(1.05) rotate(3deg);
+        transform: scale(1.08) rotate(4deg);
       }
       .landing-logo-text strong {
         display: block;
@@ -165,24 +194,6 @@
         align-items: center;
         gap: 12px;
       }
-      .btn-nav-search {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        border: 1px solid var(--tm-border);
-        background: #FFFFFF;
-        color: var(--tm-slate);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .btn-nav-search:hover {
-        background: var(--tm-brand-soft);
-        color: var(--tm-brand);
-        border-color: #C7D2FE;
-      }
       .btn-nav-login {
         border-radius: 99px;
         padding: 10px 22px;
@@ -214,19 +225,35 @@
         gap: 8px;
         border: none;
         box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        position: relative;
+        overflow: hidden;
         transition: all 0.25s ease;
+      }
+      .btn-nav-started::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 40px;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(25deg);
+        transition: left 0.6s ease;
+      }
+      .btn-nav-started:hover::after {
+        left: 120%;
       }
       .btn-nav-started:hover {
         box-shadow: 0 8px 22px rgba(99, 102, 241, 0.45);
         transform: translateY(-2px);
       }
 
-      /* Authenticated Student HUD in Landing Nav */
+      /* Authenticated Student HUD */
       .hud-profile-pill {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 4px 6px 4px 12px;
+        padding: 4px 8px 4px 14px;
         background: #FFFFFF;
         border: 1.5px solid #E2E8F0;
         border-radius: 100px;
@@ -264,16 +291,27 @@
         white-space: nowrap;
       }
       .hud-avatar-circle {
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         background: #EEF2FF;
         border: 1.5px solid #C7D2FE;
-        overflow: hidden;
+        position: relative;
         flex-shrink: 0;
+      }
+      .hud-avatar-circle::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 8px;
+        height: 8px;
+        background: #10B981;
+        border: 1.5px solid #FFFFFF;
+        border-radius: 50%;
       }
 
       /* ── SECTION HEADING REUSABLE ── */
@@ -340,6 +378,10 @@
         padding: 6px 18px 6px 8px;
         margin-bottom: 24px;
         box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+        transition: transform 0.25s ease;
+      }
+      .hero-badge-pill:hover {
+        transform: scale(1.02);
       }
       .hero-badge-icon {
         width: 26px;
@@ -415,10 +457,26 @@
         text-decoration: none;
         border: none;
         box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
-        transition: all 0.25s ease;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-hero-primary::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 50px;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(25deg);
+        transition: left 0.7s ease;
+      }
+      .btn-hero-primary:hover::after {
+        left: 130%;
       }
       .btn-hero-primary:hover {
-        transform: translateY(-2px);
+        transform: translateY(-3px) scale(1.02);
         box-shadow: 0 14px 30px rgba(79, 70, 229, 0.45);
       }
       .btn-hero-secondary {
@@ -449,11 +507,6 @@
         gap: 12px;
         max-width: 580px;
       }
-      @media (max-width: 640px) {
-        .hero-features-bar {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
       .hero-mini-pill {
         background: #FFFFFF;
         border-radius: 14px;
@@ -463,11 +516,11 @@
         gap: 10px;
         border: 1px solid #F1F5F9;
         box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
       }
       .hero-mini-pill:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
       }
       .hero-mini-pill.f-pill-indigo { background: #EEF2FF; border-color: #E0E7FF; }
       .hero-mini-pill.f-pill-rose { background: #FFF1F2; border-color: #FFE4E6; }
@@ -481,7 +534,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.15rem;
         flex-shrink: 0;
       }
       .pill-text-block {
@@ -540,333 +592,201 @@
         100% { transform: translateY(-10px); }
       }
 
-      /* Modern Floating UI Chips (No Emojis) */
-      .floating-ui-chip {
-        position: absolute;
-        z-index: 4;
-        background: rgba(255, 255, 255, 0.94);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1.5px solid rgba(255, 255, 255, 0.9);
-        border-radius: 100px;
-        padding: 8px 16px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-        user-select: none;
-        white-space: nowrap;
-      }
-      .chip-icon-box {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .chip-text strong {
-        display: block;
-        font-size: 0.84rem;
-        font-weight: 800;
-        color: var(--tm-ink);
-        line-height: 1.15;
-      }
-      .chip-text span {
-        font-size: 0.70rem;
-        font-weight: 600;
-        color: var(--tm-muted);
-      }
 
-      .chip-xp {
-        top: 20px;
-        left: -15px;
-        animation: floatChipA 4.5s ease-in-out infinite alternate;
-      }
-      .chip-xp .chip-icon-box { background: #EEF2FF; color: #4F46E5; }
-
-      .chip-streak {
-        bottom: 40px;
-        left: -10px;
-        animation: floatChipB 5s ease-in-out infinite alternate;
-      }
-      .chip-streak .chip-icon-box { background: #FFFBEB; color: #D97706; }
-
-      .chip-badge {
-        top: 35px;
-        right: -10px;
-        animation: floatChipC 4.8s ease-in-out infinite alternate;
-      }
-      .chip-badge .chip-icon-box { background: #ECFDF5; color: #059669; }
-
-      .chip-level {
-        bottom: 60px;
-        right: -15px;
-        animation: floatChipD 5.2s ease-in-out infinite alternate;
-      }
-      .chip-level .chip-icon-box { background: #FAF5FF; color: #7C3AED; }
-
-      @keyframes floatChipA { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-8px) rotate(-1deg); } }
-      @keyframes floatChipB { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(8px) rotate(1deg); } }
-      @keyframes floatChipC { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(-6px) rotate(1deg); } }
-      @keyframes floatChipD { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(7px) rotate(-1deg); } }
-
-      /* ── 5. EXPLORE CLASSES SECTION ── */
+      /* ── 5. CHOOSE YOUR CLASS SECTION ── */
       .classes-section {
         max-width: 1260px;
         margin: 0 auto 90px;
         padding: 0 24px;
       }
-      .classes-group-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 32px 0 20px;
-        padding-bottom: 10px;
-        border-bottom: 1.5px solid #E2E8F0;
-      }
-      .classes-group-title {
-        font-size: 1.05rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--tm-slate);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .classes-group-count {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--tm-muted);
-      }
       .classes-grid-premium {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 24px;
-        margin-bottom: 36px;
+        margin-top: 36px;
       }
-      .class-card-premium {
+      .class-game-card {
         background: #FFFFFF;
-        border: 1.5px solid var(--tm-border);
-        border-radius: var(--tm-card-radius);
-        padding: 26px 22px;
+        border: 1.8px solid var(--tm-border);
+        border-radius: 22px;
+        padding: 22px 20px 20px;
         text-decoration: none;
         color: inherit;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 230px;
+        align-items: center;
+        text-align: center;
         position: relative;
         overflow: hidden;
-        box-shadow: var(--tm-shadow-sm);
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
         transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+        cursor: pointer;
       }
-      .class-card-premium::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        opacity: 0;
-        transition: opacity 0.25s ease;
+      .class-game-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.10);
       }
-      .class-card-premium:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--tm-shadow-md);
-      }
-      .class-card-premium:hover::before {
-        opacity: 1;
-      }
-      .class-icon-container {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        transition: transform 0.25s ease;
-      }
-      .class-card-premium:hover .class-icon-container {
-        transform: scale(1.08);
-      }
-      .class-card-body h3 {
-        font-size: 1.30rem;
-        font-weight: 900;
-        color: var(--tm-ink);
-        margin: 0 0 6px;
-      }
-      .class-card-body p {
-        font-size: 0.88rem;
-        color: var(--tm-muted);
-        line-height: 1.5;
-        margin: 0;
-        font-weight: 500;
-      }
-      .class-card-footer {
+      
+      /* Card Top Row with Class Badge & Number */
+      .card-top-row {
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 20px;
-        padding-top: 14px;
-        border-top: 1px solid #F1F5F9;
-        font-size: 0.86rem;
+        margin-bottom: 8px;
+      }
+      .card-badge-pill {
+        font-size: 0.78rem;
         font-weight: 800;
-        color: var(--tm-brand);
-      }
-      .class-arrow-icon {
-        transition: transform 0.2s ease;
-      }
-      .class-card-premium:hover .class-arrow-icon {
-        transform: translateX(4px);
-      }
-
-      /* Class Color Identities */
-      .c-cyan { border-color: rgba(6, 182, 212, 0.18); }
-      .c-cyan::before { background: #06B6D4; }
-      .c-cyan .class-icon-container { background: var(--tm-cyan-soft); color: var(--tm-cyan); border: 1.5px solid #A5F3FC; }
-      .c-cyan:hover { border-color: #06B6D4; }
-
-      .c-blue { border-color: rgba(59, 130, 246, 0.18); }
-      .c-blue::before { background: #3B82F6; }
-      .c-blue .class-icon-container { background: #EFF6FF; color: #2563EB; border: 1.5px solid #BFDBFE; }
-      .c-blue:hover { border-color: #3B82F6; }
-
-      .c-pink { border-color: rgba(236, 72, 153, 0.18); }
-      .c-pink::before { background: #EC4899; }
-      .c-pink .class-icon-container { background: #FDF2F8; color: #DB2777; border: 1.5px solid #FBCFE8; }
-      .c-pink:hover { border-color: #EC4899; }
-
-      .c-purple { border-color: rgba(139, 92, 246, 0.18); }
-      .c-purple::before { background: #8B5CF6; }
-      .c-purple .class-icon-container { background: var(--tm-purple-soft); color: var(--tm-purple); border: 1.5px solid #DDD6FE; }
-      .c-purple:hover { border-color: #8B5CF6; }
-
-      .c-orange { border-color: rgba(249, 115, 22, 0.18); }
-      .c-orange::before { background: #F97316; }
-      .c-orange .class-icon-container { background: #FFF7ED; color: #EA580C; border: 1.5px solid #FED7AA; }
-      .c-orange:hover { border-color: #F97316; }
-
-      .c-emerald { border-color: rgba(16, 185, 129, 0.18); }
-      .c-emerald::before { background: #10B981; }
-      .c-emerald .class-icon-container { background: var(--tm-emerald-soft); color: var(--tm-emerald); border: 1.5px solid #A7F3D0; }
-      .c-emerald:hover { border-color: #10B981; }
-
-      .c-red { border-color: rgba(239, 68, 68, 0.18); }
-      .c-red::before { background: #EF4444; }
-      .c-red .class-icon-container { background: var(--tm-rose-soft); color: var(--tm-rose); border: 1.5px solid #FECDD3; }
-      .c-red:hover { border-color: #EF4444; }
-
-      .c-indigo { border-color: rgba(79, 70, 229, 0.18); }
-      .c-indigo::before { background: #4F46E5; }
-      .c-indigo .class-icon-container { background: var(--tm-brand-soft); color: var(--tm-brand); border: 1.5px solid #C7D2FE; }
-      .c-indigo:hover { border-color: #4F46E5; }
-
-      /* ── 6. WHY TEZMINDZ FEATURE CARDS ── */
-      .tez-features-section {
-        max-width: 1260px;
-        margin: 0 auto 90px;
-        padding: 0 24px;
-      }
-      .tez-features-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
-      }
-      .tez-feature-card {
-        background: #FFFFFF;
-        border: 1.5px solid var(--tm-border);
-        border-radius: var(--tm-card-radius);
-        padding: 30px 24px;
-        box-shadow: var(--tm-shadow-sm);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-      }
-      .tez-feature-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .tez-feature-card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--tm-shadow-md);
-      }
-      .tez-feature-card:hover::before {
-        opacity: 1;
-      }
-      .card-step-num {
-        font-size: 0.76rem;
-        font-weight: 900;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: 12px;
-        padding: 4px 10px;
+        letter-spacing: 0.04em;
+        padding: 4px 12px;
         border-radius: 99px;
+        background: #F1F5F9;
+        color: var(--tm-slate);
+        border: 1px solid #E2E8F0;
       }
-      .tez-icon-box {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
+      .card-grade-num-badge {
+        font-size: 1.25rem;
+        font-weight: 900;
+        line-height: 1;
+        opacity: 0.45;
+      }
+
+      /* Center Educational Illustration Box */
+      .card-icon-wrapper {
+        width: 76px;
+        height: 76px;
+        border-radius: 22px;
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 8px auto 14px;
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .class-game-card:hover .card-icon-wrapper {
+        transform: scale(1.10) translateY(-2px);
+      }
+
+      /* Card Title & Subjects */
+      .card-info-wrap {
         margin-bottom: 18px;
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        width: 100%;
       }
-      .tez-feature-card:hover .tez-icon-box {
-        transform: scale(1.08);
-      }
-      .tez-feature-card h3 {
-        font-size: 1.25rem;
+      .card-class-title {
+        font-size: 1.35rem;
         font-weight: 900;
         color: var(--tm-ink);
-        margin: 0 0 10px;
+        margin: 0 0 6px;
         letter-spacing: -0.02em;
       }
-      .tez-feature-card p {
-        font-size: 0.94rem;
-        color: var(--tm-muted);
-        line-height: 1.6;
-        margin: 0;
-        font-weight: 500;
+      .card-subjects-badge {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #64748B;
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 99px;
+        padding: 4px 12px;
+        letter-spacing: 0.02em;
       }
 
-      /* Feature Themes */
-      .f-gamified { border-color: rgba(99, 102, 241, 0.2); }
-      .f-gamified::before { background: linear-gradient(90deg, #4F46E5, #6366F1); }
-      .f-gamified .card-step-num { background: #EEF2FF; color: #4F46E5; }
-      .f-gamified .tez-icon-box { background: #EEF2FF; color: #4F46E5; border: 1.5px solid #C7D2FE; box-shadow: 0 6px 16px rgba(79, 70, 229, 0.12); }
-      .f-gamified:hover { border-color: #4F46E5; }
+      /* Start Learning Button */
+      .card-action-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 16px;
+        border-radius: 14px;
+        font-size: 0.90rem;
+        font-weight: 800;
+        color: #FFFFFF;
+        transition: all 0.24s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+      }
+      .card-action-arrow {
+        transition: transform 0.2s ease;
+      }
+      .class-game-card:hover .card-action-arrow {
+        transform: translateX(4px);
+      }
 
-      .f-olympiad { border-color: rgba(16, 185, 129, 0.2); }
-      .f-olympiad::before { background: linear-gradient(90deg, #059669, #10B981); }
-      .f-olympiad .card-step-num { background: #ECFDF5; color: #059669; }
-      .f-olympiad .tez-icon-box { background: #ECFDF5; color: #059669; border: 1.5px solid #A7F3D0; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.12); }
-      .f-olympiad:hover { border-color: #059669; }
+      /* 8 Softer & Polished Class Color Themes */
+      /* Class 1 - Sky Cyan */
+      .card-c-1 { border-color: #E0F2FE; background: linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 55%); }
+      .card-c-1 .card-badge-pill { background: #E0F2FE; color: #0284C7; border-color: #BAE6FD; }
+      .card-c-1 .card-grade-num-badge { color: #0284C7; }
+      .card-c-1 .card-icon-wrapper { background: #E0F2FE; border: 1.5px solid #BAE6FD; }
+      .card-c-1 .card-action-btn { background: #0284C7; }
+      .card-c-1:hover { border-color: #0284C7; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); }
+      .card-c-1:hover .card-action-btn { background: #0369A1; }
 
-      .f-quizzes { border-color: rgba(168, 85, 247, 0.2); }
-      .f-quizzes::before { background: linear-gradient(90deg, #7C3AED, #A855F7); }
-      .f-quizzes .card-step-num { background: #FAF5FF; color: #7C3AED; }
-      .f-quizzes .tez-icon-box { background: #FAF5FF; color: #7C3AED; border: 1.5px solid #DDD6FE; box-shadow: 0 6px 16px rgba(124, 58, 237, 0.12); }
-      .f-quizzes:hover { border-color: #7C3AED; }
+      /* Class 2 - Royal Blue */
+      .card-c-2 { border-color: #DBEAFE; background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 55%); }
+      .card-c-2 .card-badge-pill { background: #DBEAFE; color: #2563EB; border-color: #BFDBFE; }
+      .card-c-2 .card-grade-num-badge { color: #2563EB; }
+      .card-c-2 .card-icon-wrapper { background: #DBEAFE; border: 1.5px solid #BFDBFE; }
+      .card-c-2 .card-action-btn { background: #2563EB; }
+      .card-c-2:hover { border-color: #2563EB; box-shadow: 0 16px 36px rgba(37, 99, 235, 0.15); }
+      .card-c-2:hover .card-action-btn { background: #1D4ED8; }
 
-      .f-tracking { border-color: rgba(244, 63, 94, 0.2); }
-      .f-tracking::before { background: linear-gradient(90deg, #E11D48, #F43F5E); }
-      .f-tracking .card-step-num { background: #FFF1F2; color: #E11D48; }
-      .f-tracking .tez-icon-box { background: #FFF1F2; color: #E11D48; border: 1.5px solid #FECDD3; box-shadow: 0 6px 16px rgba(225, 29, 72, 0.12); }
-      .f-tracking:hover { border-color: #E11D48; }
+      /* Class 3 - Pink / Rose */
+      .card-c-3 { border-color: #FCE7F3; background: linear-gradient(180deg, #FDF2F8 0%, #FFFFFF 55%); }
+      .card-c-3 .card-badge-pill { background: #FCE7F3; color: #DB2777; border-color: #FBCFE8; }
+      .card-c-3 .card-grade-num-badge { color: #DB2777; }
+      .card-c-3 .card-icon-wrapper { background: #FCE7F3; border: 1.5px solid #FBCFE8; }
+      .card-c-3 .card-action-btn { background: #DB2777; }
+      .card-c-3:hover { border-color: #DB2777; box-shadow: 0 16px 36px rgba(219, 39, 119, 0.15); }
+      .card-c-3:hover .card-action-btn { background: #BE185D; }
+
+      /* Class 4 - Amber / Gold */
+      .card-c-4 { border-color: #FEF3C7; background: linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 55%); }
+      .card-c-4 .card-badge-pill { background: #FEF3C7; color: #D97706; border-color: #FED7AA; }
+      .card-c-4 .card-grade-num-badge { color: #D97706; }
+      .card-c-4 .card-icon-wrapper { background: #FEF3C7; border: 1.5px solid #FED7AA; }
+      .card-c-4 .card-action-btn { background: #D97706; }
+      .card-c-4:hover { border-color: #D97706; box-shadow: 0 16px 36px rgba(217, 119, 6, 0.15); }
+      .card-c-4:hover .card-action-btn { background: #B45309; }
+
+      /* Class 5 - Purple / Violet */
+      .card-c-5 { border-color: #F3E8FF; background: linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 55%); }
+      .card-c-5 .card-badge-pill { background: #F3E8FF; color: #7C3AED; border-color: #DDD6FE; }
+      .card-c-5 .card-grade-num-badge { color: #7C3AED; }
+      .card-c-5 .card-icon-wrapper { background: #F3E8FF; border: 1.5px solid #DDD6FE; }
+      .card-c-5 .card-action-btn { background: #7C3AED; }
+      .card-c-5:hover { border-color: #7C3AED; box-shadow: 0 16px 36px rgba(124, 58, 237, 0.15); }
+      .card-c-5:hover .card-action-btn { background: #6D28D9; }
+
+      /* Class 6 - Emerald / Mint */
+      .card-c-6 { border-color: #DCFCE7; background: linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 55%); }
+      .card-c-6 .card-badge-pill { background: #DCFCE7; color: #059669; border-color: #A7F3D0; }
+      .card-c-6 .card-grade-num-badge { color: #059669; }
+      .card-c-6 .card-icon-wrapper { background: #DCFCE7; border: 1.5px solid #A7F3D0; }
+      .card-c-6 .card-action-btn { background: #059669; }
+      .card-c-6:hover { border-color: #059669; box-shadow: 0 16px 36px rgba(5, 150, 105, 0.15); }
+      .card-c-6:hover .card-action-btn { background: #047857; }
+
+      /* Class 7 - Coral Sunset */
+      .card-c-7 { border-color: #FFE4E6; background: linear-gradient(180deg, #FFF1F2 0%, #FFFFFF 55%); }
+      .card-c-7 .card-badge-pill { background: #FFE4E6; color: #E11D48; border-color: #FECDD3; }
+      .card-c-7 .card-grade-num-badge { color: #E11D48; }
+      .card-c-7 .card-icon-wrapper { background: #FFE4E6; border: 1.5px solid #FECDD3; }
+      .card-c-7 .card-action-btn { background: #E11D48; }
+      .card-c-7:hover { border-color: #E11D48; box-shadow: 0 16px 36px rgba(225, 29, 72, 0.15); }
+      .card-c-7:hover .card-action-btn { background: #BE123C; }
+
+      /* Class 8 - Royal Indigo */
+      .card-c-8 { border-color: #E0E7FF; background: linear-gradient(180deg, #EEF2FF 0%, #FFFFFF 55%); }
+      .card-c-8 .card-badge-pill { background: #E0E7FF; color: #4F46E5; border-color: #C7D2FE; }
+      .card-c-8 .card-grade-num-badge { color: #4F46E5; }
+      .card-c-8 .card-icon-wrapper { background: #E0E7FF; border: 1.5px solid #C7D2FE; }
+      .card-c-8 .card-action-btn { background: #4F46E5; }
+      .card-c-8:hover { border-color: #4F46E5; box-shadow: 0 16px 36px rgba(79, 70, 229, 0.15); }
+      .card-c-8:hover .card-action-btn { background: #4338CA; }
+
 
       /* ── 7. HOW IT WORKS 4-STEP JOURNEY ── */
       .how-it-works-section {
@@ -1204,6 +1124,7 @@
         background: linear-gradient(90deg, #6366F1 0%, #A855F7 100%);
         border-radius: 99px;
         width: 78%;
+        transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .streak-days-row {
         display: flex;
@@ -1253,6 +1174,10 @@
         background: #F8FAFC;
         margin-bottom: 10px;
         font-weight: 700;
+        transition: transform 0.2s ease;
+      }
+      .leaderboard-row-item:hover {
+        transform: translateX(4px);
       }
       .leaderboard-row-item.highlight-me {
         background: var(--tm-brand-soft);
@@ -1288,6 +1213,10 @@
         border-radius: 20px;
         padding: 24px;
         box-shadow: var(--tm-shadow-sm);
+        transition: transform 0.25s ease;
+      }
+      .testimonial-quote-card:hover {
+        transform: translateY(-3px);
       }
       .testimonial-quote-card p {
         font-size: 0.98rem;
@@ -1379,6 +1308,37 @@
         border-color: #FFFFFF;
       }
 
+      /* ── FLOATING SCROLL-TO-TOP BUTTON ── */
+      .btn-back-to-top {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #4F46E5;
+        color: #FFFFFF;
+        border: none;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(12px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 990;
+      }
+      .btn-back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .btn-back-to-top:hover {
+        background: #3730A3;
+        transform: translateY(-3px) scale(1.08);
+      }
+
       /* ── 12. FOOTER ── */
       .site-footer-v2 {
         background: #FFFFFF;
@@ -1431,9 +1391,7 @@
         .landing-hero-grid { grid-template-columns: 1fr; text-align: center; }
         .hero-left-content { margin: 0 auto; }
         .hero-cta-group { justify-content: center; }
-        .hero-trust-bar { justify-content: center; }
-        .classes-grid-premium { grid-template-columns: repeat(2, 1fr); }
-        .tez-features-grid { grid-template-columns: repeat(2, 1fr); }
+        .classes-grid-premium { grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .journey-steps-container { grid-template-columns: repeat(2, 1fr); }
         .journey-progress-line { display: none; }
         .game-featured-hero-card { grid-template-columns: 1fr; }
@@ -1445,18 +1403,23 @@
       }
       @media (max-width: 640px) {
         .landing-nav-links { display: none; }
-        .classes-grid-premium { grid-template-columns: 1fr; }
-        .tez-features-grid { grid-template-columns: 1fr; }
+        .classes-grid-premium { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .class-game-card { padding: 18px 12px 14px; border-radius: 18px; }
+        .card-icon-wrapper { width: 56px; height: 56px; margin: 4px auto 10px; }
+        .card-icon-wrapper svg { width: 28px; height: 28px; }
+        .card-class-title { font-size: 1.12rem; }
+        .card-subjects-badge { font-size: 0.68rem; padding: 3px 8px; }
+        .card-action-btn { padding: 9px 12px; font-size: 0.82rem; }
         .journey-steps-container { grid-template-columns: 1fr; }
         .gami-dashboard-grid { grid-template-columns: 1fr; }
         .hero-cta-group { flex-direction: column; width: 100%; }
         .final-cta-btn-group { flex-direction: column; width: 100%; }
         .footer-inner-grid { grid-template-columns: 1fr; }
-        .floating-ui-chip { display: none; }
       }
     </style>
   </head>
   <body class="page landing">
+
     <!-- Ambient glowing backdrop orbs -->
     <div class="bg-ambient-orb orb-top-right"></div>
     <div class="bg-ambient-orb orb-mid-left"></div>
@@ -1482,10 +1445,9 @@
         <!-- Center Nav Links -->
         <nav class="landing-nav-links" aria-label="Main Navigation">
           <a href="/" class="active">Home</a>
-          <a href="#subjects">Subjects</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#features">Features</a>
-          <a href="#about">About</a>
+          <a href="/subjects/">Subjects</a>
+          <a href="/how-it-works/">How It Works</a>
+          <a href="/about/">About</a>
         </nav>
 
         <!-- Right Action Controls -->
@@ -1526,12 +1488,6 @@
               </svg>
             </a>
           {% else %}
-            <button type="button" class="btn-nav-search" title="Search platform" aria-label="Search">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
             <a class="btn-nav-login" href="/login/">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
@@ -1553,7 +1509,7 @@
 
     <!-- 2. HERO SECTION -->
     <section class="landing-hero-grid">
-      <div class="hero-left-content">
+      <div class="hero-left-content reveal-init is-revealed">
         
         <!-- Top Announcement Badge -->
         <div class="hero-badge-pill">
@@ -1598,7 +1554,7 @@
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </a>
-            <a class="btn-hero-secondary" href="#subjects">
+            <a class="btn-hero-secondary" href="/subjects/">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
                 <path d="M6 6h10"></path>
@@ -1608,18 +1564,18 @@
             </a>
           {% else %}
             <a class="btn-hero-primary" href="/register/">
-              <span>Start Learning</span>
+              <span>Start Free Practice</span>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </a>
-            <a class="btn-hero-secondary" href="/dashboard/" id="demo-link">
+            <a class="btn-hero-secondary" href="/how-it-works/">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polygon points="10 8 16 12 10 16 10 8" fill="#6366F1"></polygon>
               </svg>
-              <span>Watch Demo</span>
+              <span>How It Works</span>
             </a>
           {% endif %}
         </div>
@@ -1648,7 +1604,7 @@
             <div class="pill-icon-box">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="6" r="6"></circle>
                 <circle cx="12" cy="12" r="2"></circle>
               </svg>
             </div>
@@ -1690,7 +1646,7 @@
       </div>
 
       <!-- Right Column Hero Illustration -->
-      <div class="hero-right-illustration">
+      <div class="hero-right-illustration reveal-init is-revealed">
         <div class="hero-cloud-backdrop"></div>
         <div class="hero-character-stage">
           <img src="/static/media/hero_student.jpg" alt="Tezz-Mindz Student Learning with Laptop and Olympiad Trophies" />
@@ -1698,265 +1654,241 @@
       </div>
     </section>
 
-    <!-- 5. EXPLORE CLASSES (PRIMARY & UPPER PRIMARY) -->
-    <section class="classes-section" id="subjects">
-      <div class="section-heading-block">
-        <span class="section-tag-pill">Personalized Curriculum</span>
-        <h2>Explore Classes</h2>
-        <p>Choose your class and explore a personalized Olympiad & NCERT learning roadmap.</p>
-      </div>
 
-      <!-- Group 1: Primary Classes -->
-      <div class="classes-group-header">
-        <div class="classes-group-title">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-          </svg>
-          <span>Primary Classes (Class 1 – Class 4)</span>
-        </div>
-        <span class="classes-group-count">4 Classes • Foundation Stage</span>
+    <!-- 4. CHOOSE YOUR CLASS SECTION -->
+    <section class="classes-section reveal-init" id="subjects">
+      <div class="section-heading-block">
+        <h2>Choose Your Class</h2>
+        <p>Choose your class and start your learning adventure.</p>
       </div>
 
       <div class="classes-grid-premium">
         <!-- Class 1 -->
-        <a href="#" onclick="selectClass(event, 1)" class="class-card-premium c-cyan">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-              <path d="M6 6h10"></path>
-              <path d="M6 10h10"></path>
+        <a href="#" onclick="selectClass(event, 1)" class="class-game-card card-c-1" aria-label="Select Class 1">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 1</span>
+            <span class="card-grade-num-badge">1</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <rect x="6" y="22" width="16" height="16" rx="4" fill="#38BDF8" fill-opacity="0.25" stroke="#0284C7" stroke-width="2.5"/>
+              <text x="14" y="34" font-size="11" font-weight="900" fill="#0284C7" text-anchor="middle" font-family="sans-serif">A</text>
+              <rect x="26" y="22" width="16" height="16" rx="4" fill="#38BDF8" fill-opacity="0.25" stroke="#0284C7" stroke-width="2.5"/>
+              <text x="34" y="34" font-size="11" font-weight="900" fill="#0284C7" text-anchor="middle" font-family="sans-serif">1</text>
+              <rect x="16" y="8" width="16" height="16" rx="4" fill="#0284C7" fill-opacity="0.15" stroke="#0284C7" stroke-width="2.5"/>
+              <path d="M24 11l1.5 3.5 3.8.3-2.9 2.5.9 3.7L24 19.1l-3.3 1.9.9-3.7-2.9-2.5 3.8-.3z" fill="#F59E0B"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 1</h3>
-            <p>Number intuition, counting blocks, basic shapes, and visual word builders.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 1</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 2 -->
-        <a href="#" onclick="selectClass(event, 2)" class="class-card-premium c-blue">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m18 2 4 4-14 14H4v-4L18 2z"></path>
-              <path d="m14.5 5.5 4 4"></path>
+        <a href="#" onclick="selectClass(event, 2)" class="class-game-card card-c-2" aria-label="Select Class 2">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 2</span>
+            <span class="card-grade-num-badge">2</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <rect x="8" y="8" width="32" height="32" rx="8" fill="#60A5FA" fill-opacity="0.2" stroke="#2563EB" stroke-width="2.5"/>
+              <path d="M16 20h8M20 16v8" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+              <path d="M28 28h8M28 34h8" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="32" cy="18" r="2.5" fill="#3B82F6"/>
+              <circle cx="18" cy="30" r="2.5" fill="#3B82F6"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 2</h3>
-            <p>Addition & subtraction quests, 2D patterns, animal habitats, and phonics.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 2</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 3 -->
-        <a href="#" onclick="selectClass(event, 3)" class="class-card-premium c-pink">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
-              <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
-              <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
-              <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"></path>
+        <a href="#" onclick="selectClass(event, 3)" class="class-game-card card-c-3" aria-label="Select Class 3">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 3</span>
+            <span class="card-grade-num-badge">3</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <path d="M24 6C13.5 6 6 13.5 6 24c0 10.5 8 18 18 18 2 0 3.5-1.5 3.5-3.5 0-.9-.4-1.8-1-2.4-.6-.7-1-1.6-1-2.6 0-2 1.6-3.5 3.5-3.5H33c6 0 11-5 11-11 0-10.5-9-13-20-13z" fill="#F472B6" fill-opacity="0.2" stroke="#DB2777" stroke-width="2.5"/>
+              <circle cx="15" cy="17" r="2.5" fill="#DB2777"/>
+              <circle cx="23" cy="13" r="2.5" fill="#F59E0B"/>
+              <circle cx="31" cy="17" r="2.5" fill="#10B981"/>
+              <circle cx="35" cy="24" r="2.5" fill="#6366F1"/>
+              <circle cx="28" cy="33" r="3" fill="#DB2777" fill-opacity="0.3"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 3</h3>
-            <p>Introduction to fractions, measurement scales, plants & living systems.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 3</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 4 -->
-        <a href="#" onclick="selectClass(event, 4)" class="class-card-premium c-purple">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
-              <path d="M9 21h6"></path>
+        <a href="#" onclick="selectClass(event, 4)" class="class-game-card card-c-4" aria-label="Select Class 4">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 4</span>
+            <span class="card-grade-num-badge">4</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <path d="M24 7a13 13 0 0 0-8 23.3V34a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3.7A13 13 0 0 0 24 7z" fill="#FBBF24" fill-opacity="0.2" stroke="#D97706" stroke-width="2.5"/>
+              <path d="M19 41h10M21 45h6" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M21 21a3 3 0 0 1 6 0c0 3-3 4-3 6" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="24" cy="31" r="1" fill="#D97706"/>
+              <path d="M6 16l3 1.5M42 16l-3 1.5M24 2v3" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 4</h3>
-            <p>Factors, multiples, area & perimeter, human body systems, and grammar.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 4</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
-      </div>
 
-      <!-- Group 2: Upper Primary Classes -->
-      <div class="classes-group-header">
-        <div class="classes-group-title">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-          </svg>
-          <span>Upper Primary Classes (Class 5 – Class 8)</span>
-        </div>
-        <span class="classes-group-count">4 Classes • Olympiad Mastery Stage</span>
-      </div>
-
-      <div class="classes-grid-premium">
         <!-- Class 5 -->
-        <a href="#" onclick="selectClass(event, 5)" class="class-card-premium c-orange">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+        <a href="#" onclick="selectClass(event, 5)" class="class-game-card card-c-5" aria-label="Select Class 5">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 5</span>
+            <span class="card-grade-num-badge">5</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <path d="M24 6l16 9.2v18.6L24 43 8 33.8V15.2L24 6z" fill="#C084FC" fill-opacity="0.2" stroke="#7C3AED" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M24 6v18.5L8 15.2M24 24.5l16-9.3M24 24.5V43" stroke="#7C3AED" stroke-width="2.5" stroke-linejoin="round"/>
+              <circle cx="24" cy="24.5" r="3" fill="#7C3AED" fill-opacity="0.4"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 5</h3>
-            <p>Indian Number System to 10 Lakhs, Dream House 3D Builder & NSO Science.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 5</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 6 -->
-        <a href="#" onclick="selectClass(event, 6)" class="class-card-premium c-emerald">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"></path>
-              <path d="M8.5 2h7"></path>
-              <path d="M7 16h10"></path>
+        <a href="#" onclick="selectClass(event, 6)" class="class-game-card card-c-6" aria-label="Select Class 6">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 6</span>
+            <span class="card-grade-num-badge">6</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <path d="M19 6h10M21 6v9l-11 21a3 3 0 0 0 2.6 4.4h22.8a3 3 0 0 0 2.6-4.4L27 15V6" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13.5 31.5c4-2 7 2 11 0s6-2 10 0L37 36a2.5 2.5 0 0 1-2.2 3.6H13.2A2.5 2.5 0 0 1 11 36l2.5-4.5z" fill="#34D399" fill-opacity="0.3"/>
+              <circle cx="21" cy="33" r="2" fill="#059669"/>
+              <circle cx="27" cy="27" r="2.5" fill="#059669"/>
+              <circle cx="23" cy="21" r="1.5" fill="#059669"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 6</h3>
-            <p>Integers, algebra intro, ratio & proportion, food science & light optics.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 6</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 7 -->
-        <a href="#" onclick="selectClass(event, 7)" class="class-card-premium c-red">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        <a href="#" onclick="selectClass(event, 7)" class="class-game-card card-c-7" aria-label="Select Class 7">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 7</span>
+            <span class="card-grade-num-badge">7</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <polygon points="8 40 40 40 40 8 8 40" fill="#FDA4AF" fill-opacity="0.25" stroke="#E11D48" stroke-width="2.5" stroke-linejoin="round"/>
+              <polygon points="18 36 34 36 34 20 18 36" fill="#FFFFFF" stroke="#E11D48" stroke-width="2" stroke-linejoin="round"/>
+              <circle cx="28" cy="28" r="3" fill="#E11D48" fill-opacity="0.3"/>
+              <path d="M14 40v-3M20 40v-2M26 40v-3M32 40v-2M40 34h-3M40 28h-2M40 22h-3M40 16h-2" stroke="#E11D48" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 7</h3>
-            <p>Rational numbers, algebraic equations, lines & angles, heat & respiration.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 7</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
 
         <!-- Class 8 -->
-        <a href="#" onclick="selectClass(event, 8)" class="class-card-premium c-indigo">
-          <div class="class-icon-container">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5C4 22 6 21 7.5 19.5"></path>
-              <path d="M12 12l9-9-3 12-6 3-3-3-3-3 6-3z"></path>
-              <path d="M9 15l-3-3"></path>
+        <a href="#" onclick="selectClass(event, 8)" class="class-game-card card-c-8" aria-label="Select Class 8">
+          <div class="card-top-row">
+            <span class="card-badge-pill">Class 8</span>
+            <span class="card-grade-num-badge">8</span>
+          </div>
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+              <path d="M14 10h20v14a10 10 0 0 1-20 0V10z" fill="#818CF8" fill-opacity="0.2" stroke="#4F46E5" stroke-width="2.5"/>
+              <path d="M14 14H8a4 4 0 0 0-4 4v2a6 6 0 0 0 6 6h4M34 14h6a4 4 0 0 1 4 4v2a6 6 0 0 1-6 6h-4" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M24 24v11M16 41h16M19 35h10" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M24 13.5l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z" fill="#F59E0B"/>
             </svg>
           </div>
-          <div class="class-card-body">
-            <h3>Class 8</h3>
-            <p>Linear equations in one variable, exponents, force & pressure, Olympiad mastery.</p>
+          <div class="card-info-wrap">
+            <h3 class="card-class-title">Class 8</h3>
+            <span class="card-subjects-badge">Maths • Science • English</span>
           </div>
-          <div class="class-card-footer">
-            <span>View Syllabus</span>
-            <span class="class-arrow-icon">→</span>
+          <div class="card-action-btn">
+            <span>Start Learning</span>
+            <svg class="card-action-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </div>
         </a>
       </div>
     </section>
 
-    <!-- 6. WHY TEZMINDZ FEATURE CARDS -->
-    <section class="tez-features-section" id="features">
-      <div class="section-heading-block">
-        <span class="section-tag-pill">Why Students Succeed</span>
-        <h2>Why TezMindz?</h2>
-        <p>Built dynamically to optimize conceptual understanding, memory retention, and Olympiad test scores.</p>
-      </div>
-
-      <div class="tez-features-grid">
-        <!-- 01 Gamified Learning -->
-        <div class="tez-feature-card f-gamified">
-          <span class="card-step-num">01 Pillar</span>
-          <div class="tez-icon-box" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="6" y1="12" x2="10" y2="12"></line>
-              <line x1="8" y1="10" x2="8" y2="14"></line>
-              <line x1="15" y1="13" x2="15.01" y2="13"></line>
-              <line x1="18" y1="11" x2="18.01" y2="11"></line>
-              <rect x="2" y="6" width="20" height="12" rx="6"></rect>
-            </svg>
-          </div>
-          <h3>Gamified Learning</h3>
-          <p>Every concept is paired with an interactive 3D visual challenge to bridge theory and concrete physical application.</p>
-        </div>
-
-        <!-- 02 Olympiad Prep -->
-        <div class="tez-feature-card f-olympiad">
-          <span class="card-step-num">02 Pillar</span>
-          <div class="tez-icon-box" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-              <path d="M4 22h16"></path>
-              <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
-              <path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path>
-            </svg>
-          </div>
-          <h3>Olympiad Prep</h3>
-          <p>Curated questions, full-length test simulators, and verified syllabus pathways aligned with IMO, NSO, and IEO standards.</p>
-        </div>
-
-        <!-- 03 Interactive Quizzes -->
-        <div class="tez-feature-card f-quizzes">
-          <span class="card-step-num">03 Pillar</span>
-          <div class="tez-icon-box" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"></path>
-              <path d="M19 3v4"></path>
-              <path d="M21 5h-4"></path>
-            </svg>
-          </div>
-          <h3>Interactive Quizzes</h3>
-          <p>AI-driven Little Teacher feedback from TezBuddy that diagnoses and explains underlying logic when students make mistakes.</p>
-        </div>
-
-        <!-- 04 Progress Tracking -->
-        <div class="tez-feature-card f-tracking">
-          <span class="card-step-num">04 Pillar</span>
-          <div class="tez-icon-box" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
-              <polyline points="16 7 22 7 22 13"></polyline>
-            </svg>
-          </div>
-          <h3>Progress Tracking</h3>
-          <p>Real-time analytics detailing topic mastery percentages, response accuracy scores, and weak-point diagnostics.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7. HOW IT WORKS (VISUAL 4-STEP JOURNEY) -->
-    <section class="how-it-works-section" id="how-it-works">
+    <!-- 5. HOW IT WORKS (VISUAL 4-STEP JOURNEY) -->
+    <section class="how-it-works-section reveal-init" id="how-it-works">
       <div class="section-heading-block">
         <span class="section-tag-pill">Learning Methodology</span>
         <h2>How It Works</h2>
@@ -1990,7 +1922,7 @@
             <div class="step-icon-indicator" style="background: #ECFDF5; color: #059669;">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="6" r="6"></circle>
                 <circle cx="12" cy="12" r="2"></circle>
               </svg>
             </div>
@@ -2034,8 +1966,8 @@
       </div>
     </section>
 
-    <!-- 8. GAMES ARENA SHOWCASE -->
-    <section class="games-arena-section" id="games">
+    <!-- 6. GAMES ARENA SHOWCASE -->
+    <section class="games-arena-section reveal-init" id="games">
       <div class="section-heading-block">
         <span class="section-tag-pill">Play-Based Learning</span>
         <h2>Games Arena</h2>
@@ -2144,15 +2076,15 @@
       </div>
     </section>
 
-    <!-- 9. THE GAMIFICATION ENGINE (METRICS & PROGRESS) -->
-    <section class="gamification-section">
+    <!-- 7. THE GAMIFICATION ENGINE (METRICS & PROGRESS) -->
+    <section class="gamification-section reveal-init">
       <div class="section-heading-block">
         <span class="section-tag-pill">Rewards &amp; Motivation</span>
         <h2>The Gamification Engine</h2>
         <p>Unlock authentic digital achievements, maintain multiplier streaks, and track real-time Olympiad mastery.</p>
       </div>
 
-      <!-- 5 Floating Dashboard Stat Counters -->
+      <!-- 5 Dashboard Stat Counters -->
       <div class="gami-dashboard-grid">
         <!-- XP -->
         <div class="gami-stat-card">
@@ -2160,7 +2092,7 @@
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
           </div>
           <div>
-            <div class="gami-stat-val">2,450</div>
+            <div class="gami-stat-val counter-num" data-target="2450">0</div>
             <div class="gami-stat-lbl">Experience XP</div>
           </div>
         </div>
@@ -2171,7 +2103,7 @@
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
           </div>
           <div>
-            <div class="gami-stat-val">7 Days</div>
+            <div class="gami-stat-val counter-num" data-target="7">0</div>
             <div class="gami-stat-lbl">Daily Streak</div>
           </div>
         </div>
@@ -2182,7 +2114,7 @@
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
           </div>
           <div>
-            <div class="gami-stat-val">12</div>
+            <div class="gami-stat-val counter-num" data-target="12">0</div>
             <div class="gami-stat-lbl">Mastery Badges</div>
           </div>
         </div>
@@ -2193,7 +2125,7 @@
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <div>
-            <div class="gami-stat-val">08</div>
+            <div class="gami-stat-val counter-num" data-target="8">0</div>
             <div class="gami-stat-lbl">Tier Level</div>
           </div>
         </div>
@@ -2217,7 +2149,7 @@
           <h3 style="font-size: 1.6rem; font-weight: 900; color: var(--tm-ink); margin: 6px 0 8px;">Class 5 Olympiad Readiness</h3>
           <p style="font-size: 0.94rem; color: #64748B; margin: 0;">Completed 8 of 10 Math &amp; Science chapters. 780 XP remaining to unlock Master Challenger Tier.</p>
           <div class="progress-visual-bar-wrap">
-            <div class="progress-visual-bar-fill"></div>
+            <div class="progress-visual-bar-fill" style="width: 78%;"></div>
           </div>
           <div style="display:flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; color: var(--tm-slate);">
             <span>Progress: 78% Completed</span>
@@ -2241,8 +2173,8 @@
       </div>
     </section>
 
-    <!-- 10. LEADERBOARD PREVIEW & TESTIMONIALS -->
-    <section class="social-proof-grid" id="leaderboard">
+    <!-- 8. LEADERBOARD PREVIEW & TESTIMONIALS -->
+    <section class="social-proof-grid reveal-init" id="leaderboard">
       <!-- Leaderboard Preview -->
       <div class="leaderboard-container-card">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -2313,8 +2245,8 @@
       </div>
     </section>
 
-    <!-- 11. FINAL HIGH-CONVERSION CTA BANNER -->
-    <section class="final-cta-section">
+    <!-- 9. FINAL HIGH-CONVERSION CTA BANNER -->
+    <section class="final-cta-section reveal-init">
       <div class="final-cta-card">
         <h2>Ready to Make Learning More Fun?</h2>
         <p>Join thousands of students across India who prepare for Math, Science, and English Olympiads through interactive 3D games and adaptive quizzes.</p>
@@ -2322,16 +2254,24 @@
         <div class="final-cta-btn-group">
           {% if request.user.is_authenticated %}
             <a class="btn-cta-white" href="/dashboard/">Go to Dashboard →</a>
-            <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+            <a class="btn-cta-outline" href="/subjects/">Explore Classes</a>
           {% else %}
-            <a class="btn-cta-white" href="/register/">Start Learning Now →</a>
-            <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+            <a class="btn-cta-white" href="/register/">Start Free Practice →</a>
+            <a class="btn-cta-outline" href="/subjects/">Explore Classes</a>
           {% endif %}
         </div>
       </div>
     </section>
 
-    <!-- 12. SITE FOOTER -->
+    <!-- Floating Back to Top Button -->
+    <button type="button" class="btn-back-to-top" id="backToTopBtn" onclick="scrollToTop()" title="Back to top" aria-label="Back to top">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+    </button>
+
+    <!-- 10. SITE FOOTER -->
     <footer class="site-footer-v2" id="about">
       <div class="footer-inner-grid">
         <div class="footer-col">
@@ -2361,9 +2301,9 @@
 
         <div class="footer-col">
           <h5>Platform</h5>
-          <a href="#subjects">Class 1 – Class 8</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#features">Why TezMindz</a>
+          <a href="/subjects/">Class 1 – Class 8</a>
+          <a href="/how-it-works/">How It Works</a>
+          <a href="/about/">About Us</a>
           <a href="/leaderboard/">National Leaderboard</a>
         </div>
 
@@ -2388,38 +2328,79 @@
       window.USER_DATA = {{ user_data_js|safe }};
       {% endif %}
 
-      // Sticky navbar elevation on scroll
+      // Sticky navbar elevation & Back to Top button
       window.addEventListener('scroll', function() {
         var nav = document.getElementById('main-navbar');
+        var backToTopBtn = document.getElementById('backToTopBtn');
+
         if (window.scrollY > 20) {
           nav.classList.add('scrolled');
         } else {
           nav.classList.remove('scrolled');
         }
+
+        if (window.scrollY > 400) {
+          backToTopBtn.classList.add('visible');
+        } else {
+          backToTopBtn.classList.remove('visible');
+        }
       });
 
-      function loginDemo(redirectUrl) {
-        fetch("/login/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-          },
-          body: JSON.stringify({ email: "student", password: "password123" })
-        })
-        .then(function(res) {
-          if (res.ok) return res.json();
-          throw new Error("Demo login failed");
-        })
-        .then(function(data) {
-          if (data.success) {
-            location.href = redirectUrl;
-          }
-        })
-        .catch(function(err) {
-          location.href = "/login/";
-        });
+      function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+
+      // Scroll Reveal via IntersectionObserver
+      document.addEventListener('DOMContentLoaded', function() {
+        var revealElements = document.querySelectorAll('.reveal-init');
+        if ('IntersectionObserver' in window) {
+          var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-revealed');
+                // Animate counters inside this block if present
+                var counters = entry.target.querySelectorAll('.counter-num');
+                counters.forEach(function(c) {
+                  animateCounter(c);
+                });
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.15 });
+
+          revealElements.forEach(function(el) {
+            observer.observe(el);
+          });
+        } else {
+          revealElements.forEach(function(el) {
+            el.classList.add('is-revealed');
+          });
+        }
+      });
+
+      function animateCounter(el) {
+        var target = parseInt(el.getAttribute('data-target'), 10);
+        if (isNaN(target)) return;
+        var start = 0;
+        var duration = 1200;
+        var startTime = null;
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = Math.min((timestamp - startTime) / duration, 1);
+          var current = Math.floor(progress * target);
+          el.innerText = target > 100 ? current.toLocaleString() : current;
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            el.innerText = target > 100 ? target.toLocaleString() : target;
+          }
+        }
+        window.requestAnimationFrame(step);
+      }
+
+
+
 
       function selectClass(e, classLevel) {
         e.preventDefault();

@@ -192,3 +192,93 @@ class AuthNavbarAndLogoutTests(TestCase):
         self.assertContains(res_logout, "Get Started")
         self.assertNotContains(res_logout, 'class="hud-profile-pill"')
 
+
+class DedicatedPagesTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.cls5 = Class.objects.create(
+            grade_number=5,
+            name="Grade 5",
+            class_label="Class 5",
+            stage="Primary",
+            age_group="Age 10-11",
+            category="primary"
+        )
+        self.user = User.objects.create_user(
+            username="aarav_test",
+            email="aarav_test@tezmindz.com",
+            password="password123",
+            first_name="Aarav"
+        )
+        self.profile = StudentProfile.objects.create(
+            user=self.user,
+            student_class=self.cls5,
+            xp=300,
+            coins=50,
+            streak=3,
+            current_level=2
+        )
+
+    def test_about_page_status_and_content(self):
+        """Dedicated /about/ page renders correctly with mission, vision, and core pillars."""
+        res = self.client.get("/about/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "About Tezz-Mindz")
+        self.assertContains(res, "Pioneering the Future of")
+        self.assertContains(res, "Our Mission")
+        self.assertContains(res, "Our Vision")
+        self.assertContains(res, "Pedagogical Precision")
+
+    def test_subjects_page_status_and_classes(self):
+        """Dedicated /subjects/ page renders correctly with classes directory and 3 subject tracks."""
+        res = self.client.get("/subjects/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Class 1 to 8")
+        self.assertContains(res, "Mathematics (IMO)")
+        self.assertContains(res, "Science (NSO)")
+        self.assertContains(res, "English (IEO)")
+        self.assertContains(res, "Class 5")
+
+    def test_how_it_works_page_status_and_steps(self):
+        """Dedicated /how-it-works/ page renders correctly with 4-step journey and FAQ."""
+        res = self.client.get("/how-it-works/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "How")
+        self.assertContains(res, "Tezz-Mindz")
+        self.assertContains(res, "Discover &amp; Learn")
+        self.assertContains(res, "Practice &amp; Diagnose")
+        self.assertContains(res, "Apply in 3D Arena")
+        self.assertContains(res, "Master &amp; Compete")
+        self.assertContains(res, "Frequently Asked Questions")
+
+    def test_cross_page_navigation_links(self):
+        """Navigation links to /subjects/, /how-it-works/, and /about/ exist across pages."""
+        for path in ["/", "/about/", "/subjects/", "/how-it-works/"]:
+            res = self.client.get(path)
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, 'href="/subjects/"')
+            self.assertContains(res, 'href="/how-it-works/"')
+            self.assertContains(res, 'href="/about/"')
+
+    def test_authenticated_student_hud_on_dedicated_pages(self):
+        """Authenticated student sees their HUD on /about/, /subjects/, and /how-it-works/."""
+        self.client.login(username="aarav_test", password="password123")
+        for path in ["/about/", "/subjects/", "/how-it-works/"]:
+            res = self.client.get(path)
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, "Aarav")
+            self.assertContains(res, "Class 5")
+            self.assertContains(res, 'class="hud-profile-pill"')
+
+    def test_legacy_html_redirects(self):
+        """Legacy .html URLs redirect to modern clean paths."""
+        res_about = self.client.get("/about.html")
+        self.assertRedirects(res_about, "/about/", status_code=301)
+
+        res_subj = self.client.get("/subjects.html")
+        self.assertRedirects(res_subj, "/subjects/", status_code=301)
+
+        res_hiw = self.client.get("/how-it-works.html")
+        self.assertRedirects(res_hiw, "/how-it-works/", status_code=301)
+
+
