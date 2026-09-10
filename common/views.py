@@ -195,8 +195,6 @@ def check_achievements(profile):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def landing_page(request):
-    if request.user.is_authenticated:
-        return redirect("common:dashboard")
     return render(request, "index.html", get_user_data_context(request))
 
 
@@ -285,7 +283,6 @@ def register_page(request):
     return render(request, "register.html", get_user_data_context(request))
 
 
-@login_required
 def logout_page(request):
     logout(request)
     return redirect("common:landing")

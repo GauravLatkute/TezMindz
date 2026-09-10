@@ -124,3 +124,71 @@ class Chapter1WeTheTravellersTests(TestCase):
         # Topic 2 is now accessible
         res_t2 = self.client.get(f"/concept/{self.topic2.id}/")
         self.assertEqual(res_t2.status_code, 200)
+
+
+class AuthNavbarAndLogoutTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.cls5 = Class.objects.create(
+            grade_number=5,
+            name="Grade 5",
+            class_label="Class 5",
+            stage="Primary",
+            age_group="Age 10-11",
+            category="primary"
+        )
+        self.user = User.objects.create_user(
+            username="aarav_sharma",
+            email="aarav@tezmindz.com",
+            password="password123",
+            first_name="Aarav"
+        )
+        self.profile = StudentProfile.objects.create(
+            user=self.user,
+            student_class=self.cls5,
+            xp=450,
+            coins=120,
+            streak=5,
+            current_level=3
+        )
+
+    def test_unauthenticated_landing_page_shows_login_button(self):
+        """Unauthenticated user sees public Home page with Login and Get Started buttons."""
+        res = self.client.get("/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'class="btn-nav-login"')
+        self.assertContains(res, "Get Started")
+        self.assertNotContains(res, 'class="hud-profile-pill"')
+
+    def test_authenticated_landing_page_swaps_login_button_to_profile(self):
+        """Authenticated student sees Home page with their name, profile pill, and Dashboard CTA (no Login button)."""
+        self.client.login(username="aarav_sharma", password="password123")
+        res = self.client.get("/")
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Aarav")
+        self.assertContains(res, "Class 5")
+        self.assertContains(res, "Dashboard")
+        self.assertContains(res, 'class="hud-profile-pill"')
+        self.assertNotContains(res, 'class="btn-nav-login"')
+
+    def test_distinct_user_dashboard_page(self):
+        """Authenticated student can navigate between separate Home page (/) and User Dashboard (/dashboard/)."""
+        self.client.login(username="aarav_sharma", password="password123")
+        res_home = self.client.get("/")
+        self.assertEqual(res_home.status_code, 200)
+        self.assertContains(res_home, "Olympiad Learning,")
+
+        res_dash = self.client.get("/dashboard/")
+        self.assertEqual(res_dash.status_code, 200)
+        self.assertContains(res_dash, "Adventure World")
+
+    def test_clean_logout_flow(self):
+        """Logging out terminates session cleanly and redirects directly to Home page in logged-out state."""
+        self.client.login(username="aarav_sharma", password="password123")
+        res_logout = self.client.get("/logout/", follow=True)
+        self.assertEqual(res_logout.status_code, 200)
+        # Should now be on the public landing page in logged-out state
+        self.assertContains(res_logout, 'class="btn-nav-login"')
+        self.assertContains(res_logout, "Get Started")
+        self.assertNotContains(res_logout, 'class="hud-profile-pill"')
+

@@ -128,7 +128,12 @@ class AISmartHintView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        options = list(question.options.values_list("text", flat=True))
+        if hasattr(question, "legacy_options"):
+            options = list(question.legacy_options.values_list("text", flat=True))
+        elif hasattr(question, "options"):
+            options = list(question.options.values_list("text", flat=True))
+        else:
+            options = []
         profile = request.user.profile
 
         hint = AIService.generate_smart_hint(

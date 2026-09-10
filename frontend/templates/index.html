@@ -221,6 +221,61 @@
         transform: translateY(-2px);
       }
 
+      /* Authenticated Student HUD in Landing Nav */
+      .hud-profile-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 6px 4px 12px;
+        background: #FFFFFF;
+        border: 1.5px solid #E2E8F0;
+        border-radius: 100px;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        flex-shrink: 0;
+      }
+      .hud-profile-pill:hover {
+        border-color: #A78BFA;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.14);
+        transform: translateY(-1px);
+      }
+      .hud-profile-meta {
+        text-align: right;
+        line-height: 1.15;
+      }
+      .hud-profile-meta strong {
+        display: block;
+        font-size: 0.84rem;
+        font-weight: 900;
+        color: #0F172A;
+        white-space: nowrap;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hud-profile-meta small {
+        font-size: 0.66rem;
+        font-weight: 800;
+        color: #6366F1;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+      .hud-avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #EEF2FF;
+        border: 1.5px solid #C7D2FE;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
       /* ── SECTION HEADING REUSABLE ── */
       .section-heading-block {
         text-align: center;
@@ -1435,26 +1490,63 @@
 
         <!-- Right Action Controls -->
         <div class="landing-nav-actions">
-          <button type="button" class="btn-nav-search" title="Search platform" aria-label="Search">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-          <a class="btn-nav-login" href="/login/">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Login</span>
-          </a>
-          <a class="btn-nav-started" href="/register/">
-            <span>Get Started</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </a>
+          {% if request.user.is_authenticated %}
+            <!-- Authenticated Student HUD & Go to Dashboard -->
+            <a class="hud-profile-pill" href="/profile/" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }} ({{ profile.student_class.class_label|default:'Class 5' }})">
+              <div class="hud-profile-meta">
+                <strong>{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}</strong>
+                <small>{{ profile.student_class.class_label|default:"Class 5" }}</small>
+              </div>
+              <div class="hud-avatar-circle">
+                <svg viewBox="0 0 36 36" width="30" height="30">
+                  <defs>
+                    <linearGradient id="hudAvatarBgHome" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#818CF8"/>
+                      <stop offset="100%" stop-color="#4F46E5"/>
+                    </linearGradient>
+                    <linearGradient id="hudVisorHome" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38BDF8"/>
+                      <stop offset="100%" stop-color="#0284C7"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="18" cy="18" r="17" fill="url(#hudAvatarBgHome)"/>
+                  <ellipse cx="18" cy="19" rx="10" ry="11" fill="#FFFFFF"/>
+                  <path d="M10 16 C10 13 26 13 26 16 C26 19 23 20 18 20 C13 20 10 19 10 16 Z" fill="url(#hudVisorHome)"/>
+                  <ellipse cx="15" cy="15.5" rx="3" ry="1.2" fill="#FFFFFF" opacity="0.8"/>
+                  <path d="M11 28 C13 25 23 25 25 28 L27 34 C23 36 13 36 9 34 Z" fill="#312E81"/>
+                  <circle cx="18" cy="27" r="2" fill="#F59E0B"/>
+                </svg>
+              </div>
+            </a>
+            <a class="btn-nav-started" href="/dashboard/">
+              <span>Dashboard</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          {% else %}
+            <button type="button" class="btn-nav-search" title="Search platform" aria-label="Search">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+            <a class="btn-nav-login" href="/login/">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Login</span>
+            </a>
+            <a class="btn-nav-started" href="/register/">
+              <span>Get Started</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          {% endif %}
         </div>
       </div>
     </header>
@@ -1465,7 +1557,15 @@
         
         <!-- Top Announcement Badge -->
         <div class="hero-badge-pill">
-          <span class="hero-badge-icon">🏆</span>
+          <span class="hero-badge-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
+              <path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path>
+            </svg>
+          </span>
           <span class="hero-badge-text">India's Next Gen Olympiad Learning Platform</span>
         </div>
 
@@ -1481,32 +1581,62 @@
 
         <!-- Subtitle -->
         <p class="hero-description">
-          Learn concepts, play games, solve challenges and become an Olympiad Champion with <strong>Tezz-Mindz</strong>.
+          {% if request.user.is_authenticated %}
+            Welcome back, <strong>{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}</strong>! Continue mastering concepts, completing challenges, and earning trophies with <strong>Tezz-Mindz</strong>.
+          {% else %}
+            Learn concepts, play games, solve challenges and become an Olympiad Champion with <strong>Tezz-Mindz</strong>.
+          {% endif %}
         </p>
         
         <!-- CTA Group -->
         <div class="hero-cta-group">
-          <a class="btn-hero-primary" href="/register/">
-            <span>Start Learning</span>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </a>
-          <a class="btn-hero-secondary" href="/dashboard/" id="demo-link">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polygon points="10 8 16 12 10 16 10 8" fill="#6366F1"></polygon>
-            </svg>
-            <span>Watch Demo</span>
-          </a>
+          {% if request.user.is_authenticated %}
+            <a class="btn-hero-primary" href="/dashboard/">
+              <span>Continue Learning</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a class="btn-hero-secondary" href="#subjects">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                <path d="M6 6h10"></path>
+                <path d="M6 10h10"></path>
+              </svg>
+              <span>Explore Classes</span>
+            </a>
+          {% else %}
+            <a class="btn-hero-primary" href="/register/">
+              <span>Start Learning</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a class="btn-hero-secondary" href="/dashboard/" id="demo-link">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366F1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8" fill="#6366F1"></polygon>
+              </svg>
+              <span>Watch Demo</span>
+            </a>
+          {% endif %}
         </div>
 
         <!-- Bottom 4 Feature Mini-Pills Bar -->
         <div class="hero-features-bar">
           <!-- 1. Game Based Learning -->
           <div class="hero-mini-pill f-pill-indigo">
-            <div class="pill-icon-box">🎮</div>
+            <div class="pill-icon-box">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="6" y1="12" x2="10" y2="12"></line>
+                <line x1="8" y1="10" x2="8" y2="14"></line>
+                <line x1="15" y1="13" x2="15.01" y2="13"></line>
+                <line x1="18" y1="11" x2="18.01" y2="11"></line>
+                <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+              </svg>
+            </div>
             <div class="pill-text-block">
               <strong>Game Based</strong>
               <span>Learning</span>
@@ -1515,7 +1645,13 @@
 
           <!-- 2. Olympiad Focused -->
           <div class="hero-mini-pill f-pill-rose">
-            <div class="pill-icon-box">🎯</div>
+            <div class="pill-icon-box">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg>
+            </div>
             <div class="pill-text-block">
               <strong>Olympiad</strong>
               <span>Focused</span>
@@ -1524,7 +1660,12 @@
 
           <!-- 3. Progress Tracking -->
           <div class="hero-mini-pill f-pill-emerald">
-            <div class="pill-icon-box">📊</div>
+            <div class="pill-icon-box">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+            </div>
             <div class="pill-text-block">
               <strong>Progress</strong>
               <span>Tracking</span>
@@ -1533,7 +1674,12 @@
 
           <!-- 4. Rewards & Certificates -->
           <div class="hero-mini-pill f-pill-amber">
-            <div class="pill-icon-box">🏆</div>
+            <div class="pill-icon-box">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6"></circle>
+                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+              </svg>
+            </div>
             <div class="pill-text-block">
               <strong>Rewards</strong>
               <span>&amp; Certificates</span>
@@ -2174,8 +2320,13 @@
         <p>Join thousands of students across India who prepare for Math, Science, and English Olympiads through interactive 3D games and adaptive quizzes.</p>
         
         <div class="final-cta-btn-group">
-          <a class="btn-cta-white" href="/register/">Start Learning Now →</a>
-          <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+          {% if request.user.is_authenticated %}
+            <a class="btn-cta-white" href="/dashboard/">Go to Dashboard →</a>
+            <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+          {% else %}
+            <a class="btn-cta-white" href="/register/">Start Learning Now →</a>
+            <a class="btn-cta-outline" href="#subjects">Explore Classes</a>
+          {% endif %}
         </div>
       </div>
     </section>
