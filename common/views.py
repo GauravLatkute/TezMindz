@@ -26,20 +26,28 @@ from progress.models import ConceptMastery, LessonProgress, QuizAttempt, Student
 # ══════════════════════════════════════════════════════════════════════════════
 
 def get_user_data_context(request):
-    """Inject window.USER_DATA and profile into every template context."""
+    """Inject window.USER_DATA and profile into every template context safely."""
     context = {}
     if request.user.is_authenticated:
+        profile = _get_profile(request)
+        context["profile"] = profile
         try:
-            profile = request.user.profile
+            if profile and hasattr(profile, "student_class") and profile.student_class:
+                class_level = profile.student_class.grade_number
+                class_label = profile.student_class.class_label
+            else:
+                class_level = 5
+                class_label = "Class 5"
+
             user_data = {
                 "name": request.user.first_name or request.user.username,
                 "username": request.user.username,
-                "classLevel": profile.student_class.grade_number,
-                "classLabel": profile.student_class.class_label,
-                "xp": profile.xp,
-                "coins": profile.coins,
-                "streak": profile.streak,
-                "level": profile.current_level,
+                "classLevel": class_level,
+                "classLabel": class_label,
+                "xp": getattr(profile, "xp", 0) if profile else 0,
+                "coins": getattr(profile, "coins", 0) if profile else 0,
+                "streak": getattr(profile, "streak", 0) if profile else 0,
+                "level": getattr(profile, "current_level", 1) if profile else 1,
                 "loggedIn": True,
             }
         except Exception:
@@ -52,9 +60,9 @@ def get_user_data_context(request):
                 "loggedIn": True,
             }
         context["user_data_js"] = json.dumps(user_data)
-        context["profile"] = _get_profile(request)
     else:
         context["user_data_js"] = json.dumps({"loggedIn": False})
+        context["profile"] = None
     return context
 
 
@@ -63,17 +71,20 @@ def _get_profile(request):
     try:
         return request.user.profile
     except Exception:
-        cls5 = Class.objects.filter(grade_number=5).first() or Class.objects.first()
-        if not cls5:
-            cls5 = Class.objects.create(
-                grade_number=5, class_label="Class 5", name="Grade 5",
-                stage="Primary", age_group="Age 10-11", category="primary"
+        try:
+            cls5 = Class.objects.filter(grade_number=5).first() or Class.objects.first()
+            if not cls5:
+                cls5 = Class.objects.create(
+                    grade_number=5, class_label="Class 5", name="Grade 5",
+                    stage="Primary", age_group="Age 10-11", category="primary"
+                )
+            prof, _ = StudentProfile.objects.get_or_create(
+                user=request.user,
+                defaults={"student_class": cls5, "xp": 0, "coins": 0, "streak": 1, "current_level": 1}
             )
-        prof, _ = StudentProfile.objects.get_or_create(
-            user=request.user,
-            defaults={"student_class": cls5, "xp": 0, "coins": 0, "streak": 1, "current_level": 1}
-        )
-        return prof
+            return prof
+        except Exception:
+            return None
 
 
 def _get_student_class(profile):
@@ -204,15 +215,19 @@ def about_page(request):
 
 def subjects_page(request):
     context = get_user_data_context(request)
-    classes = Class.objects.filter(is_active=True).order_by("grade_number")
-    class_subjects = (
-        ClassSubject.objects.filter(student_class__is_active=True, subject__is_active=True)
-        .select_related("student_class", "subject")
-        .prefetch_related("chapters__concepts")
-        .order_by("student_class__grade_number", "subject__title")
-    )
-    context["classes"] = classes
-    context["class_subjects"] = class_subjects
+    try:
+        classes = Class.objects.filter(is_active=True).order_by("grade_number")
+        class_subjects = (
+            ClassSubject.objects.filter(student_class__is_active=True, subject__is_active=True)
+            .select_related("student_class", "subject")
+            .prefetch_related("chapters__concepts")
+            .order_by("student_class__grade_number", "subject__title")
+        )
+        context["classes"] = classes
+        context["class_subjects"] = class_subjects
+    except Exception:
+        context["classes"] = []
+        context["class_subjects"] = []
     return render(request, "subjects.html", context)
 
 

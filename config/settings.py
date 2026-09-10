@@ -24,7 +24,19 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-h8=wpq^w3^n)t&w(ll^&r6rf8!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.pythonanywhere.com").split(",") if h.strip()]
+ALLOWED_HOSTS = ["*"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.pythonanywhere.com",
+    "http://*.pythonanywhere.com",
+    "http://127.0.0.1",
+    "http://localhost",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS")
+if csrf_env:
+    CSRF_TRUSTED_ORIGINS.extend([origin.strip() for origin in csrf_env.split(",") if origin.strip()])
 
 # Application definition
 
@@ -71,10 +83,8 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            d for d in [
-                BASE_DIR / "frontend" / "templates",
-                BASE_DIR / "templates",
-            ] if d.exists()
+            BASE_DIR / "frontend" / "templates",
+            BASE_DIR / "templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -162,10 +172,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
-    d for d in [
-        BASE_DIR / "frontend" / "static",
-        BASE_DIR / "static",
-    ] if d.exists()
+    BASE_DIR / "frontend" / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
