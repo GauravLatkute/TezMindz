@@ -420,11 +420,6 @@
     color: #047857;
   }
 </style>
-
-<!-- Injected Game Stylesheet if dedicated folder template exists -->
-{% if has_dedicated_template %}
-<link rel="stylesheet" href="{{ game_static_base }}style.css">
-{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -457,6 +452,11 @@
         <div class="hud-stat-pill coins" title="Total Coins">
           🪙 <span id="tmz-hud-coins">{{ profile.coins|default:"0" }}</span>
         </div>
+        {% if has_dedicated_template %}
+        <a href="{% url 'common:game_play_standalone' game.slug %}" class="hud-btn" target="_blank" title="Open Game in Dedicated Clean Window (No Nav/Footer) 🚀" style="background: #10B981; color: #FFFFFF; font-weight: 800; border-color: #059669;">
+          ↗ Open Full Window
+        </a>
+        {% endif %}
         <button id="tmz-audio-toggle" class="hud-btn" type="button" title="Toggle Sound">
           🔊 Sound: ON
         </button>
@@ -493,8 +493,23 @@
     <!-- ── GAME VIEWPORT ── -->
     <div id="tmz-game-viewport">
       {% if has_dedicated_template %}
-        <!-- Dedicated Modular Game HTML Template Loaded from games/{{ game_path }}/index.html -->
-        {% include game_template_rel %}
+        {% if is_standalone_game %}
+          <!-- Dedicated Standalone Web App (Iframe Isolated) -->
+          <div style="width: 100%; border-radius: 20px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.15); min-height: 640px; position: relative;">
+            <iframe 
+              src="{{ game_iframe_url }}" 
+              id="tmz-game-iframe"
+              style="width: 100%; height: 720px; border: none; display: block;" 
+              allow="autoplay; fullscreen; accelerometer; gyroscope"
+              title="{{ game.title }}"
+            ></iframe>
+          </div>
+        {% else %}
+          <!-- Native Modular Component Game Template -->
+          <link rel="stylesheet" href="{{ game_static_base }}style.css">
+          {% include game_template_rel %}
+          <script src="{{ game_static_base }}game.js"></script>
+        {% endif %}
       {% else %}
         <!-- Rich Standard TezMindz Game Arena Fallback -->
         <div class="fallback-arena-card">
@@ -637,8 +652,4 @@
   }
 </script>
 
-<!-- 4. Injected Dedicated Game JavaScript if available -->
-{% if has_dedicated_template %}
-<script src="{{ game_static_base }}game.js"></script>
-{% endif %}
 {% endblock %}

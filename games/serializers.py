@@ -41,6 +41,7 @@ class GameContentSafeSerializer(serializers.ModelSerializer):
 
 class GameLevelSafeSerializer(serializers.ModelSerializer):
     contents = GameContentSafeSerializer(many=True, read_only=True)
+    is_locked = serializers.SerializerMethodField()
 
     class Meta:
         model = GameLevel
@@ -59,6 +60,9 @@ class GameLevelSafeSerializer(serializers.ModelSerializer):
             "unlock_requirement",
             "contents"
         ]
+
+    def get_is_locked(self, obj):
+        return False
 
 
 class GameProgressSerializer(serializers.ModelSerializer):

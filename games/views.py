@@ -58,6 +58,10 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
     if str(game_id).lower() in ["none", "null", "undefined", ""]:
         game_id = None
 
+    # Allow staff and admins to test inactive/draft games
+    is_staff_user = request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    active_filter = {} if is_staff_user else {"is_active": True}
+
     if target_slug and grade and subject_slug and chapter_num and topic_num:
         game = Game.objects.select_related(
             "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
@@ -66,14 +70,14 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
             concept__chapter__class_subject__student_class__grade_number=grade,
             concept__chapter__order=chapter_num,
             concept__order=topic_num,
-            is_active=True
+            **active_filter
         ).first()
     elif target_slug:
         game = Game.objects.select_related(
             "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
         ).filter(
             slug=target_slug,
-            is_active=True
+            **active_filter
         ).first()
     elif game_id:
         try:
@@ -81,7 +85,7 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
                 "concept__chapter__class_subject__student_class", "concept__chapter__class_subject__subject"
             ).filter(
                 id=int(game_id),
-                is_active=True
+                **active_filter
             ).first()
         except (ValueError, TypeError):
             game = None
@@ -94,10 +98,10 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
         if student_class:
             game = Game.objects.filter(
                 concept__chapter__class_subject__student_class=student_class,
-                is_active=True
+                **active_filter
             ).first()
         if not game:
-            game = Game.objects.filter(is_active=True).first()
+            game = Game.objects.filter(**active_filter).first()
         if not game:
             return redirect("common:games")
 
@@ -123,10 +127,33 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
 
     game_static_base = f"/static/games/{game_path}/"
     
-    # Check if dedicated HTML template exists in games/ directory
+    # Check if dedicated HTML template exists in games/ directory (either root or subfolder)
     full_html_path = settings.BASE_DIR / "games" / game_path / "index.html"
     has_dedicated_template = full_html_path.exists()
+    
+    if not has_dedicated_template:
+        # Check if index.html is located in an immediate subfolder
+        base_game_dir = settings.BASE_DIR / "games" / game_path
+        if base_game_dir.exists():
+            for sub_index in base_game_dir.glob("**/index.html"):
+                sub_rel = sub_index.relative_to(settings.BASE_DIR / "games")
+                game_path = str(sub_rel.parent).replace("\\", "/")
+                game_static_base = f"/static/games/{game_path}/"
+                full_html_path = sub_index
+                has_dedicated_template = True
+                break
     game_template_rel = f"{game_path}/index.html" if has_dedicated_template else None
+
+    # Check whether the index.html is a full standalone web app (has <!DOCTYPE or <html)
+    # or an embedded modular HTML fragment
+    is_standalone_game = False
+    if has_dedicated_template and full_html_path.exists():
+        try:
+            sample_text = full_html_path.read_text(encoding="utf-8", errors="ignore")[:300].lower()
+            if "<!doctype" in sample_text or "<html" in sample_text:
+                is_standalone_game = True
+        except Exception:
+            pass
 
     # 4. Serialize level contents for client SDK
     levels = game.levels.order_by("level_number")
@@ -144,7 +171,7 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
             "xp_reward": lvl.xp_reward,
             "coin_reward": lvl.coin_reward,
             "configuration": lvl.configuration,
-            "is_locked": lvl.is_locked,
+            "is_locked": False,
             "contents": [
                 {
                     "id": c.id,
@@ -189,6 +216,8 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
         "levels": levels_data,
     }
 
+    game_iframe_url = f"{game_static_base}index.html" if has_dedicated_template else None
+
     context = get_user_data_context(request)
     context.update({
         "game": game,
@@ -202,11 +231,30 @@ def modular_game_runner_view(request, game_id=None, slug=None, grade=None, subje
         "game_path": game_path,
         "game_static_base": game_static_base,
         "has_dedicated_template": has_dedicated_template,
+        "is_standalone_game": is_standalone_game,
         "game_template_rel": game_template_rel,
+        "game_iframe_url": game_iframe_url,
+        "direct_game_url": game_iframe_url,
         "game_context_json": json.dumps(game_context),
     })
 
+    # Render standalone distraction-free view if requested via query param or dedicated route
+    if request.GET.get("standalone") == "1" or request.GET.get("mode") == "standalone":
+        context["back_url"] = request.META.get("HTTP_REFERER")
+        return render(request, "games/standalone_runner.html", context)
+
     return render(request, "games/modular_runner.html", context)
+
+
+def standalone_game_view(request, slug=None, game_id=None, *args, **kwargs):
+    """
+    Dedicated fullscreen/standalone runner view that opens any educational game
+    in a clean, independent page without TezMindz navigation bar or footer.
+    """
+    q = request.GET.copy()
+    q["standalone"] = "1"
+    request.GET = q
+    return modular_game_runner_view(request, slug=slug, game_id=game_id, *args, **kwargs)
 
 @login_required
 def dream_house_builder_player_view(request):

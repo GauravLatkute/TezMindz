@@ -825,12 +825,11 @@
       .card-c-8:hover .card-action-btn { background: #4338CA; }
 
 
-      /* ── 7. OUR RESULTS & OLYMPIAD ACHIEVERS ── */
+      /* ── 7. OUR RESULTS & ACHIEVERS (SIMPLE) ── */
       .our-results-section {
         max-width: 1260px;
         margin: 0 auto 90px;
         padding: 0 24px;
-        position: relative;
       }
       .results-metrics-bar {
         display: grid;
@@ -871,7 +870,6 @@
         color: var(--tm-muted);
         font-weight: 600;
       }
-
       .achievers-cards-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -880,24 +878,18 @@
       .achiever-card {
         background: #FFFFFF;
         border: 1.5px solid #E2E8F0;
-        border-radius: var(--tm-card-radius);
+        border-radius: 22px;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
         box-shadow: var(--tm-shadow-sm);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
       .achiever-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--tm-shadow-lg);
-        border-color: #CBD5E1;
+        transform: translateY(-5px);
+        box-shadow: var(--tm-shadow-md);
       }
       .achiever-img-container {
-        position: relative;
         width: 100%;
-        height: 220px;
+        height: 200px;
         overflow: hidden;
         background: #EEF2FF;
       }
@@ -911,127 +903,27 @@
       .achiever-card:hover .achiever-img {
         transform: scale(1.05);
       }
-      .achiever-rank-pill {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        background: rgba(15, 23, 42, 0.88);
-        backdrop-filter: blur(8px);
-        color: #FFFFFF;
-        font-size: 0.74rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        padding: 4px 10px;
-        border-radius: 99px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .achiever-score-pill {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        background: #10B981;
-        color: #FFFFFF;
-        font-size: 0.72rem;
-        font-weight: 800;
-        padding: 3px 9px;
-        border-radius: 99px;
-        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
-      }
       .achiever-content-body {
-        padding: 20px 18px 22px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        justify-content: space-between;
+        padding: 18px 16px 20px;
       }
       .achiever-name {
-        font-size: 1.18rem;
+        font-size: 1.1rem;
         font-weight: 800;
         color: var(--tm-ink);
         margin: 0 0 4px;
       }
-      .achiever-school {
-        font-size: 0.8rem;
+      .achiever-detail {
+        font-size: 0.82rem;
         color: var(--tm-muted);
-        margin: 0 0 12px;
-        font-weight: 500;
+        margin: 0 0 10px;
         line-height: 1.4;
       }
-      .achiever-exam-badge {
-        font-size: 0.78rem;
-        font-weight: 800;
-        padding: 5px 10px;
-        border-radius: 8px;
-        margin-bottom: 12px;
+      .achiever-achievement {
         display: inline-block;
-      }
-      .exam-imo { background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; }
-      .exam-nso { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
-      .exam-ieo { background: #FAF5FF; color: #7C3AED; border: 1px solid #DDD6FE; }
-      .exam-uieo { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
-
-      .achiever-quote {
-        font-size: 0.84rem;
-        color: var(--tm-slate);
-        line-height: 1.48;
-        font-style: italic;
-        margin: 0 0 16px;
-        flex-grow: 1;
-      }
-      .achiever-tags-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-        padding-top: 12px;
-        border-top: 1px solid #F1F5F9;
-        font-size: 0.74rem;
-        font-weight: 700;
-      }
-      .achiever-tag {
-        background: #F8FAFC;
-        color: var(--tm-slate);
-        padding: 3px 8px;
-        border-radius: 6px;
-        border: 1px solid #E2E8F0;
-      }
-
-      .results-bottom-banner {
-        margin-top: 36px;
-        background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
-        border-radius: 18px;
-        padding: 20px 30px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: #FFFFFF;
-        box-shadow: 0 12px 30px rgba(49, 46, 129, 0.2);
-      }
-      .results-bottom-text {
-        font-size: 0.95rem;
-        font-weight: 700;
-      }
-      .results-bottom-text span {
-        color: #FCD34D;
-      }
-      .results-olympiad-logos {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-      }
-      .olympiad-pill-tag {
-        background: rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 4px 12px;
-        border-radius: 99px;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 800;
-        letter-spacing: 0.04em;
+        padding: 5px 12px;
+        border-radius: 99px;
       }
 
       /* ── 7.5 SUBSCRIPTION PLANS SECTION ── */
@@ -1745,42 +1637,16 @@
         transform: translateY(-2px);
       }
 
-      /* ── 10. PARENT TRUST & SUCCESS STORIES (FEEDBACK) ── */
+      /* ── 10. PARENT REVIEWS (SIMPLE) ── */
       .parents-trust-feedback-section {
         max-width: 1260px;
         margin: 0 auto 90px;
         padding: 0 24px;
-        position: relative;
-      }
-      .parent-trust-summary-bar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin: 20px 0 36px;
-      }
-      .trust-summary-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #FFFFFF;
-        border: 1.5px solid #E2E8F0;
-        padding: 8px 18px;
-        border-radius: 99px;
-        font-size: 0.88rem;
-        font-weight: 700;
-        color: var(--tm-slate);
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-      }
-      .trust-summary-pill i {
-        font-size: 1.05rem;
       }
       .parent-reviews-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 24px;
-        margin-bottom: 32px;
       }
       .parent-review-card {
         background: #FFFFFF;
@@ -1791,59 +1657,23 @@
         flex-direction: column;
         justify-content: space-between;
         box-shadow: var(--tm-shadow-sm);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
       .parent-review-card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--tm-shadow-lg);
-        border-color: #CBD5E1;
+        transform: translateY(-5px);
+        box-shadow: var(--tm-shadow-md);
       }
-      .review-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 14px;
-      }
-      .review-stars-group {
+      .review-stars {
         color: #F59E0B;
-        font-size: 0.95rem;
+        font-size: 1rem;
         letter-spacing: 2px;
+        margin-bottom: 16px;
       }
-      .review-badge-verified {
-        background: #ECFDF5;
-        color: #059669;
-        font-size: 0.72rem;
-        font-weight: 800;
-        padding: 3px 10px;
-        border-radius: 99px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        border: 1px solid #A7F3D0;
-      }
-      .review-highlight-tag {
-        display: inline-block;
-        background: #EEF2FF;
-        color: #4F46E5;
-        font-size: 0.76rem;
-        font-weight: 800;
-        padding: 4px 10px;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        border: 1px solid #C7D2FE;
-      }
-      .review-headline {
-        font-size: 1.05rem;
-        font-weight: 800;
+      .review-quote {
+        font-size: 1rem;
+        font-weight: 600;
         color: var(--tm-ink);
-        margin: 0 0 10px;
-        line-height: 1.35;
-      }
-      .review-body-text {
-        font-size: 0.90rem;
-        color: var(--tm-slate);
-        line-height: 1.6;
+        line-height: 1.55;
         margin: 0 0 20px;
         flex-grow: 1;
       }
@@ -1855,80 +1685,27 @@
         border-top: 1px solid #F1F5F9;
       }
       .review-avatar {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
         color: #FFFFFF;
-        font-size: 0.92rem;
+        font-size: 0.85rem;
         font-weight: 900;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
       }
-      .review-author-info {
-        flex: 1;
-        min-width: 0;
-      }
       .review-author-name {
-        font-size: 0.94rem;
-        font-weight: 800;
-        color: var(--tm-ink);
-        margin: 0;
-      }
-      .review-author-role {
-        font-size: 0.75rem;
-        color: var(--tm-muted);
-        margin: 2px 0 4px;
-      }
-      .review-child-tag {
-        display: inline-block;
-        background: #F1F5F9;
-        color: #475569;
-        font-size: 0.72rem;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 6px;
-      }
-
-      /* Sleek Reassurance Bar */
-      .parent-reassurance-bar {
-        background: #FFFFFF;
-        border: 1.5px solid #E2E8F0;
-        border-radius: 20px;
-        padding: 24px 28px;
-        box-shadow: var(--tm-shadow-sm);
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
-      }
-      .reassurance-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-      }
-      .reassurance-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
-      }
-      .reassurance-item h5 {
         font-size: 0.92rem;
         font-weight: 800;
         color: var(--tm-ink);
-        margin: 0 0 3px;
+        margin: 0;
       }
-      .reassurance-item p {
+      .review-author-detail {
         font-size: 0.78rem;
         color: var(--tm-muted);
-        margin: 0;
-        line-height: 1.45;
+        margin: 2px 0 0;
       }
 
       /* ── 11. FINAL CTA BANNER ── */
@@ -2082,7 +1859,6 @@
         .classes-grid-premium { grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .results-metrics-bar { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 20px 24px; }
         .achievers-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .results-bottom-banner { flex-direction: column; gap: 16px; text-align: center; }
         .pricing-cards-grid { grid-template-columns: 1fr; max-width: 520px; margin: 40px auto 0; gap: 32px; }
         .pricing-card.card-plan-pro { transform: none; }
         .pricing-card.card-plan-pro:hover { transform: translateY(-6px); }
@@ -2091,8 +1867,7 @@
         .leaderboard-podium-grid { grid-template-columns: 1fr; gap: 16px; max-width: 480px; }
         .podium-rank-1 { transform: none; }
         .podium-rank-1:hover { transform: translateY(-6px); }
-        .parent-reviews-grid { grid-template-columns: 1fr; max-width: 540px; margin: 0 auto 28px; }
-        .parent-reassurance-bar { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .parent-reviews-grid { grid-template-columns: 1fr; max-width: 540px; margin: 0 auto; }
         .footer-inner-grid { grid-template-columns: 1fr 1fr; }
       }
       @media (max-width: 640px) {
@@ -2110,12 +1885,165 @@
         .pricing-card { padding: 30px 20px 24px; }
         .pricing-trust-strip { flex-direction: column; gap: 14px; align-items: flex-start; padding: 18px 20px; }
         .trust-summary-pill { font-size: 0.8rem; padding: 6px 14px; }
-        .parent-reassurance-bar { grid-template-columns: 1fr; padding: 20px; }
         .games-showcase-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
         .game-card-v2 { min-height: auto; }
         .hero-cta-group { flex-direction: column; width: 100%; }
         .final-cta-btn-group { flex-direction: column; width: 100%; }
         .footer-inner-grid { grid-template-columns: 1fr; }
+      }
+
+      /* ── WHATSAPP FLOATING BUTTON ── */
+      .whatsapp-float {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .whatsapp-chat-popup {
+        background: #FFFFFF;
+        border-radius: 18px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+        width: 320px;
+        overflow: hidden;
+        transform: scale(0.5) translateY(20px);
+        opacity: 0;
+        pointer-events: none;
+        transform-origin: bottom right;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .whatsapp-chat-popup.open {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .whatsapp-popup-header {
+        background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .whatsapp-popup-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .whatsapp-popup-header-text h4 {
+        color: #FFFFFF;
+        font-size: 1rem;
+        font-weight: 800;
+        margin: 0 0 2px;
+      }
+      .whatsapp-popup-header-text p {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin: 0;
+      }
+      .whatsapp-popup-body {
+        padding: 16px 18px;
+        background: #ECE5DD;
+      }
+      .whatsapp-popup-msg {
+        background: #FFFFFF;
+        border-radius: 0 12px 12px 12px;
+        padding: 12px 14px;
+        font-size: 0.88rem;
+        color: #1A1A1A;
+        line-height: 1.5;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        position: relative;
+        max-width: 260px;
+      }
+      .whatsapp-popup-msg::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -8px;
+        width: 0;
+        height: 0;
+        border-top: 8px solid #FFFFFF;
+        border-left: 8px solid transparent;
+      }
+      .whatsapp-popup-msg .msg-time {
+        display: block;
+        text-align: right;
+        font-size: 0.68rem;
+        color: #999;
+        margin-top: 4px;
+      }
+      .whatsapp-popup-footer {
+        padding: 14px 18px;
+        background: #FFFFFF;
+      }
+      .whatsapp-popup-footer a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #25D366;
+        color: #FFFFFF;
+        padding: 12px 20px;
+        border-radius: 99px;
+        font-size: 0.92rem;
+        font-weight: 800;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+      }
+      .whatsapp-popup-footer a:hover {
+        background: #1EBE5D;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+      }
+      .whatsapp-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #25D366;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+      }
+      .whatsapp-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 28px rgba(37, 211, 102, 0.5);
+      }
+      .whatsapp-btn svg {
+        transition: transform 0.3s ease;
+      }
+      .whatsapp-btn.active svg {
+        transform: rotate(90deg);
+      }
+      .whatsapp-btn-pulse {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: #25D366;
+        animation: wa-pulse 2s ease-out infinite;
+        z-index: -1;
+      }
+      @keyframes wa-pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.6); opacity: 0; }
+      }
+      @media (max-width: 640px) {
+        .whatsapp-float { bottom: 20px; right: 16px; }
+        .whatsapp-chat-popup { width: 290px; }
+        .whatsapp-btn { width: 54px; height: 54px; }
       }
     </style>
   </head>
@@ -2589,144 +2517,78 @@
       </div>
     </section>
 
-    <!-- 5. OUR RESULTS & OLYMPIAD ACHIEVERS -->
+    <!-- 5. OUR RESULTS & ACHIEVERS -->
     <section class="our-results-section reveal-init" id="results">
       <div class="section-heading-block">
-        <span class="section-tag-pill">🏆 Proven Excellence</span>
-        <h2>Our Results &amp; Olympiad Achievers</h2>
-        <p>Meet the brilliant young minds who mastered concepts with TezMindz and achieved top National &amp; International ranks.</p>
+        <span class="section-tag-pill">🏆 Our Achievers</span>
+        <h2>Students Who Made Us Proud</h2>
+        <p>Real students, real results — powered by TezMindz learning games.</p>
       </div>
 
-      <!-- Key Impact Numbers Bar -->
+      <!-- Stats Bar -->
       <div class="results-metrics-bar">
         <div class="metric-stat-box">
           <div class="metric-num" style="color: #4F46E5;">98.6%</div>
-          <div class="metric-label">Olympiad Qualification Rate</div>
+          <div class="metric-label">Qualification Rate</div>
         </div>
         <div class="metric-stat-box">
           <div class="metric-num" style="color: #059669;">500+</div>
-          <div class="metric-label">Top 10 State &amp; Int. Ranks</div>
+          <div class="metric-label">Top Rankers</div>
         </div>
         <div class="metric-stat-box">
           <div class="metric-num" style="color: #D97706;">15,000+</div>
-          <div class="metric-label">Active Student Achievers</div>
+          <div class="metric-label">Active Students</div>
         </div>
         <div class="metric-stat-box">
           <div class="metric-num" style="color: #7C3AED;">4.9 / 5 ⭐</div>
-          <div class="metric-label">Parent &amp; Student Satisfaction</div>
+          <div class="metric-label">Parent Rating</div>
         </div>
       </div>
 
-      <!-- 4 Real Student Achiever Cards Grid -->
+      <!-- Student Cards -->
       <div class="achievers-cards-grid">
-        <!-- Student 1 -->
         <div class="achiever-card">
           <div class="achiever-img-container">
-            <img src="/static/media/student_topper_1.jpg" alt="Aanya Sharma - IMO Rank 1" class="achiever-img" />
-            <span class="achiever-rank-pill">🥇 Int. Rank 1</span>
-            <span class="achiever-score-pill">100/100 Score</span>
+            <img src="/static/media/student_topper_1.jpg" alt="Aanya Sharma" class="achiever-img" />
           </div>
           <div class="achiever-content-body">
-            <div>
-              <h3 class="achiever-name">Aanya Sharma</h3>
-              <p class="achiever-school"><i class="bi bi-geo-alt-fill"></i> Class 5 • DPS R.K. Puram, New Delhi</p>
-              <div class="achiever-exam-badge exam-imo">
-                <i class="bi bi-award-fill"></i> IMO Gold Medalist
-              </div>
-              <p class="achiever-quote">“TezMindz 3D games turned Math into my favourite subject. The fraction challenges helped me score 100% in IMO!”</p>
-            </div>
-            <div class="achiever-tags-row">
-              <span class="achiever-tag">📐 Mathematics</span>
-              <span class="achiever-tag">⭐ 1,450 XP</span>
-              <span class="achiever-tag">🔥 45D Streak</span>
-            </div>
+            <h3 class="achiever-name">Aanya Sharma</h3>
+            <p class="achiever-detail">Class 5 • New Delhi</p>
+            <span class="achiever-achievement" style="background: #EEF2FF; color: #4F46E5;">🥇 IMO Gold Medalist</span>
           </div>
         </div>
 
-        <!-- Student 2 -->
         <div class="achiever-card">
           <div class="achiever-img-container">
-            <img src="/static/media/student_topper_2.jpg" alt="Vihaan Patel - NSO State Rank 2" class="achiever-img" />
-            <span class="achiever-rank-pill">🥈 State Rank 2</span>
-            <span class="achiever-score-pill">98.5% Score</span>
+            <img src="/static/media/student_topper_2.jpg" alt="Vihaan Patel" class="achiever-img" />
           </div>
           <div class="achiever-content-body">
-            <div>
-              <h3 class="achiever-name">Vihaan Patel</h3>
-              <p class="achiever-school"><i class="bi bi-geo-alt-fill"></i> Class 4 • Cathedral &amp; John Connon, Mumbai</p>
-              <div class="achiever-exam-badge exam-nso">
-                <i class="bi bi-award-fill"></i> NSO Silver Medalist
-              </div>
-              <p class="achiever-quote">“The AI Little Teacher explained plant biology and physics simulations so clearly that science became effortless.”</p>
-            </div>
-            <div class="achiever-tags-row">
-              <span class="achiever-tag">🔬 Science</span>
-              <span class="achiever-tag">⭐ 1,320 XP</span>
-              <span class="achiever-tag">🔥 30D Streak</span>
-            </div>
+            <h3 class="achiever-name">Vihaan Patel</h3>
+            <p class="achiever-detail">Class 4 • Mumbai</p>
+            <span class="achiever-achievement" style="background: #ECFDF5; color: #059669;">🥈 NSO Silver Medalist</span>
           </div>
         </div>
 
-        <!-- Student 3 -->
         <div class="achiever-card">
           <div class="achiever-img-container">
-            <img src="/static/media/student_topper_3.jpg" alt="Rhea Deshmukh - IEO Champion" class="achiever-img" />
-            <span class="achiever-rank-pill">🏆 100 Percentile</span>
-            <span class="achiever-score-pill">Perfect 100%</span>
+            <img src="/static/media/student_topper_3.jpg" alt="Rhea Deshmukh" class="achiever-img" />
           </div>
           <div class="achiever-content-body">
-            <div>
-              <h3 class="achiever-name">Rhea Deshmukh</h3>
-              <p class="achiever-school"><i class="bi bi-geo-alt-fill"></i> Class 6 • National Public School, Bengaluru</p>
-              <div class="achiever-exam-badge exam-ieo">
-                <i class="bi bi-award-fill"></i> IEO English Champion
-              </div>
-              <p class="achiever-quote">“The grammar quests and daily quiz challenges made preparing for IEO feel like playing an exciting mobile game.”</p>
-            </div>
-            <div class="achiever-tags-row">
-              <span class="achiever-tag">📖 English</span>
-              <span class="achiever-tag">⭐ 1,580 XP</span>
-              <span class="achiever-tag">🔥 60D Streak</span>
-            </div>
+            <h3 class="achiever-name">Rhea Deshmukh</h3>
+            <p class="achiever-detail">Class 6 • Bengaluru</p>
+            <span class="achiever-achievement" style="background: #FAF5FF; color: #7C3AED;">🏆 IEO Champion</span>
           </div>
         </div>
 
-        <!-- Student 4 -->
         <div class="achiever-card">
           <div class="achiever-img-container">
-            <img src="/static/media/student_topper_4.jpg" alt="Kabir Mehta - UIEO National Rank 3" class="achiever-img" />
-            <span class="achiever-rank-pill">🌟 Nat. Rank 3</span>
-            <span class="achiever-score-pill">99.2% Score</span>
+            <img src="/static/media/student_topper_4.jpg" alt="Kabir Mehta" class="achiever-img" />
           </div>
           <div class="achiever-content-body">
-            <div>
-              <h3 class="achiever-name">Kabir Mehta</h3>
-              <p class="achiever-school"><i class="bi bi-geo-alt-fill"></i> Class 5 • DAV Boys Senior Secondary, Chennai</p>
-              <div class="achiever-exam-badge exam-uieo">
-                <i class="bi bi-award-fill"></i> UIEO Top Scorer
-              </div>
-              <p class="achiever-quote">“Dream House Builder helped me visualize place values and logic patterns that appeared directly in my exam!”</p>
-            </div>
-            <div class="achiever-tags-row">
-              <span class="achiever-tag">🧠 Reasoning</span>
-              <span class="achiever-tag">⭐ 1,290 XP</span>
-              <span class="achiever-tag">🔥 25D Streak</span>
-            </div>
+            <h3 class="achiever-name">Kabir Mehta</h3>
+            <p class="achiever-detail">Class 5 • Chennai</p>
+            <span class="achiever-achievement" style="background: #FFFBEB; color: #D97706;">🌟 UIEO Top Scorer</span>
           </div>
-        </div>
-      </div>
-
-      <!-- Bottom Olympiad Verification Banner -->
-      <div class="results-bottom-banner">
-        <div class="results-bottom-text">
-          <span>🏅 Official Olympiad Training Curriculum</span> • Preparing students for national competitive excellence
-        </div>
-        <div class="results-olympiad-logos">
-          <span class="olympiad-pill-tag">IMO (Math)</span>
-          <span class="olympiad-pill-tag">NSO (Science)</span>
-          <span class="olympiad-pill-tag">IEO (English)</span>
-          <span class="olympiad-pill-tag">UIEO (Unified)</span>
-          <span class="olympiad-pill-tag">SilverZone</span>
         </div>
       </div>
     </section>
@@ -3100,49 +2962,26 @@
       </div>
     </section>
 
-    <!-- 8. PARENT TRUST & SUCCESS STORIES (FEEDBACK) -->
+    <!-- 8. PARENT REVIEWS -->
     <section class="parents-trust-feedback-section reveal-init" id="parent-reviews">
       <div class="section-heading-block">
-        <span class="section-tag-pill">🛡️ Built For Parents, Loved By Students</span>
-        <h2>Why 10,000+ Parents Trust TezMindz</h2>
-        <p>Real stories from families whose children conquered math anxiety, improved school scores, and built daily study confidence.</p>
+        <span class="section-tag-pill">💬 What Parents Say</span>
+        <h2>Loved by 10,000+ Parents</h2>
+        <p>Hear from real families whose children are learning and growing with TezMindz.</p>
       </div>
 
-      <!-- Trust Badges Summary Row -->
-      <div class="parent-trust-summary-bar">
-        <div class="trust-summary-pill">
-          <i class="bi bi-star-fill" style="color: #F59E0B;"></i>
-          <span><strong>4.9 / 5.0</strong> Rating (10,000+ Parents)</span>
-        </div>
-        <div class="trust-summary-pill">
-          <i class="bi bi-graph-up-arrow" style="color: #059669;"></i>
-          <span><strong>94% Grade Boost</strong> in 30 Days</span>
-        </div>
-        <div class="trust-summary-pill">
-          <i class="bi bi-shield-check" style="color: #4F46E5;"></i>
-          <span><strong>100% Ad-Free</strong> Safe Learning</span>
-        </div>
-      </div>
-
-      <!-- 3 Clean Parent Review Cards -->
       <div class="parent-reviews-grid">
         <!-- Review 1 -->
         <div class="parent-review-card">
           <div>
-            <div class="review-card-header">
-              <div class="review-stars-group">★★★★★</div>
-              <span class="review-badge-verified"><i class="bi bi-patch-check-fill"></i> Verified Parent</span>
-            </div>
-            <span class="review-highlight-tag">🌟 Math Mastery &amp; IMO Gold</span>
-            <h4 class="review-headline">“From math anxiety to school topper and IMO Gold!”</h4>
-            <p class="review-body-text">“Aarav used to dread fractions and word problems. Within 3 weeks of playing 3D learning games on TezMindz, he mastered concepts visually. His school math score jumped from 72% to 98%, and he won the IMO Gold medal!”</p>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">"My son's math score jumped from 72% to 98% in just 3 weeks. He actually enjoys studying now — no more nagging!"</p>
           </div>
           <div class="review-author-row">
-            <div class="review-avatar" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">AS</div>
-            <div class="review-author-info">
-              <h5 class="review-author-name">Dr. Ananya Sharma</h5>
-              <div class="review-author-role">Pediatrician • Noida</div>
-              <span class="review-child-tag">👦 Kabir • Class 5 (ICSE)</span>
+            <div class="review-avatar" style="background: linear-gradient(135deg, #4F46E5, #7C3AED);">AS</div>
+            <div>
+              <h5 class="review-author-name">Ananya Sharma</h5>
+              <div class="review-author-detail">Parent of Class 5 student • Noida</div>
             </div>
           </div>
         </div>
@@ -3150,20 +2989,14 @@
         <!-- Review 2 -->
         <div class="parent-review-card">
           <div>
-            <div class="review-card-header">
-              <div class="review-stars-group">★★★★★</div>
-              <span class="review-badge-verified"><i class="bi bi-patch-check-fill"></i> Verified Parent</span>
-            </div>
-            <span class="review-highlight-tag">⏰ Independent Daily Habit</span>
-            <h4 class="review-headline">“Zero nagging — she practices happily on her own!”</h4>
-            <p class="review-body-text">“As working parents, we had little time for tutoring. TezMindz’s AI Voice Tutor patiently guides Rhea step-by-step through science and math. The weekly WhatsApp progress reports give us total peace of mind.”</p>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">"She practices on her own every day without being told. The games make learning feel like play — best investment we made!"</p>
           </div>
           <div class="review-author-row">
-            <div class="review-avatar" style="background: linear-gradient(135deg, #059669 0%, #0D9488 100%);">RD</div>
-            <div class="review-author-info">
+            <div class="review-avatar" style="background: linear-gradient(135deg, #059669, #0D9488);">RD</div>
+            <div>
               <h5 class="review-author-name">Rajesh Deshmukh</h5>
-              <div class="review-author-role">Software Architect • Bengaluru</div>
-              <span class="review-child-tag">👧 Rhea • Class 6 (CBSE)</span>
+              <div class="review-author-detail">Parent of Class 6 student • Bengaluru</div>
             </div>
           </div>
         </div>
@@ -3171,64 +3004,15 @@
         <!-- Review 3 -->
         <div class="parent-review-card">
           <div>
-            <div class="review-card-header">
-              <div class="review-stars-group">★★★★★</div>
-              <span class="review-badge-verified"><i class="bi bi-patch-check-fill"></i> Verified Parent</span>
-            </div>
-            <span class="review-highlight-tag">🚀 Mental Speed &amp; Confidence</span>
-            <h4 class="review-headline">“Teachers noticed the confidence jump immediately.”</h4>
-            <p class="review-body-text">“The mental arithmetic games transformed Ishaan’s calculation speed. His school teacher asked what tuition he was taking! Learning feels like an adventure rather than a chore. Best decision we made for his education.”</p>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-quote">"His school teacher asked what tuition he's taking! The confidence boost and speed improvement is remarkable."</p>
           </div>
           <div class="review-author-row">
-            <div class="review-avatar" style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%);">MS</div>
-            <div class="review-author-info">
+            <div class="review-avatar" style="background: linear-gradient(135deg, #D97706, #B45309);">MS</div>
+            <div>
               <h5 class="review-author-name">Meera Sengupta</h5>
-              <div class="review-author-role">Senior Educator • Kolkata</div>
-              <span class="review-child-tag">👦 Ishaan • Class 4 (CBSE)</span>
+              <div class="review-author-detail">Parent of Class 4 student • Kolkata</div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sleek Horizontal Parent Reassurance Bar -->
-      <div class="parent-reassurance-bar">
-        <div class="reassurance-item">
-          <div class="reassurance-icon" style="background: #ECFDF5; color: #059669;">
-            <i class="bi bi-shield-check"></i>
-          </div>
-          <div>
-            <h5>100% Ad-Free &amp; Safe</h5>
-            <p>Zero ads, no popups or unsafe links. Pure productive learning screen time.</p>
-          </div>
-        </div>
-
-        <div class="reassurance-item">
-          <div class="reassurance-icon" style="background: #EEF2FF; color: #4F46E5;">
-            <i class="bi bi-whatsapp"></i>
-          </div>
-          <div>
-            <h5>Weekly WhatsApp Reports</h5>
-            <p>Score breakdowns, accuracy heatmaps, and weak-area alerts on your phone.</p>
-          </div>
-        </div>
-
-        <div class="reassurance-item">
-          <div class="reassurance-icon" style="background: #FEF3C7; color: #D97706;">
-            <i class="bi bi-journal-bookmark-fill"></i>
-          </div>
-          <div>
-            <h5>CBSE &amp; ICSE Aligned</h5>
-            <p>100% mapped to school curriculum and IMO, NSO, IEO Olympiad patterns.</p>
-          </div>
-        </div>
-
-        <div class="reassurance-item">
-          <div class="reassurance-icon" style="background: #FAF5FF; color: #7C3AED;">
-            <i class="bi bi-robot"></i>
-          </div>
-          <div>
-            <h5>24/7 AI Voice Doubt Solver</h5>
-            <p>Step-by-step patient explanations so parents never face stressful tutoring.</p>
           </div>
         </div>
       </div>
@@ -3402,6 +3186,58 @@
           });
         }
       }
+    </script>
+
+    <!-- ══ WHATSAPP FLOATING CHAT WIDGET ══ -->
+    <!-- ⚠️ REPLACE 918263986554 below with your real WhatsApp number (with country code, no + or spaces) -->
+    <div class="whatsapp-float" id="whatsappWidget">
+      <!-- Chat Popup -->
+      <div class="whatsapp-chat-popup" id="whatsappPopup">
+        <div class="whatsapp-popup-header">
+          <div class="whatsapp-popup-avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div class="whatsapp-popup-header-text">
+            <h4>Tezz-Mindz Support</h4>
+            <p>● Online | Replies within minutes</p>
+          </div>
+        </div>
+        <div class="whatsapp-popup-body">
+          <div class="whatsapp-popup-msg">
+            👋 Hi there! Welcome to <strong>Tezz-Mindz</strong>. How can we help you today? Ask us about courses, pricing, or anything else!
+            <span class="msg-time">just now</span>
+          </div>
+        </div>
+        <div class="whatsapp-popup-footer">
+          <a href="https://wa.me/918263986554?text=Hi%20Tezz-Mindz!%20I%20want%20to%20know%20more%20about%20your%20Olympiad%20learning%20platform." target="_blank" rel="noopener noreferrer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <span>Start Chat</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Floating Button -->
+      <button class="whatsapp-btn" id="whatsappToggle" onclick="toggleWhatsApp()" aria-label="Chat on WhatsApp">
+        <div class="whatsapp-btn-pulse"></div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" id="waIcon"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </button>
+    </div>
+
+    <script>
+      function toggleWhatsApp() {
+        var popup = document.getElementById('whatsappPopup');
+        var btn = document.getElementById('whatsappToggle');
+        popup.classList.toggle('open');
+        btn.classList.toggle('active');
+      }
+      // Close popup when clicking outside
+      document.addEventListener('click', function(e) {
+        var widget = document.getElementById('whatsappWidget');
+        if (widget && !widget.contains(e.target)) {
+          document.getElementById('whatsappPopup').classList.remove('open');
+          document.getElementById('whatsappToggle').classList.remove('active');
+        }
+      });
     </script>
   </body>
 </html>

@@ -576,6 +576,13 @@
             <span>Game Arena</span>
           </a>
 
+          {% if request.user.is_staff or request.user.is_superuser %}
+          <a class="tm-nav-link" href="/tezadmin/" style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: #FFFFFF !important; font-weight: 800; border-radius: 99px; padding: 6px 14px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Admin Panel 🛡️</span>
+          </a>
+          {% endif %}
+
           <!-- Explore More Dropdown -->
           <div class="tm-dropdown" id="desktop-more-dropdown">
             <a class="tm-nav-link {% block nav_explore %}{% endblock %}" href="javascript:void(0)" onclick="toggleMoreDropdown(event)">
@@ -589,6 +596,13 @@
               </svg>
             </a>
             <div class="tm-dropdown-menu">
+              {% if request.user.is_staff or request.user.is_superuser %}
+              <a class="tm-dropdown-item" href="/tezadmin/" style="background: rgba(99, 102, 241, 0.08); font-weight: 800; color: #4F46E5;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Admin Control Center 🛡️</span>
+              </a>
+              <div class="tm-dropdown-divider"></div>
+              {% endif %}
               <a class="tm-dropdown-item" href="/">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 <span>Main Website (Home)</span>
@@ -636,10 +650,10 @@
       <!-- Right: Student Profile -->
       <div class="tm-student-hud">
         {% if request.user.is_authenticated %}
-          <a class="hud-profile-pill" href="/profile/" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }} ({{ profile.student_class.class_label|default:'Class 5' }})">
+          <a class="hud-profile-pill" href="{% if request.user.is_staff or request.user.is_superuser %}/tezadmin/{% else %}/profile/{% endif %}" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }} ({{ profile.student_class.class_label|default:'Class 5' }})">
             <div class="hud-profile-meta">
               <strong>{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}</strong>
-              <small>{{ profile.student_class.class_label|default:"Class 5" }}</small>
+              <small>{% if request.user.is_superuser %}Super Admin 🛡️{% elif request.user.is_staff %}Staff Admin 🛡️{% else %}{{ profile.student_class.class_label|default:"Class 5" }}{% endif %}</small>
             </div>
             <div class="hud-avatar-circle">
               <svg viewBox="0 0 36 36" width="30" height="30">
@@ -720,6 +734,12 @@
       <button type="button" onclick="toggleMobileDrawer()" style="border:none;background:#F1F5F9;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;display:grid;place-items:center;">✕</button>
     </div>
     <div class="tm-drawer-grid">
+      {% if request.user.is_staff or request.user.is_superuser %}
+      <a class="tm-drawer-card" href="/tezadmin/" style="background: rgba(99, 102, 241, 0.1); border-color: #6366F1; font-weight: 800; color: #4F46E5;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Admin Control Center 🛡️</span>
+      </a>
+      {% endif %}
       <a class="tm-drawer-card" href="/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> <span>Main Website (Home)</span></a>
       <a class="tm-drawer-card" href="/progress/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg> <span>Progress &amp; Mastery</span></a>
       <a class="tm-drawer-card" href="/achievements/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2Z"></path></svg> <span>Achievements</span></a>

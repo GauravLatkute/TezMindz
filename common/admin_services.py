@@ -10,13 +10,18 @@ from accounts.models import StudentProfile
 from games.models import Game, GameSession, GameAttempt, GameProgress
 from common.models import AdminAuditLog, TopicUnlockRule
 
-# Allowed safe client-side web asset extensions
+import subprocess
+import shutil
+
+# Allowed safe client-side web asset and frontend source extensions
 ALLOWED_EXTENSIONS = {
-    '.html', '.htm', '.css', '.js',
-    '.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico',
-    '.mp3', '.wav', '.ogg', '.m4a',
-    '.json', '.md', '.txt',
-    '.woff', '.woff2', '.ttf', '.eot'
+    '.html', '.htm', '.css', '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs',
+    '.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico', '.avif',
+    '.mp3', '.wav', '.ogg', '.m4a', '.aac',
+    '.json', '.md', '.txt', '.csv', '.xml',
+    '.woff', '.woff2', '.ttf', '.eot', '.otf',
+    '.map', '.lock', '.yaml', '.yml', '.toml', '.env', '.example',
+    '.wasm', '.webmanifest'
 }
 
 DISALLOWED_EXTENSIONS = {
@@ -26,7 +31,7 @@ DISALLOWED_EXTENSIONS = {
     '.dll', '.so', '.dylib', '.jar', '.vbs', '.scr'
 }
 
-MAX_ZIP_SIZE = 50 * 1024 * 1024  # 50 MB limit
+MAX_ZIP_SIZE = 100 * 1024 * 1024  # 100 MB limit
 
 
 def log_admin_action(request, action, target_model, target_id="", details=""):
@@ -56,10 +61,15 @@ def log_admin_action(request, action, target_model, target_id="", details=""):
 def sanitize_and_extract_game_zip(uploaded_zip, target_relative_path):
     """
     Securely inspects, validates, and extracts game source code into games/<target_relative_path>/.
-    Rejects any executable or server-side scripts, protecting server integrity.
+    Supports:
+    1. Static web games (HTML5/Canvas/Phaser/Three.js/CSS/JS)
+    2. React / Vite / TypeScript web app archives (automatically detects package.json,
+       runs build with relative base, and deploys dist/ bundle to root)
+    3. Nested ZIP archives (automatically hoists index.html and assets to root)
+    4. Auto-fixes absolute root asset paths in index.html (/assets/ -> ./assets/)
     """
     if uploaded_zip.size > MAX_ZIP_SIZE:
-        return False, "File size exceeds the 50 MB limit."
+        return False, "File size exceeds the 100 MB limit."
 
     target_dir = (settings.BASE_DIR / "games" / target_relative_path).resolve()
 
@@ -84,32 +94,109 @@ def sanitize_and_extract_game_zip(uploaded_zip, target_relative_path):
                 if ext in DISALLOWED_EXTENSIONS:
                     return False, f"Security Violation: '{ext}' files are strictly forbidden for security reasons."
 
-                if ext not in ALLOWED_EXTENSIONS and ext != '':
+                # Allow common dotfiles like .gitignore, .env.example
+                base_name = os.path.basename(member)
+                if ext not in ALLOWED_EXTENSIONS and ext != '' and not base_name.startswith('.'):
                     return False, f"Unsupported file type: '{ext}' in {member}."
 
-            # 2. Second Pass: Extract Clean Files
+            # 2. Second Pass: Extract Files Cleanly
             target_dir.mkdir(parents=True, exist_ok=True)
             for member in namelist:
-                # Directory or file extraction
                 if member.endswith('/'):
                     (target_dir / member).mkdir(parents=True, exist_ok=True)
                     continue
 
-                # Strip leading top-level folder if archive was wrapped in a root folder
                 out_path = target_dir / member
                 out_path.parent.mkdir(parents=True, exist_ok=True)
                 with z.open(member) as source, open(out_path, 'wb') as dest:
                     dest.write(source.read())
 
-            # Verify index.html exists
+            # 3. Check for Modern Frontend Build Requirement (Vite / React / Vue / TS)
+            # Look for package.json in target_dir or immediate subdirectories
+            pkg_files = list(target_dir.glob("**/package.json"))
+            if pkg_files:
+                pkg_dir = pkg_files[0].parent
+                print(f"[Game ZIP] Detected package.json in {pkg_dir}. Triggering automated Vite build...")
+                try:
+                    # Run npm install and build with relative base
+                    cmd = f'cmd /c "cd /d \"{pkg_dir}\" && npm install --prefer-offline && npx vite build --base=./"'
+                    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=180)
+                    
+                    dist_dir = pkg_dir / "dist"
+                    if not dist_dir.exists():
+                        build_dir = pkg_dir / "build"
+                        if build_dir.exists():
+                            dist_dir = build_dir
+
+                    if dist_dir.exists() and (dist_dir / "index.html").exists():
+                        # Copy built assets into target_dir root
+                        for item in dist_dir.iterdir():
+                            dest_item = target_dir / item.name
+                            if item.is_dir():
+                                shutil.copytree(str(item), str(dest_item), dirs_exist_ok=True)
+                            else:
+                                shutil.copy2(str(item), str(dest_item))
+                        print(f"[Game ZIP] Successfully built and deployed bundle from {dist_dir} to {target_dir}")
+                    else:
+                        # Try npm run build as fallback
+                        cmd_fallback = f'cmd /c "cd /d \"{pkg_dir}\" && npm run build"'
+                        subprocess.run(cmd_fallback, shell=True, capture_output=True, text=True, timeout=180)
+                        if dist_dir.exists() and (dist_dir / "index.html").exists():
+                            for item in dist_dir.iterdir():
+                                dest_item = target_dir / item.name
+                                if item.is_dir():
+                                    shutil.copytree(str(item), str(dest_item), dirs_exist_ok=True)
+                                else:
+                                    shutil.copy2(str(item), str(dest_item))
+                except Exception as build_err:
+                    print(f"[Game ZIP Build Warning] Automated build step encountered: {build_err}")
+
+            # 4. Verify & Hoist index.html if nested inside subfolders
             index_file = target_dir / "index.html"
             if not index_file.exists():
-                # Check subdirectories for index.html and hoist if necessary
+                sub_index = None
                 for sub in target_dir.glob("**/index.html"):
-                    index_file = sub
+                    sub_index = sub
                     break
+                if sub_index:
+                    sub_dir = sub_index.parent
+                    for item in list(sub_dir.iterdir()):
+                        dest = target_dir / item.name
+                        if item.is_dir():
+                            shutil.copytree(str(item), str(dest), dirs_exist_ok=True)
+                        else:
+                            shutil.copy2(str(item), str(dest))
+                else:
+                    # Check for alternative HTML entry points (game.html, play.html, etc.)
+                    html_candidates = list(target_dir.glob("*.html")) or list(target_dir.glob("**/*.html"))
+                    if html_candidates:
+                        best_html = html_candidates[0]
+                        shutil.copy2(str(best_html), str(index_file))
 
-            return True, f"Extracted {len(namelist)} files successfully into {target_relative_path}."
+            # 5. Sanitize absolute asset paths in index.html so it serves cleanly from /static/
+            if index_file.exists():
+                try:
+                    content = index_file.read_text(encoding="utf-8", errors="ignore")
+                    modified = False
+                    # Rewrite root-relative paths like /assets/ to ./assets/
+                    for raw_prefix, rel_prefix in [
+                        ('src="/assets/', 'src="./assets/'),
+                        ("src='/assets/", "src='./assets/"),
+                        ('href="/assets/', 'href="./assets/'),
+                        ("href='/assets/", "href='./assets/"),
+                        ('src="/vite.svg"', 'src="./vite.svg"'),
+                        ('href="/vite.svg"', 'href="./vite.svg"'),
+                        ('href="/favicon.ico"', 'href="./favicon.ico"')
+                    ]:
+                        if raw_prefix in content:
+                            content = content.replace(raw_prefix, rel_prefix)
+                            modified = True
+                    if modified:
+                        index_file.write_text(content, encoding="utf-8")
+                except Exception as e:
+                    print(f"[Game ZIP Path Sanitize Warning] {e}")
+
+            return True, f"Extracted and configured {len(namelist)} game files successfully into {target_relative_path}."
 
     except zipfile.BadZipFile:
         return False, "Invalid ZIP archive format."

@@ -185,7 +185,12 @@
           </td>
           <td style="text-align: right; padding-right: 24px;">
             <div class="action-btns" style="justify-content: flex-end;">
-              <a href="{% url 'common:game_play_by_slug' game.slug %}" class="action-btn" target="_blank" title="Play / Preview Game">
+              {% if game.direct_preview_url %}
+              <a href="{{ game.direct_preview_url }}" class="action-btn" target="_blank" title="Open Clean Static Game (Direct Window) ↗" style="background: #10B981; color: #FFFFFF; border-color: #059669;">
+                <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+              {% endif %}
+              <a href="{% url 'common:game_play_standalone' game.slug %}" class="action-btn" target="_blank" title="Launch Game in Different Page 🚀" style="background: #6366F1; color: #FFFFFF; border-color: #4F46E5;">
                 <i class="bi bi-play-fill"></i>
               </a>
               <a href="{% url 'tezadmin:game_analytics' game.id %}" class="action-btn" title="View Telemetry Analytics">

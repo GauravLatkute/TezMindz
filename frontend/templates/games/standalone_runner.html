@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ game.title }} — TezMindz Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0F172A;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #F8FAFC;
+    }
+
+    /* ── TOP FLOATING CONTROL BAR ── */
+    .runner-topbar {
+      height: 54px;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
+    }
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+      color: #FFFFFF;
+    }
+
+    .game-meta-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .game-title-text {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 320px;
+    }
+    .game-grade-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      color: #FFFFFF;
+      padding: 2px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hud-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #CBD5E1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .hud-tool-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+    .hud-tool-btn.primary {
+      background: #10B981;
+      color: #FFFFFF;
+      border-color: #059669;
+      width: auto;
+      padding: 0 12px;
+      gap: 6px;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+    .hud-tool-btn.primary:hover {
+      background: #059669;
+    }
+
+    /* ── GAME CANVAS / IFRAME CONTAINER ── */
+    .runner-viewport {
+      width: 100%;
+      height: calc(100% - 54px);
+      position: relative;
+      background: #000000;
+      overflow: hidden;
+    }
+
+    .runner-viewport.is-fullscreen {
+      height: 100%;
+    }
+
+    #game-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #000000;
+    }
+
+    /* In-game floating exit button in fullscreen mode */
+    .floating-exit-fs {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      z-index: 10000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .floating-exit-fs:hover {
+      background: rgba(239, 68, 68, 0.9);
+    }
+
+    @media (max-width: 640px) {
+      .runner-topbar {
+        padding: 0 10px;
+        height: 48px;
+      }
+      .runner-viewport {
+        height: calc(100% - 48px);
+      }
+      .game-title-text {
+        max-width: 160px;
+        font-size: 0.92rem;
+      }
+      .game-grade-pill {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Floating Bar -->
+  <header class="runner-topbar" id="runner-topbar">
+    <div class="topbar-left">
+      {% if back_url %}
+        <a href="{{ back_url }}" class="btn-back">
+          <i class="bi bi-arrow-left"></i> {{ back_label|default:"Back" }}
+        </a>
+      {% elif request.META.HTTP_REFERER and "tezadmin" in request.META.HTTP_REFERER %}
+        <a href="{% url 'tezadmin:game_library' %}" class="btn-back">
+          <i class="bi bi-arrow-left"></i> Admin Library
+        </a>
+      {% else %}
+        <a href="{% url 'common:games' %}" class="btn-back">
+          <i class="bi bi-arrow-left"></i> Games
+        </a>
+      {% endif %}
+
+      <div class="game-meta-badge">
+        <span class="game-grade-pill">{{ student_class.class_label|default:"Class 5" }}</span>
+        <h1 class="game-title-text">{{ game.title }}</h1>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="hud-tool-btn" id="btn-reload" title="Reload Game (Restart)" onclick="reloadGame()">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+
+      <button class="hud-tool-btn" id="btn-fullscreen" title="Toggle Edge-to-Edge Fullscreen" onclick="toggleFullscreen()">
+        <i class="bi bi-arrows-fullscreen"></i>
+      </button>
+
+      {% if direct_game_url %}
+      <a href="{{ direct_game_url }}" target="_blank" class="hud-tool-btn primary" title="Open Pure Game in New Browser Tab">
+        <i class="bi bi-box-arrow-up-right"></i>
+        <span>New Tab</span>
+      </a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Viewport Arena -->
+  <main class="runner-viewport" id="runner-viewport">
+    <button class="floating-exit-fs" id="floating-exit-fs" onclick="toggleFullscreen()">
+      <i class="bi bi-fullscreen-exit"></i> Exit Fullscreen
+    </button>
+
+    {% if game_iframe_url %}
+      <iframe 
+        id="game-frame"
+        src="{{ game_iframe_url }}"
+        allow="autoplay; fullscreen; accelerometer; gyroscope; gamepad; clipboard-write; web-share"
+        title="{{ game.title }}"
+      ></iframe>
+    {% elif has_dedicated_template %}
+      <div style="width: 100%; height: 100%; overflow: auto; background: #FFF; color: #0F172A; padding: 20px;">
+        <link rel="stylesheet" href="{{ game_static_base }}style.css">
+        {% include game_template_rel %}
+        <script src="{{ game_static_base }}game.js"></script>
+      </div>
+    {% else %}
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">🎮</div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Game Ready to Play</h2>
+        <p style="color: #94A3B8; max-width: 480px; margin-bottom: 24px;">
+          This game is registered in the TezMindz curriculum.
+        </p>
+        <a href="{% url 'common:game_play_by_slug' game.slug %}" class="btn-back" style="background: #6366F1; font-size: 1rem; padding: 12px 24px;">
+          Launch in Standard Runner
+        </a>
+      </div>
+    {% endif %}
+  </main>
+
+  <script>
+    function reloadGame() {
+      const frame = document.getElementById('game-frame');
+      if (frame) {
+        frame.src = frame.src;
+      } else {
+        window.location.reload();
+      }
+    }
+
+    function toggleFullscreen() {
+      const viewport = document.getElementById('runner-viewport');
+      const exitBtn = document.getElementById('floating-exit-fs');
+
+      if (!document.fullscreenElement) {
+        if (viewport.requestFullscreen) {
+          viewport.requestFullscreen().catch(err => console.log(err));
+        } else if (viewport.webkitRequestFullscreen) {
+          viewport.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(err => console.log(err));
+        }
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const exitBtn = document.getElementById('floating-exit-fs');
+      if (document.fullscreenElement) {
+        if (exitBtn) exitBtn.style.display = 'inline-flex';
+      } else {
+        if (exitBtn) exitBtn.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

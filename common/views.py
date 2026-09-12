@@ -92,44 +92,44 @@ def _get_student_class(profile):
 
 
 def _class_owns_chapter(profile, chapter):
-    """Returns True if the chapter belongs to the student's class."""
-    return chapter.class_subject.student_class_id == profile.student_class_id
+    """All chapters are open and accessible to all students."""
+    return True
 
 
 def _class_owns_concept(profile, concept):
-    return concept.chapter.class_subject.student_class_id == profile.student_class_id
+    """All concepts are open and accessible to all students."""
+    return True
 
 
 def _class_owns_game(profile, game):
-    return game.concept.chapter.class_subject.student_class_id == profile.student_class_id
+    """All games are open and accessible to all students."""
+    return True
 
 
 def _class_owns_quiz(profile, quiz):
-    return quiz.concept.chapter.class_subject.student_class_id == profile.student_class_id
+    """All quizzes are open and accessible to all students."""
+    return True
 
 
 def get_or_create_topic_progress(profile, concept):
     """
     Retrieves or initializes StudentTopicProgress for a student and concept.
-    Topic 1 of Chapter 1 of each subject is automatically unlocked (is_unlocked=True).
+    All topics, games, and quizzes are permanently open and unlocked.
     """
     tp, created = StudentTopicProgress.objects.get_or_create(
         student=profile,
         concept=concept,
         defaults={
-            "is_unlocked": (concept.order == 1 and concept.chapter.order == 1)
+            "is_unlocked": True,
+            "game_unlocked": True,
+            "quiz_unlocked": True,
         }
     )
-    if not tp.is_unlocked:
-        # Check if previous topic is mastered
-        prev_concept = concept.chapter.concepts.filter(
-            order__lt=concept.order, is_active=True
-        ).order_by("-order").first()
-        if prev_concept:
-            prev_tp = StudentTopicProgress.objects.filter(student=profile, concept=prev_concept).first()
-            if prev_tp and prev_tp.is_mastered:
-                tp.is_unlocked = True
-                tp.save(update_fields=["is_unlocked"])
+    if not (tp.is_unlocked and tp.game_unlocked and tp.quiz_unlocked):
+        tp.is_unlocked = True
+        tp.game_unlocked = True
+        tp.quiz_unlocked = True
+        tp.save(update_fields=["is_unlocked", "game_unlocked", "quiz_unlocked"])
     return tp
 
 
@@ -522,8 +522,7 @@ def subject_page(request, cs_id):
         ClassSubject.objects.select_related("student_class", "subject"),
         id=cs_id
     )
-    if cs.student_class_id != profile.student_class_id:
-        return redirect("common:learn")
+    # All subjects and chapters are open and accessible to all students
 
     chapters = (
         Chapter.objects
@@ -596,17 +595,24 @@ def concept_page(request, concept_id):
     if not _class_owns_concept(profile, concept):
         return redirect("common:learn")
 
-    # Sequence Unlocking Verification
+    # All topics are permanently unlocked
     tp = get_or_create_topic_progress(profile, concept)
-    if not tp.is_unlocked:
-        # If locked, redirect to chapter page
-        return redirect("common:chapter", chapter_id=concept.chapter_id)
 
     lessons = concept.lessons.order_by("order")
     quizzes = concept.quizzes.filter(is_active=True)
-    games = concept.games.all()
+    games = concept.games.filter(is_active=True)
+    # Prefer game that has actual on-disk code
+    first_game = None
+    from django.conf import settings
+    for g in games:
+        if g.game_path:
+            full_p = settings.BASE_DIR / "games" / g.game_path.strip("/\\") / "index.html"
+            if full_p.exists():
+                first_game = g
+                break
+    if not first_game:
+        first_game = games.first()
 
-    first_game = games.first()
     first_quiz = quizzes.first()
     quick_question = first_quiz.questions.prefetch_related("options").first() if first_quiz else None
 
@@ -637,12 +643,11 @@ def difficulty_page(request, game_id):
         Game.objects.select_related("concept__chapter__class_subject__student_class"),
         id=game_id
     )
-    if not _class_owns_game(profile, game):
+    is_staff = request.user.is_staff or request.user.is_superuser
+    if not is_staff and not _class_owns_game(profile, game):
         return redirect("common:games")
 
     tp = get_or_create_topic_progress(profile, game.concept)
-    if not tp.game_unlocked:
-        return redirect("common:concept", concept_id=game.concept_id)
 
     context = get_user_data_context(request)
     context["game"] = game
@@ -652,13 +657,26 @@ def difficulty_page(request, game_id):
 @login_required
 def games_page(request):
     profile = _get_profile(request)
-    games = (
+    from django.conf import settings
+
+    games_qs = (
         Game.objects
-        .filter(concept__chapter__class_subject__student_class=profile.student_class)
-        .select_related("concept__chapter__class_subject__subject")
+        .filter(concept__chapter__class_subject__student_class=profile.student_class, is_active=True)
+        .select_related("concept__chapter__class_subject__subject", "concept__chapter")
     )
+    games_list = list(games_qs)
+    for g in games_list:
+        g.has_custom_code = False
+        if g.game_path:
+            p = settings.BASE_DIR / "games" / g.game_path.strip("/\\") / "index.html"
+            if p.exists():
+                g.has_custom_code = True
+
+    # Playable custom code games appear first
+    games_list.sort(key=lambda x: (not x.has_custom_code, x.concept.chapter.order, x.concept.order))
+
     context = get_user_data_context(request)
-    context["games"] = games
+    context["games"] = games_list
     return render(request, "games.html", context)
 
 
@@ -675,14 +693,12 @@ def game_page(request, game_id):
     game = Game.objects.select_related("concept__chapter__class_subject__student_class").filter(id=game_id).first()
     if not game:
         return _runner(request, slug=None)
-    if not _class_owns_game(profile, game):
+
+    is_staff = request.user.is_staff or request.user.is_superuser
+    if not is_staff and not _class_owns_game(profile, game):
         return redirect("common:games")
 
-    # Sequence Check: Game requires Learn to be completed
     tp = get_or_create_topic_progress(profile, game.concept)
-    if not tp.game_unlocked:
-        return redirect("common:concept", concept_id=game.concept_id)
-
     return _runner(request, game_id=game_id)
 
 
@@ -690,6 +706,12 @@ def modular_game_runner_view(request, *args, **kwargs):
     """Lazy wrapper to prevent circular imports."""
     from games.views import modular_game_runner_view as _runner
     return _runner(request, *args, **kwargs)
+
+
+def standalone_game_view(request, *args, **kwargs):
+    """Lazy wrapper for dedicated fullscreen standalone game view."""
+    from games.views import standalone_game_view as _standalone_runner
+    return _standalone_runner(request, *args, **kwargs)
 
 
 
@@ -723,20 +745,18 @@ def result_page(request):
 def quiz_page(request, quiz_id):
     """
     Child-friendly interactive Quiz screen.
-    Backend verifies that Game is completed (quiz_unlocked=True).
+    All quizzes are open and accessible.
     """
     profile = _get_profile(request)
     quiz = get_object_or_404(
         Quiz.objects.select_related("concept__chapter__class_subject__student_class"),
         id=quiz_id, is_active=True
     )
-    if not _class_owns_quiz(profile, quiz):
+    is_staff = request.user.is_staff or request.user.is_superuser
+    if not is_staff and not _class_owns_quiz(profile, quiz):
         return redirect("common:learn")
 
-    # Sequence Check: Quiz requires Game to be completed
     tp = get_or_create_topic_progress(profile, quiz.concept)
-    if not tp.quiz_unlocked:
-        return redirect("common:concept", concept_id=quiz.concept_id)
 
     questions = quiz.questions.prefetch_related("options").order_by("display_order")
 

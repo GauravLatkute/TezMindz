@@ -1,6 +1,7 @@
 from django.urls import path
 from games.views import (
     modular_game_runner_view,
+    standalone_game_view,
     dream_house_builder_player_view,
     dream_house_builder_result_view,
     GameListAPIView,
@@ -24,6 +25,8 @@ urlpatterns = [
     path("class/<int:grade>/<slug:subject_slug>/chapter/<int:chapter_num>/topic/<int:topic_num>/game/<slug:game_slug>/", modular_game_runner_view, name="hierarchical_game_play"),
     path("play/<slug:slug>/", modular_game_runner_view, name="modular_play_by_slug"),
     path("play/<int:game_id>/", modular_game_runner_view, name="modular_play_by_id"),
+    path("standalone/<slug:slug>/", standalone_game_view, name="standalone_play_by_slug"),
+    path("standalone/<int:game_id>/", standalone_game_view, name="standalone_play_by_id"),
     path("dream-house-builder/", dream_house_builder_player_view, name="dream_house_builder"),
     path("dream-house-builder/result/<int:session_id>/", dream_house_builder_result_view, name="dream_house_builder_result"),
 

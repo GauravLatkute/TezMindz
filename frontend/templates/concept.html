@@ -77,7 +77,6 @@
   }
   .meter-pill.done { background: #ECFDF5; color: #047857; border: 1.5px solid #A7F3D0; }
   .meter-pill.current { background: #EDE9FE; color: #5B50EB; border: 1.5px solid #DDD6FE; animation: tm-pulse-glow 2s infinite; }
-  .meter-pill.locked { background: #F1F5F9; color: #94A3B8; border: 1.5px solid #E2E8F0; }
 
   /* ── 3 BIG MISSION CARDS ── */
   .missions-stack-container {
@@ -98,10 +97,6 @@
   .mission-action-card.active-mission {
     border-color: #5B50EB;
     box-shadow: 0 12px 32px rgba(91, 80, 235, 0.1);
-  }
-  .mission-action-card.locked-card {
-    background: #F8FAFC;
-    opacity: 0.7;
   }
 
   .mission-card-top-row {
@@ -128,7 +123,6 @@
   .mission-icon-box.learn { background: #EDE9FE; color: #5B50EB; border: 1.5px solid #DDD6FE; }
   .mission-icon-box.game { background: #FEF3C7; color: #D97706; border: 1.5px solid #FDE68A; }
   .mission-icon-box.quiz { background: #EFF6FF; color: #2563EB; border: 1.5px solid #BFDBFE; }
-  .mission-icon-box.locked { background: #E2E8F0; color: #94A3B8; }
 
   .mission-card-title-box h2 {
     font-size: 1.3rem;
@@ -501,20 +495,16 @@
 
     {% if topic_progress.game_completed %}
       <div class="meter-pill done"><i class="bi bi-check-circle-fill"></i> 2. Game Complete</div>
-    {% elif topic_progress.game_unlocked %}
-      <div class="meter-pill current"><i class="bi bi-controller"></i> 2. Game Ready</div>
     {% else %}
-      <div class="meter-pill locked"><i class="bi bi-lock-fill"></i> 2. Game Locked</div>
+      <div class="meter-pill current"><i class="bi bi-controller"></i> 2. Game Ready</div>
     {% endif %}
 
     <i class="bi bi-chevron-right" style="color:#94A3B8;"></i>
 
     {% if topic_progress.quiz_completed %}
       <div class="meter-pill done"><i class="bi bi-trophy-fill"></i> 3. Quiz Mastered</div>
-    {% elif topic_progress.quiz_unlocked %}
-      <div class="meter-pill current"><i class="bi bi-patch-question-fill"></i> 3. Quiz Ready</div>
     {% else %}
-      <div class="meter-pill locked"><i class="bi bi-lock-fill"></i> 3. Quiz Locked</div>
+      <div class="meter-pill current"><i class="bi bi-patch-question-fill"></i> 3. Quiz Ready</div>
     {% endif %}
   </div>
 
@@ -727,11 +717,11 @@
       <div style="display:flex;justify-content:flex-end;">
         {% if topic_progress.learn_completed %}
           <div class="badge-pill" style="background:#ECFDF5;color:#047857;padding:12px 24px;font-size:0.95rem;">
-            <i class="bi bi-check-lg"></i> Learn Complete • Game Unlocked!
+            <i class="bi bi-check-lg"></i> Learn Step Completed! ✨
           </div>
         {% else %}
           <button type="button" class="btn-unlock-learn-action" id="btn-complete-learn-mission" onclick="submitLearnComplete({{ concept.id }})">
-            I Understand! Complete Learn &amp; Unlock Game 🚀
+            Mark Learn Step Complete (+15 XP) ✨
           </button>
         {% endif %}
       </div>
@@ -739,10 +729,10 @@
   </div>
 
   <!-- ── 2. PLAY GAME MISSION ── -->
-  <div class="mission-action-card {% if topic_progress.game_unlocked and not topic_progress.game_completed %}active-mission{% elif not topic_progress.game_unlocked %}locked-card{% endif %}">
+  <div class="mission-action-card {% if topic_progress.game_completed %}completed-card{% else %}active-mission{% endif %}">
     <div class="mission-card-top-row" style="cursor:default;">
       <div class="mission-card-title-box">
-        <div class="mission-icon-box {% if topic_progress.game_unlocked %}game{% else %}locked{% endif %}">🎮</div>
+        <div class="mission-icon-box game">🎮</div>
         <div>
           <h2>Step 2: Educational Game Challenge</h2>
           <span>{% if concept.id == 1 or concept.order == 1 and chapter.order == 1 %}Dream House Builder 3D (Interactive Construction){% else %}{{ first_game.title|default:"Topic Challenge Game" }}{% endif %}</span>
@@ -750,25 +740,18 @@
       </div>
       {% if topic_progress.game_completed %}
         <span class="badge-pill" style="background:#ECFDF5;color:#047857;padding:6px 16px;"><i class="bi bi-check-circle-fill"></i> Completed (+50 XP • +15 Coins)</span>
-      {% elif topic_progress.game_unlocked %}
-        <span class="badge-pill" style="background:#FEF3C7;color:#D97706;padding:6px 16px;"><i class="bi bi-unlock-fill"></i> Unlocked (+50 XP • +15 Coins)</span>
       {% else %}
-        <span class="badge-pill" style="background:#E2E8F0;color:#64748B;padding:6px 16px;"><i class="bi bi-lock-fill"></i> Locked</span>
+        <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;padding:6px 16px;"><i class="bi bi-play-circle-fill"></i> Ready (+50 XP • +15 Coins)</span>
       {% endif %}
     </div>
 
-    {% if topic_progress.game_unlocked %}
     <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <p style="margin:0;font-size:0.92rem;color:#475569;font-weight:600;">
-        Play the educational challenge to earn bonus XP and unlock the mastery quiz!
+        Play the educational challenge to reinforce your skills and earn bonus XP!
       </p>
-      {% if concept.id == 1 or concept.order == 1 and chapter.order == 1 and chapter.class_subject.subject.icon_type == 'math' %}
-        <a class="btn-primary" href="{% url 'games:dream_house_builder' %}" style="background:linear-gradient(135deg,#5B50EB,#3B82F6);padding:12px 24px;">
-          Launch 3D Game Arena <i class="bi bi-arrow-right"></i>
-        </a>
-      {% elif first_game %}
-        <a class="btn-primary" href="/game/{{ first_game.slug }}/play/" style="padding:12px 24px;">
-          Launch Game Challenge <i class="bi bi-arrow-right"></i>
+      {% if first_game %}
+        <a class="btn-primary" href="/game/{{ first_game.slug }}/standalone/" target="_blank" style="background:linear-gradient(135deg,#6366F1,#4F46E5);padding:12px 26px;" title="Open in Dedicated Different Page 🚀">
+          <span>Play Game (Full Window)</span> <i class="bi bi-box-arrow-up-right"></i>
         </a>
       {% else %}
         <a class="btn-primary" href="/games/" style="padding:12px 24px;">
@@ -776,14 +759,13 @@
         </a>
       {% endif %}
     </div>
-    {% endif %}
   </div>
 
   <!-- ── 3. QUIZ MISSION ── -->
-  <div class="mission-action-card {% if topic_progress.quiz_unlocked and not topic_progress.quiz_completed %}active-mission{% elif not topic_progress.quiz_unlocked %}locked-card{% endif %}">
+  <div class="mission-action-card {% if topic_progress.quiz_completed %}completed-card{% else %}active-mission{% endif %}">
     <div class="mission-card-top-row" style="cursor:default;">
       <div class="mission-card-title-box">
-        <div class="mission-icon-box {% if topic_progress.quiz_unlocked %}quiz{% else %}locked{% endif %}">🏆</div>
+        <div class="mission-icon-box quiz">🏆</div>
         <div>
           <h2>Step 3: Topic Mastery Quiz</h2>
           <span>{{ first_quiz.title|default:"Topic Assessment" }} (Passing: 60%)</span>
@@ -791,23 +773,19 @@
       </div>
       {% if topic_progress.quiz_completed %}
         <span class="badge-pill" style="background:#ECFDF5;color:#047857;padding:6px 16px;"><i class="bi bi-trophy-fill"></i> Mastered (+30 XP)</span>
-      {% elif topic_progress.quiz_unlocked %}
-        <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;padding:6px 16px;"><i class="bi bi-patch-question-fill"></i> Ready (+30 XP)</span>
       {% else %}
-        <span class="badge-pill" style="background:#E2E8F0;color:#64748B;padding:6px 16px;"><i class="bi bi-lock-fill"></i> Locked</span>
+        <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;padding:6px 16px;"><i class="bi bi-patch-question-fill"></i> Ready (+30 XP)</span>
       {% endif %}
     </div>
 
-    {% if topic_progress.quiz_unlocked %}
     <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <p style="margin:0;font-size:0.92rem;color:#475569;font-weight:600;">
-        Answer {{ first_quiz.questions.count|default:4 }} Olympiad questions to unlock the next topic on your map!
+        Answer {{ first_quiz.questions.count|default:4 }} Olympiad questions to test your understanding!
       </p>
       <a class="btn-primary" href="/quiz/{{ first_quiz.id|default:1 }}/" style="background:linear-gradient(135deg,#2563EB,#1D4ED8);padding:12px 24px;">
         Start Mastery Quiz <i class="bi bi-arrow-right"></i>
       </a>
     </div>
-    {% endif %}
   </div>
 
 </div>
@@ -853,9 +831,9 @@
       if (feedback) {
         feedback.style.display = 'block';
         feedback.style.color = '#047857';
-        feedback.innerHTML = '🎉 Excellent! That is 100% correct! Unlocking Educational Game (+15 XP)... 🚀';
+        feedback.innerHTML = '🎉 Excellent! That is 100% correct! Completing Learn Step (+15 XP)... 🚀';
       }
-      // Auto-complete learn and unlock game!
+      // Auto-complete learn!
       setTimeout(() => {
         submitLearnComplete({{ concept.id }});
       }, 600);
@@ -876,7 +854,7 @@
     const btn = document.getElementById('btn-complete-learn-mission');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Unlocking Game...';
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving Progress...';
     }
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');

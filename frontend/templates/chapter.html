@@ -151,15 +151,10 @@
     color: inherit;
     flex-wrap: wrap;
   }
-  .adventure-step-node:hover .step-card-content:not(.locked-card) {
+  .adventure-step-node:hover .step-card-content {
     transform: translateX(6px);
     border-color: #A78BFA;
     box-shadow: 0 12px 32px rgba(79, 70, 229, 0.08);
-  }
-  .step-card-content.locked-card {
-    background: #F8FAFC;
-    opacity: 0.75;
-    cursor: not-allowed;
   }
   .step-card-content.mastered-card {
     border-color: #A7F3D0;
@@ -239,24 +234,17 @@
       <div class="step-node-sphere mastered" title="Topic Mastered!">
         ✓
       </div>
-    {% elif concept.progress.is_unlocked %}
-      {% if forloop.first or not concept.progress.learn_completed %}
-        <div class="step-node-sphere active-mission" title="Active Mission!">
-          ⭐
-        </div>
-      {% else %}
-        <div class="step-node-sphere available" title="Mission Unlocked">
-          🚀
-        </div>
-      {% endif %}
+    {% elif forloop.first or not concept.progress.learn_completed %}
+      <div class="step-node-sphere active-mission" title="Active Mission!">
+        ⭐
+      </div>
     {% else %}
-      <div class="step-node-sphere locked" title="Locked Mission">
-        🔒
+      <div class="step-node-sphere available" title="Mission Available">
+        🚀
       </div>
     {% endif %}
 
-    <!-- Topic Card Box -->
-    {% if concept.progress.is_unlocked %}
+    <!-- Topic Card Box (All Open & Unlocked) -->
     <a class="step-card-content {% if concept.progress.is_mastered %}mastered-card{% endif %}" href="/concept/{{ concept.id }}/">
       <div class="step-info-col">
         <h3>Mission {{ concept.order }}: {{ concept.name }}</h3>
@@ -265,12 +253,12 @@
           <span class="badge-pill purple">{{ concept.get_difficulty_display }}</span>
           {% if concept.progress.is_mastered %}
             <span class="badge-pill" style="background:#ECFDF5;color:#047857;"><i class="bi bi-trophy-fill"></i> Mastered (100%)</span>
-          {% elif concept.progress.quiz_unlocked %}
-            <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;"><i class="bi bi-patch-question-fill"></i> Quiz Ready</span>
-          {% elif concept.progress.game_unlocked %}
-            <span class="badge-pill" style="background:#FEF3C7;color:#D97706;"><i class="bi bi-controller"></i> Game Ready</span>
+          {% elif concept.progress.quiz_completed %}
+            <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;"><i class="bi bi-patch-check-fill"></i> Quiz Complete</span>
+          {% elif concept.progress.game_completed %}
+            <span class="badge-pill" style="background:#FEF3C7;color:#D97706;"><i class="bi bi-controller"></i> Game Complete</span>
           {% else %}
-            <span class="badge-pill purple"><i class="bi bi-book"></i> Learn Active</span>
+            <span class="badge-pill" style="background:#DCFCE7;color:#15803D;"><i class="bi bi-unlock-fill"></i> Open</span>
           {% endif %}
         </div>
       </div>
@@ -285,22 +273,6 @@
         </div>
       </div>
     </a>
-    {% else %}
-    <div class="step-card-content locked-card">
-      <div class="step-info-col">
-        <h3 style="color:#64748B;">Mission {{ concept.order }}: {{ concept.name }}</h3>
-        <p style="color:#94A3B8;">Locked. Complete Mission {{ concept.order|add:"-1" }} to unlock this adventure.</p>
-        <div class="step-badges-row">
-          <span class="badge-pill" style="background:#E2E8F0;color:#64748B;"><i class="bi bi-lock-fill"></i> Locked</span>
-        </div>
-      </div>
-      <div class="step-action-col">
-        <button class="btn-primary" disabled style="opacity:0.4;background:#94A3B8;cursor:not-allowed;padding:10px 20px;">
-          <i class="bi bi-lock-fill"></i> Locked
-        </button>
-      </div>
-    </div>
-    {% endif %}
 
   </div>
   {% endfor %}

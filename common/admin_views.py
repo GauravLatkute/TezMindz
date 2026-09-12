@@ -261,9 +261,27 @@ def admin_game_library_view(request):
         .order_by("concept__chapter__class_subject__student_class__grade_number", "concept__chapter__order", "concept__order")
     )
 
-    # Attach session metrics
+    # Attach session metrics and direct preview URL
     for g in games:
         g.play_count = g.sessions.count()
+        g.has_custom_html = False
+        g.direct_preview_url = None
+        if g.game_path:
+            clean_path = g.game_path.strip("/\\")
+            html_file = settings.BASE_DIR / "games" / clean_path / "index.html"
+            if html_file.exists():
+                g.has_custom_html = True
+                g.direct_preview_url = f"/static/games/{clean_path}/index.html"
+            else:
+                # Check subfolder
+                base_dir = settings.BASE_DIR / "games" / clean_path
+                if base_dir.exists():
+                    for sub in base_dir.glob("**/index.html"):
+                        sub_rel = sub.relative_to(settings.BASE_DIR / "games")
+                        rel_parent = str(sub_rel.parent).replace("\\", "/")
+                        g.has_custom_html = True
+                        g.direct_preview_url = f"/static/games/{rel_parent}/index.html"
+                        break
 
     context = {
         "title": "Educational Game Library",
@@ -336,7 +354,9 @@ def admin_game_form_view(request, game_id=None):
             zip_file = request.FILES["game_zip"]
             success, msg = sanitize_and_extract_game_zip(zip_file, game.game_path)
             if success:
-                messages.success(request, f"Game source code extracted: {msg}")
+                game.is_active = True
+                game.save()
+                messages.success(request, f"Game '{game.title}' ready! {msg}")
                 log_admin_action(request, "Uploaded Game ZIP", "Game", game.id, msg)
             else:
                 messages.error(request, f"ZIP upload failed: {msg}")

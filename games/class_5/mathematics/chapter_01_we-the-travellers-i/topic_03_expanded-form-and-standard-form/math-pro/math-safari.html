@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Safari: Conceptual Mathematics Adventure (Class 1 to 4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top, #fef3c7 0%, #fffbeb 60%, #fed7aa 100%);
+      --primary: #f59e0b;
+      --primary-dark: #d97706;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --border-color: #fde68a;
+      --text-main: #1e293b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      overflow-x: hidden;
+    }
+    .game-app {
+      width: 100%;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    /* Top Bar */
+    .header-bar {
+      width: 100%;
+      background: #ffffff;
+      border: 3px solid #fde68a;
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(217, 119, 6, 0.12);
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .brand-icon {
+      font-size: 28px;
+      animation: bounce 2s infinite;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #78350f;
+      line-height: 1.1;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: #b45309;
+    }
+    /* Grade Switcher Tabs */
+    .grade-tabs {
+      display: flex;
+      background: #fef3c7;
+      padding: 4px;
+      border-radius: 16px;
+      border: 1px solid #fde68a;
+      gap: 4px;
+    }
+    .grade-tab {
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      color: #92400e;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .grade-tab.active {
+      background: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+      transform: scale(1.05);
+    }
+    /* Status indicators */
+    .status-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .score-badge {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1.5px solid #a7f3d0;
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .combo-badge {
+      background: #ef4444;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 900;
+      animation: pulse 1s infinite;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1.5px solid #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+    .icon-btn.active {
+      background: #f59e0b;
+      color: #fff;
+    }
+    .hearts {
+      display: flex;
+      gap: 2px;
+      font-size: 18px;
+    }
+    /* Phase Navigation Bar */
+    .phase-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #fde68a;
+      border-radius: 20px;
+      padding: 4px;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.08);
+      width: 100%;
+      max-width: 600px;
+    }
+    .phase-tab {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 14px;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      color: #92400e;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .phase-tab:hover {
+      background: #fef3c7;
+    }
+    .phase-tab.active {
+      background: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+      transform: scale(1.02);
+    }
+    /* Lesson & Quiz Cards */
+    .concept-card {
+      background: #ffffff;
+      border: 2px solid #fde68a;
+      border-radius: 20px;
+      padding: 16px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .concept-step {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 14px;
+      border-radius: 0 14px 14px 0;
+      font-size: 13px;
+      line-height: 1.4;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .step-badge {
+      background: #f59e0b;
+      color: #ffffff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .quiz-card {
+      background: #ffffff;
+      border: 3px solid #fde68a;
+      border-radius: 24px;
+      padding: 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .quiz-options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+    .quiz-btn {
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 2px solid #fed7aa;
+      background: #fffbeb;
+      color: #1e293b;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quiz-btn:hover:not(:disabled) {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+    .quiz-btn.correct {
+      background: #d1fae5 !important;
+      border-color: #10b981 !important;
+      color: #065f46 !important;
+      font-weight: 900;
+    }
+    .quiz-btn.wrong {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #991b1b !important;
+    }
+    /* Main Stage Card */
+    .stage-card {
+      width: 100%;
+      background: var(--card-bg);
+      border: 4px solid var(--border-color);
+      border-radius: 32px;
+      box-shadow: 0 12px 32px rgba(217, 119, 6, 0.12);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+    /* Mission Banner */
+    .mission-banner {
+      width: 100%;
+      border-radius: 20px;
+      padding: 14px 20px;
+      color: #ffffff;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .mission-banner.c1 { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+    .mission-banner.c2 { background: linear-gradient(135deg, #10b981, #0d9488); }
+    .mission-banner.c3 { background: linear-gradient(135deg, #d97706, #ca8a04); }
+    .mission-banner.c4 { background: linear-gradient(135deg, #e11d48, #be123c); }
+    .mission-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mission-avatar {
+      font-size: 38px;
+    }
+    .mission-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
+    }
+    .mission-prompt {
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .equation-tag {
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(4px);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+    /* Interactive Arena Container */
+    .interactive-arena {
+      width: 100%;
+      min-height: 280px;
+      background: #fefce8;
+      border: 3px solid #fef08a;
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Class 1: Ten-Frame Styles */
+    .ten-frame-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-width: 480px;
+      margin: 12px 0;
+    }
+    .ten-frame-cell {
+      height: 64px;
+      background: #ffffff;
+      border: 3px dashed #f59e0b;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .ten-frame-cell.filled {
+      border-style: solid;
+      background: #fef3c7;
+      border-color: #d97706;
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .ten-frame-cell.added {
+      background: #d1fae5;
+      border-color: #059669;
+    }
+    .cell-num {
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      font-size: 10px;
+      font-weight: 900;
+      color: #94a3b8;
+    }
+    /* Class 2: Balance Scale Physics Beam */
+    .scale-stage {
+      width: 100%;
+      max-width: 500px;
+      height: 220px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .scale-post {
+      width: 18px;
+      height: 120px;
+      background: #78350f;
+      border-radius: 8px;
+      position: absolute;
+      bottom: 20px;
+      z-index: 1;
+    }
+    .scale-base {
+      width: 110px;
+      height: 20px;
+      background: #451a03;
+      border-radius: 10px;
+      position: absolute;
+      bottom: 10px;
+      z-index: 1;
+    }
+    .scale-beam {
+      width: 100%;
+      max-width: 440px;
+      height: 14px;
+      background: #b45309;
+      border-radius: 10px;
+      position: absolute;
+      bottom: 128px;
+      z-index: 2;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .scale-pivot {
+      width: 22px;
+      height: 22px;
+      background: #f59e0b;
+      border: 3px solid #78350f;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .scale-pan {
+      position: absolute;
+      top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .scale-pan.left { left: 4px; }
+    .scale-pan.right { right: 4px; }
+    .pan-string {
+      width: 2px;
+      height: 50px;
+      background: #64748b;
+    }
+    .pan-plate {
+      min-width: 110px;
+      min-height: 55px;
+      background: #fff;
+      border: 3px solid #d97706;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    /* Class 3: Array Grid */
+    .array-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      background: #78350f;
+      padding: 10px;
+      border-radius: 18px;
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .array-cell {
+      width: 44px;
+      height: 44px;
+      background: #9a3412;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .array-cell.active {
+      background: #f59e0b;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
+      transform: scale(1.06);
+    }
+    /* Class 4: Fraction Circle */
+    .fraction-svg {
+      width: 220px;
+      height: 220px;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,0.12));
+    }
+    .slice-path {
+      cursor: pointer;
+      transition: all 0.2s;
+      stroke: #ffffff;
+      stroke-width: 3px;
+    }
+    .slice-path:hover {
+      opacity: 0.85;
+    }
+    /* Bottom Controls Shelf */
+    .control-shelf {
+      width: 100%;
+      background: #ffffff;
+      border: 3px solid #fde68a;
+      border-radius: 24px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .control-label {
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #92400e;
+      letter-spacing: 0.5px;
+    }
+    .item-buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .action-pill {
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .action-pill:active {
+      transform: scale(0.95);
+    }
+    .action-pill.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .action-pill.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .action-pill.emerald { background: linear-gradient(135deg, #10b981, #059669); }
+    .action-pill.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .action-pill.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .action-pill.amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    /* Overlays */
+    .success-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(16, 185, 129, 0.88);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 900;
+      gap: 8px;
+      z-index: 10;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      .brand-title { font-size: 15px; }
+      .mission-prompt { font-size: 16px; }
+      .ten-frame-cell { height: 50px; font-size: 28px; }
+      .array-cell { width: 36px; height: 36px; font-size: 18px; }
+      .fraction-svg { width: 170px; height: 170px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-app">
+  <!-- Top Navigation Bar -->
+  <header class="header-bar">
+    <div class="brand" onclick="showMap()">
+      <div class="brand-icon">🦁</div>
+      <div>
+        <div class="brand-title">Math Safari</div>
+        <div class="brand-subtitle">Conceptual Math • Class 1 to 4</div>
+      </div>
+    </div>
+
+    <!-- Class Switcher -->
+    <div class="grade-tabs">
+      <button class="grade-tab active" id="tab-1" onclick="switchGrade(1)">Class 1</button>
+      <button class="grade-tab" id="tab-2" onclick="switchGrade(2)">Class 2</button>
+      <button class="grade-tab" id="tab-3" onclick="switchGrade(3)">Class 3</button>
+      <button class="grade-tab" id="tab-4" onclick="switchGrade(4)">Class 4</button>
+    </div>
+
+    <!-- Status & Controls -->
+    <div class="status-group">
+      <div class="combo-badge" id="combo-badge" style="display:none;">2x Combo!</div>
+      <div class="score-badge">
+        <span>✨</span>
+        <span id="score-text">0</span>
+      </div>
+      <div class="hearts" id="hearts-display">❤️❤️❤️</div>
+      <button class="icon-btn" id="sound-btn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
+      <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()" title="Safari Beat">🎵</button>
+    </div>
+  </header>
+
+  <!-- Learning Phase Tabs (1. Learn -> 2. Hands-On Activity -> 3. Chapter Quiz) -->
+  <div class="phase-tabs" id="phase-tabs-container">
+    <button class="phase-tab active" id="phase-teach" onclick="switchPhase('teach')">📖 1. Learn Concept</button>
+    <button class="phase-tab" id="phase-activity" onclick="switchPhase('activity')">🎮 2. Hands-On Activity</button>
+    <button class="phase-tab" id="phase-quiz" onclick="switchPhase('quiz')">✍️ 3. Chapter Quiz</button>
+  </div>
+
+  <!-- Main Game Stage Card -->
+  <main class="stage-card" id="stage-card">
+    <!-- Dynamic Mission Header -->
+    <div class="mission-banner c1" id="mission-banner">
+      <div class="mission-left">
+        <div class="mission-avatar" id="mascot-avatar">🐘</div>
+        <div>
+          <div class="mission-title" id="mission-title">Class 1 • Ten-Frame Cannon</div>
+          <div class="mission-prompt" id="mission-prompt">Ella has 6 fruits. Make 10!</div>
+        </div>
+      </div>
+      <div class="equation-tag" id="equation-display">6 + ? = 10</div>
+    </div>
+
+    <!-- Interactive Visual Arena -->
+    <div class="interactive-arena" id="interactive-arena">
+      <!-- Arena Content injected via JavaScript -->
+    </div>
+
+    <!-- Dynamic Control Shelf -->
+    <div class="control-shelf" id="control-shelf">
+      <!-- Controls injected via JavaScript -->
+    </div>
+  </main>
+</div>
+
+<script>
+/**
+ * Synthesizer Sound Engine (Web Audio API)
+ * High-performance, zero-latency, works 100% offline
+ */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+    this.bgmPlaying = false;
+    this.bgmTimer = null;
+  }
+  getCtx() {
+    if (this.muted) return null;
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    return this.ctx;
+  }
+  playPop(pitch = 1) {
+    const c = this.getCtx();
+    if (!c) return;
+    const now = c.currentTime;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.frequency.setValueAtTime(440 * pitch, now);
+    osc.frequency.exponentialRampToValueAtTime(880 * pitch, now + 0.08);
+    g.gain.setValueAtTime(0.2, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(now); osc.stop(now + 0.09);
+  }
+  playSplash() {
+    const c = this.getCtx();
+    if (!c) return;
+    const now = c.currentTime;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.exponentialRampToValueAtTime(150, now + 0.14);
+    g.gain.setValueAtTime(0.25, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(now); osc.stop(now + 0.15);
+  }
+  playClunk() {
+    const c = this.getCtx();
+    if (!c) return;
+    const now = c.currentTime;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+    g.gain.setValueAtTime(0.18, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(now); osc.stop(now + 0.13);
+  }
+  playSuccess() {
+    const c = this.getCtx();
+    if (!c) return;
+    const freqs = [523.25, 659.25, 783.99, 1046.5];
+    const now = c.currentTime;
+    freqs.forEach((f, idx) => {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      const t = now + idx * 0.08;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.25, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t); osc.stop(t + 0.36);
+    });
+  }
+  playOops() {
+    const c = this.getCtx();
+    if (!c) return;
+    const now = c.currentTime;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.2);
+    g.gain.setValueAtTime(0.2, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(now); osc.stop(now + 0.21);
+  }
+  toggleBGM() {
+    this.bgmPlaying = !this.bgmPlaying;
+    if (this.bgmPlaying) {
+      const notes = [261.63, 329.63, 392.00, 440.00, 392.00, 329.63];
+      let step = 0;
+      const tick = () => {
+        if (!this.bgmPlaying || this.muted) return;
+        const c = this.getCtx();
+        if (c) {
+          const now = c.currentTime;
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.frequency.setValueAtTime(notes[step % notes.length], now);
+          g.gain.setValueAtTime(0.03, now);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+          osc.connect(g); g.connect(c.destination);
+          osc.start(now); osc.stop(now + 0.22);
+        }
+        step++;
+        this.bgmTimer = setTimeout(tick, 280);
+      };
+      tick();
+    } else {
+      if (this.bgmTimer) clearTimeout(this.bgmTimer);
+    }
+    return this.bgmPlaying;
+  }
+}
+
+const sounds = new SoundEngine();
+
+/* Global Game State */
+let currentGrade = 1;
+let score = 0;
+let combo = 0;
+let lives = 3;
+
+/* Class 1 State */
+let c1Target = 10;
+let c1Initial = 6;
+let c1Filled = 6;
+
+/* Class 2 State */
+let c2Target = 15;
+let c2RightInitial = 8;
+let c2AddedWeights = [];
+
+/* Class 3 State */
+let c3TargetRows = 3;
+let c3TargetCols = 4;
+let c3CurrentRows = 1;
+let c3CurrentCols = 1;
+
+/* Class 4 State */
+let c4Num = 3;
+let c4Den = 4;
+let c4TotalSlices = 4;
+let c4SelectedSlices = [false, false, false, false];
+
+function updateHeader() {
+  document.getElementById('score-text').innerText = score;
+  const comboBadge = document.getElementById('combo-badge');
+  if (combo > 1) {
+    comboBadge.style.display = 'block';
+    comboBadge.innerText = combo + 'x Combo!';
+  } else {
+    comboBadge.style.display = 'none';
+  }
+  let heartsStr = '';
+  for (let i = 0; i < 3; i++) {
+    heartsStr += i < lives ? '❤️' : '🤍';
+  }
+  document.getElementById('hearts-display').innerText = heartsStr;
+
+  // Update tabs
+  for (let g = 1; g <= 4; g++) {
+    const tab = document.getElementById('tab-' + g);
+    if (tab) {
+      if (g === currentGrade) tab.classList.add('active');
+      else tab.classList.remove('active');
+    }
+  }
+}
+
+function triggerScore(pts) {
+  combo++;
+  score += pts + combo * 25;
+  sounds.playSuccess();
+  updateHeader();
+}
+
+function triggerMistake() {
+  combo = 0;
+  lives = Math.max(0, lives - 1);
+  sounds.playOops();
+  updateHeader();
+  if (lives <= 0) {
+    setTimeout(() => {
+      alert("Expedition Finished! Your Score: " + score + " points! Let's explore again!");
+      lives = 3;
+      score = 0;
+      updateHeader();
+      renderCurrentGrade();
+    }, 400);
+  }
+}
+
+/* Learning Phase State: 'teach' | 'activity' | 'quiz' */
+let currentPhase = 'teach';
+
+/* Switch Grade */
+function switchGrade(g) {
+  currentGrade = g;
+  currentPhase = 'teach'; // Always first teach the concept!
+  sounds.playPop(1.1);
+  updateHeader();
+  updatePhaseTabs();
+  renderCurrentStage();
+}
+
+/* Switch Phase */
+function switchPhase(p) {
+  currentPhase = p;
+  sounds.playPop(1.1);
+  updatePhaseTabs();
+  renderCurrentStage();
+}
+
+function updatePhaseTabs() {
+  const phases = ['teach', 'activity', 'quiz'];
+  phases.forEach((p) => {
+    const el = document.getElementById('phase-' + p);
+    if (el) {
+      if (p === currentPhase) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+}
+
+function renderCurrentStage() {
+  const banner = document.getElementById('mission-banner');
+  banner.className = 'mission-banner c' + currentGrade;
+
+  if (currentPhase === 'teach') {
+    renderLesson(currentGrade);
+  } else if (currentPhase === 'activity') {
+    renderCurrentGrade();
+  } else if (currentPhase === 'quiz') {
+    renderQuiz(currentGrade);
+  }
+}
+
+/* 1. LESSON / TEACH PHASE */
+const LESSON_DATA = {
+  1: {
+    avatar: '🐘',
+    mascot: 'Ella the Elephant',
+    title: 'Class 1 • Ten-Frame Friends of 10',
+    coreConcept: 'Numbers love making teams of 10! A Ten-Frame has 10 spaces (5 top, 5 bottom). If some are full, count the empty spaces to find the missing friend!',
+    whatToDo: 'Look at the filled fruit slots in the wagon. Count how many empty slots remain to reach exactly 10, then launch fruits from the cannon to fill them!',
+    steps: [
+      'Look at Ella’s wagon: 6 spaces are filled with yellow bananas.',
+      'Count empty boxes: 7, 8, 9, 10... that is 4 empty boxes!',
+      'Tap the cannon to launch 4 fruits. 6 + 4 = 10!'
+    ],
+    secretFormula: '6 + 4 = 10 (Target - Initial = Needed)'
+  },
+  2: {
+    avatar: '⚖️',
+    mascot: 'Leo the Balancing Lion',
+    title: 'Class 2 • Algebraic Balance Scales',
+    coreConcept: 'The equal sign (=) is a balance scale! Whatever weight sits on the left pan must match the right pan so the needle stays centered at zero.',
+    whatToDo: 'Read the heavy mystery weight on the left. The right side already has some weights. Add counter-weights (5kg, 2kg, 1kg) until both pans balance perfectly!',
+    steps: [
+      'Left Pan has 14 kg. Right Pan only has 8 kg (tilted down on left!).',
+      'Calculate the missing weight: 14 kg - 8 kg = 6 kg needed.',
+      'Tap [+5 kg] and [+1 kg] onto the right pan. 8 + 6 = 14 kg!'
+    ],
+    secretFormula: 'Left (14 kg) = Right (8 kg + 6 kg) = Balanced!'
+  },
+  3: {
+    avatar: '🌻',
+    mascot: 'Zara the Zebra Botanist',
+    title: 'Class 3 • Geometric Grid Arrays',
+    coreConcept: 'Multiplication is repeated addition arranged in rows and columns! 3 rows of 4 sunflowers means 4 + 4 + 4 = 12 total sunflowers.',
+    whatToDo: 'Zara gives you a garden plot order (e.g. 3 × 4 = 12). Use the Row and Column buttons to expand the flower bed until it matches the goal!',
+    steps: [
+      'Check the seed order: Target is 3 Rows × 4 Columns = 12 sunflowers.',
+      'Tap [+ Row] until you have 3 horizontal rows of soil.',
+      'Tap [+ Column] until you have 4 vertical columns. 3 × 4 = 12!'
+    ],
+    secretFormula: 'Rows × Columns = Total (Area Model of Multiplication)'
+  },
+  4: {
+    avatar: '🍉',
+    mascot: 'Milo the Monkey Baker',
+    title: 'Class 4 • Equivalent Fraction Slicer',
+    coreConcept: 'A fraction represents equal parts of a whole! The Denominator (bottom) tells how many equal slices, and the Numerator (top) tells how many slices are taken.',
+    whatToDo: 'Milo requests a fraction of watermelon (e.g. 3/4). Choose how many slices to cut into, then tap the slices to serve Milo exactly the right amount!',
+    steps: [
+      'Check Milo’s order: 3/4 of a fresh juicy watermelon.',
+      'Choose slice count: Cut into 4 equal slices (each slice is 1/4).',
+      'Tap 3 slices to shade them: 3 out of 4 slices = 3/4!'
+    ],
+    secretFormula: 'Numerator (parts chosen) / Denominator (total equal parts)'
+  }
+};
+
+function renderLesson(grade) {
+  const data = LESSON_DATA[grade];
+  document.getElementById('mascot-avatar').innerText = data.avatar;
+  document.getElementById('mission-title').innerText = data.title;
+  document.getElementById('mission-prompt').innerText = 'Step 1: Understand the mathematical concept first!';
+  document.getElementById('equation-display').innerText = '📖 Concept Lesson';
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div class="concept-card">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:22px;">💡</span>
+        <div>
+          <div style="font-size:12px; font-weight:900; color:#92400e; text-transform:uppercase;">Core Concept</div>
+          <div style="font-size:14px; font-weight:700; color:#1e293b; line-height:1.4;">${data.coreConcept}</div>
+        </div>
+      </div>
+
+      <div style="background:#fef3c7; border:1.5px solid #fde68a; border-radius:14px; padding:12px;">
+        <div style="font-size:12px; font-weight:900; color:#b45309; text-transform:uppercase; margin-bottom:4px;">
+          🎯 What You Have To Do in this Chapter:
+        </div>
+        <div style="font-size:13px; font-weight:800; color:#78350f;">
+          ${data.whatToDo}
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+        <div style="font-size:12px; font-weight:900; color:#92400e; text-transform:uppercase;">3 Steps To Master:</div>
+        ${data.steps.map((st, i) => `
+          <div class="concept-step">
+            <div class="step-badge">${i + 1}</div>
+            <div>${st}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="background:#ecfdf5; border:1.5px solid #a7f3d0; border-radius:14px; padding:10px 14px; font-size:13px; font-weight:800; color:#065f46; display:flex; align-items:center; gap:8px;">
+        <span>🐾</span>
+        <span>${data.mascot}'s Rule: <strong>${data.secretFormula}</strong></span>
+      </div>
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%; justify-content:center;">
+      <button class="action-pill emerald" style="font-size:15px; padding:12px 24px;" onclick="switchPhase('activity')">
+        🎮 I Understand! Start Hands-On Activity ➔
+      </button>
+      <button class="action-pill amber" style="font-size:14px;" onclick="switchPhase('quiz')">
+        ✍️ Skip to Chapter Quiz
+      </button>
+    </div>
+  `;
+}
+
+/* 3. QUIZ PHASE */
+const QUIZ_DATA = {
+  1: [
+    {
+      q: "Ella has 7 apples in her 10-frame wagon. How many more does she need to reach 10?",
+      options: ["2 apples", "3 apples", "4 apples", "5 apples"],
+      correct: 1,
+      exp: "7 + 3 = 10! You need 3 more apples to fill the ten-frame."
+    },
+    {
+      q: "Which pair of numbers are 'Friends of 10'?",
+      options: ["4 and 5", "6 and 4", "7 and 2", "8 and 3"],
+      correct: 1,
+      exp: "6 + 4 equals exactly 10! They form a complete 10-frame."
+    },
+    {
+      q: "A ten-frame has 5 slots on top and 5 on the bottom. If the top row is full, how many items are there?",
+      options: ["4", "5", "6", "10"],
+      correct: 1,
+      exp: "The top row always holds 5 items! Half of ten is 5."
+    },
+    {
+      q: "If Ella launches 5 bananas and 5 apples into an empty wagon, what is the total?",
+      options: ["8", "9", "10", "12"],
+      correct: 2,
+      exp: "5 + 5 = 10! A double of five makes a full ten-frame."
+    },
+    {
+      q: "Ella had 10 fruits. 2 rolled away out of the wagon. How many are left?",
+      options: ["7", "8", "9", "6"],
+      correct: 1,
+      exp: "10 - 2 = 8! Counting backward from 10 gives 8."
+    }
+  ],
+  2: [
+    {
+      q: "Left Pan = 15 kg. Right Pan has 9 kg. How many kg must you add to balance it?",
+      options: ["5 kg", "6 kg", "7 kg", "8 kg"],
+      correct: 1,
+      exp: "15 - 9 = 6 kg! Adding 6 kg makes both sides equal."
+    },
+    {
+      q: "What does the equal sign (=) mean in a balance scale?",
+      options: ["Left is heavier", "Right is heavier", "Both sides are equally heavy", "The scale is broken"],
+      correct: 2,
+      exp: "The equal sign means balance — both quantities have the same value!"
+    },
+    {
+      q: "If Left Pan has 18 kg and Right Pan has 12 kg, the scale will tilt towards:",
+      options: ["The Left Pan (heavier)", "The Right Pan", "It stays perfectly flat", "It spins"],
+      correct: 0,
+      exp: "Heavier weights pull down! 18 kg is heavier than 12 kg."
+    },
+    {
+      q: "Solve for the missing weight: 20 kg = 14 kg + ?",
+      options: ["4 kg", "6 kg", "8 kg", "10 kg"],
+      correct: 1,
+      exp: "20 - 14 = 6 kg! 14 + 6 = 20."
+    },
+    {
+      q: "Leo puts a 5kg weight and a 5kg weight on the right side. How much is that?",
+      options: ["8 kg", "10 kg", "15 kg", "20 kg"],
+      correct: 1,
+      exp: "5 kg + 5 kg = 10 kg."
+    }
+  ],
+  3: [
+    {
+      q: "Zara plants 3 rows with 4 sunflowers in each row. How many flowers in total?",
+      options: ["7", "10", "12", "14"],
+      correct: 2,
+      exp: "3 rows × 4 columns = 12 flowers! 4 + 4 + 4 = 12."
+    },
+    {
+      q: "Which multiplication equation represents an array of 5 rows and 2 columns?",
+      options: ["5 + 2 = 7", "5 × 2 = 10", "5 - 2 = 3", "2 × 2 = 4"],
+      correct: 1,
+      exp: "Rows × Columns = Total, so 5 × 2 = 10!"
+    },
+    {
+      q: "If you rotate a 3 × 6 array sideways into 6 × 3, does the total number of flowers change?",
+      options: ["Yes, it doubles", "Yes, it gets smaller", "No, 3 × 6 = 6 × 3 = 18", "Yes, by 3"],
+      correct: 2,
+      exp: "Commutative property! 3 × 6 and 6 × 3 both equal 18 flowers."
+    },
+    {
+      q: "A garden bed has 4 rows of 5 flowers. That is 20 flowers. What is 20 ÷ 4?",
+      options: ["3", "4", "5", "6"],
+      correct: 2,
+      exp: "20 flowers shared across 4 rows gives 5 flowers in each row!"
+    },
+    {
+      q: "What is 4 × 4?",
+      options: ["12", "14", "16", "18"],
+      correct: 2,
+      exp: "4 rows of 4 columns = 16! A square array of 16."
+    }
+  ],
+  4: [
+    {
+      q: "Milo cuts a watermelon into 4 equal slices and eats 3. What fraction did he eat?",
+      options: ["1/4", "3/4", "4/3", "2/4"],
+      correct: 1,
+      exp: "3 slices out of 4 equal parts is written as 3/4!"
+    },
+    {
+      q: "In the fraction 2/5, what is the Denominator (bottom number)?",
+      options: ["2", "5", "7", "3"],
+      correct: 1,
+      exp: "The bottom number is the Denominator: it tells the total equal slices (5)."
+    },
+    {
+      q: "Which fraction is equal to 1/2 (half a melon)?",
+      options: ["1/4", "2/4", "3/4", "1/3"],
+      correct: 1,
+      exp: "2 out of 4 slices is exactly half the watermelon (2/4 = 1/2)!"
+    },
+    {
+      q: "If all 6 slices of a 6-slice pie are eaten, what fraction is that?",
+      options: ["6/6 = 1 Whole", "1/6", "5/6", "0/6"],
+      correct: 0,
+      exp: "6/6 equals 1 whole pie!"
+    },
+    {
+      q: "Which fraction is LARGER: 1/2 or 1/4?",
+      options: ["1/4 is bigger", "1/2 is bigger", "They are equal", "Cannot tell"],
+      correct: 1,
+      exp: "1/2 is half the melon, which is bigger than 1/4 (a quarter)!"
+    }
+  ]
+};
+
+let quizCurrentQ = 0;
+let quizScoreCount = 0;
+let quizAnswered = false;
+
+function renderQuiz(grade) {
+  const questions = QUIZ_DATA[grade];
+  if (quizCurrentQ >= questions.length) {
+    renderQuizSummary(grade);
+    return;
+  }
+
+  const qObj = questions[quizCurrentQ];
+  quizAnswered = false;
+
+  document.getElementById('mascot-avatar').innerText = '✍️';
+  document.getElementById('mission-title').innerText = `Class ${grade} • Chapter Mastery Quiz`;
+  document.getElementById('mission-prompt').innerText = `Question ${quizCurrentQ + 1} of ${questions.length}`;
+  document.getElementById('equation-display').innerText = `Q ${quizCurrentQ + 1}/${questions.length}`;
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div class="quiz-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #fde68a; padding-bottom:8px;">
+        <span style="font-size:12px; font-weight:900; color:#b45309; text-transform:uppercase;">Mastery Check</span>
+        <span style="font-size:12px; font-weight:900; color:#065f46; background:#ecfdf5; padding:3px 10px; border-radius:10px;">
+          Question ${quizCurrentQ + 1} of ${questions.length}
+        </span>
+      </div>
+
+      <div style="font-size:16px; font-weight:800; color:#1e293b; text-align:center; margin:8px 0;">
+        ${qObj.q}
+      </div>
+
+      <div class="quiz-options-grid" id="quiz-options-box">
+        ${qObj.options.map((opt, idx) => `
+          <button class="quiz-btn" id="q-opt-${idx}" onclick="answerQuizQuestion(${grade}, ${idx})">
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="quiz-feedback-box" style="display:none; margin-top:8px;"></div>
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+      <button class="action-pill amber" onclick="switchPhase('teach')">📖 Review Lesson</button>
+      <button class="action-pill emerald" id="quiz-next-btn" style="display:none;" onclick="nextQuizQuestion(${grade})">
+        Next Question ➔
+      </button>
+    </div>
+  `;
+}
+
+function answerQuizQuestion(grade, chosenIdx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  const questions = QUIZ_DATA[grade];
+  const qObj = questions[quizCurrentQ];
+  const isCorrect = chosenIdx === qObj.correct;
+
+  const chosenBtn = document.getElementById('q-opt-' + chosenIdx);
+  const correctBtn = document.getElementById('q-opt-' + qObj.correct);
+
+  if (isCorrect) {
+    sounds.playSuccess();
+    quizScoreCount++;
+    triggerScore(100);
+    if (chosenBtn) chosenBtn.classList.add('correct');
+  } else {
+    sounds.playOops();
+    triggerMistake();
+    if (chosenBtn) chosenBtn.classList.add('wrong');
+    if (correctBtn) correctBtn.classList.add('correct');
+  }
+
+  // Disable all buttons
+  for (let i = 0; i < qObj.options.length; i++) {
+    const b = document.getElementById('q-opt-' + i);
+    if (b) b.disabled = true;
+  }
+
+  // Show Feedback Box
+  const fb = document.getElementById('quiz-feedback-box');
+  if (fb) {
+    fb.style.display = 'block';
+    fb.style.padding = '12px 14px';
+    fb.style.borderRadius = '14px';
+    fb.style.fontSize = '13px';
+    fb.style.fontWeight = '700';
+    if (isCorrect) {
+      fb.style.background = '#ecfdf5';
+      fb.style.border = '1.5px solid #a7f3d0';
+      fb.style.color = '#065f46';
+      fb.innerHTML = `🎉 <strong>Spot on!</strong> ${qObj.exp}`;
+    } else {
+      fb.style.background = '#fff1f2';
+      fb.style.border = '1.5px solid #fecdd3';
+      fb.style.color = '#9f1239';
+      fb.innerHTML = `💡 <strong>Concept Reminder:</strong> ${qObj.exp}`;
+    }
+  }
+
+  const nextBtn = document.getElementById('quiz-next-btn');
+  if (nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+function nextQuizQuestion(grade) {
+  sounds.playPop(1.1);
+  quizCurrentQ++;
+  renderQuiz(grade);
+}
+
+function renderQuizSummary(grade) {
+  const questions = QUIZ_DATA[grade];
+  const accuracy = Math.round((quizScoreCount / questions.length) * 100);
+  const passed = accuracy >= 60;
+
+  sounds.playSuccess();
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div class="quiz-card" style="text-align:center; align-items:center;">
+      <div style="font-size:50px; animation:bounce 1.5s infinite;">
+        ${passed ? '🏆' : '💪'}
+      </div>
+      <div style="font-size:22px; font-weight:900; color:#1e293b;">
+        ${passed ? `Class ${grade} Mastery Complete!` : 'Great Practice Effort!'}
+      </div>
+      <div style="font-size:14px; font-weight:700; color:#78350f;">
+        You scored <strong>${quizScoreCount} / ${questions.length}</strong> correct (${accuracy}% accuracy)!
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:10px;">
+        <button class="action-pill emerald" onclick="switchPhase('activity')">🎮 Play Hands-On Activity</button>
+        <button class="action-pill amber" onclick="restartQuiz(${grade})">↺ Retake Quiz</button>
+      </div>
+
+      ${grade < 4 && passed ? `
+        <button class="action-pill emerald" style="margin-top:8px; font-size:14px; padding:10px 20px;" onclick="switchGrade(${grade + 1})">
+          Next Class Adventure (Class ${grade + 1}) ➔
+        </button>
+      ` : ''}
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <button class="action-pill amber" onclick="switchPhase('teach')">📖 Review Class Lesson</button>
+  `;
+}
+
+function restartQuiz(grade) {
+  quizCurrentQ = 0;
+  quizScoreCount = 0;
+  quizAnswered = false;
+  renderQuiz(grade);
+}
+
+function renderCurrentGrade() {
+  const banner = document.getElementById('mission-banner');
+  banner.className = 'mission-banner c' + currentGrade;
+  if (currentGrade === 1) renderClass1();
+  else if (currentGrade === 2) renderClass2();
+  else if (currentGrade === 3) renderClass3();
+  else if (currentGrade === 4) renderClass4();
+}
+
+/* CLASS 1: Ten-Frame Fruit Cannon */
+function renderClass1() {
+  document.getElementById('mascot-avatar').innerText = '🐘';
+  document.getElementById('mission-title').innerText = 'Class 1 • Ten-Frame Fruit Cannon';
+  document.getElementById('mission-prompt').innerText = `Ella has ${c1Initial} fruits. Make ${c1Target}!`;
+  document.getElementById('equation-display').innerText = `${c1Initial} + ${Math.max(0, c1Filled - c1Initial)} = ${c1Filled} / ${c1Target}`;
+
+  const arena = document.getElementById('interactive-arena');
+  let cellsHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const isInitial = i < c1Initial;
+    const isAdded = i >= c1Initial && i < c1Filled;
+    const isFilled = isInitial || isAdded;
+    cellsHTML += `
+      <div class="ten-frame-cell ${isFilled ? 'filled' : ''} ${isAdded ? 'added' : ''}">
+        <span class="cell-num">${i + 1}</span>
+        ${isFilled ? (isInitial ? '🍌' : '🍎') : ''}
+      </div>
+    `;
+  }
+
+  arena.innerHTML = `
+    <div style="font-size:12px; font-weight:800; color:#92400e; margin-bottom:4px;">TEN-FRAME TARGET WAGON (${c1Filled}/${c1Target})</div>
+    <div class="ten-frame-grid">${cellsHTML}</div>
+    <div style="font-size:12px; font-weight:800; color:#b45309;">
+      ${c1Filled < c1Target ? `Tap Launch below to add ${c1Target - c1Filled} more fruits!` : 'Target achieved!'}
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div class="control-label">Fruit Launchers</div>
+    <div class="item-buttons-row">
+      <button class="action-pill red" onclick="launchClass1Fruit('🍎')">🍎 Launch Apple</button>
+      <button class="action-pill orange" onclick="launchClass1Fruit('🍊')">🍊 Launch Orange</button>
+      <button class="action-pill emerald" onclick="launchClass1Fruit('🍉')">🍉 Launch Melon</button>
+      <button class="action-pill amber" onclick="resetClass1()">↺ Reset Added</button>
+    </div>
+  `;
+}
+
+function launchClass1Fruit(emoji) {
+  if (c1Filled >= c1Target + 3) return;
+  sounds.playSplash();
+  c1Filled++;
+  if (c1Filled === c1Target) {
+    triggerScore(150);
+    const arena = document.getElementById('interactive-arena');
+    arena.innerHTML += `<div class="success-overlay">🎉 Awesome! ${c1Initial} + ${c1Target - c1Initial} = ${c1Target}!</div>`;
+    setTimeout(() => {
+      c1Target = 10;
+      c1Initial = Math.floor(Math.random() * 6) + 2;
+      c1Filled = c1Initial;
+      renderClass1();
+    }, 1600);
+  } else if (c1Filled > c1Target) {
+    triggerMistake();
+  }
+  renderClass1();
+}
+
+function resetClass1() {
+  sounds.playPop(0.8);
+  c1Filled = c1Initial;
+  renderClass1();
+}
+
+/* CLASS 2: Safari Balance Scales */
+function renderClass2() {
+  document.getElementById('mascot-avatar').innerText = '🐵';
+  document.getElementById('mission-title').innerText = 'Class 2 • Safari Balance Scale';
+  document.getElementById('mission-prompt').innerText = `Balance the scale: ${c2Target} kg on left!`;
+
+  const rightSum = c2RightInitial + c2AddedWeights.reduce((a, b) => a + b, 0);
+  const diff = rightSum - c2Target;
+  const tilt = Math.max(-18, Math.min(18, diff * 3.5));
+
+  document.getElementById('equation-display').innerText = `${c2Target} = ${c2RightInitial} + ${c2AddedWeights.reduce((a, b) => a + b, 0)} (${rightSum} kg)`;
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div style="font-size:12px; font-weight:800; color:#065f46; margin-bottom:8px;">
+      ${diff === 0 ? '⚖️ IN PERFECT BALANCE!' : diff < 0 ? `Need ${Math.abs(diff)} kg more on right!` : `Too heavy by ${diff} kg!`}
+    </div>
+    <div class="scale-stage">
+      <div class="scale-base"></div>
+      <div class="scale-post"></div>
+      <div class="scale-beam" style="transform: rotate(${tilt}deg);">
+        <div class="scale-pivot"></div>
+        <div class="scale-pan left">
+          <div class="pan-string"></div>
+          <div class="pan-plate">
+            <div>Target</div>
+            <div style="font-size:16px; color:#b45309;">📦 ${c2Target} kg</div>
+          </div>
+        </div>
+        <div class="scale-pan right">
+          <div class="pan-string"></div>
+          <div class="pan-plate">
+            <div>Right Pan</div>
+            <div style="font-size:16px; color:#059669;">${rightSum} kg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div class="control-label">Drop Weights onto Right Pan</div>
+    <div class="item-buttons-row">
+      <button class="action-pill amber" onclick="addClass2Weight(1)">🍌 +1 kg</button>
+      <button class="action-pill orange" onclick="addClass2Weight(2)">🥥 +2 kg</button>
+      <button class="action-pill emerald" onclick="addClass2Weight(3)">🍈 +3 kg</button>
+      <button class="action-pill blue" onclick="addClass2Weight(5)">🍉 +5 kg</button>
+      <button class="action-pill purple" onclick="addClass2Weight(7)">💎 +7 kg</button>
+      <button class="action-pill red" onclick="resetClass2()">↺ Clear</button>
+    </div>
+  `;
+}
+
+function addClass2Weight(w) {
+  sounds.playClunk();
+  c2AddedWeights.push(w);
+  const rightSum = c2RightInitial + c2AddedWeights.reduce((a, b) => a + b, 0);
+  if (rightSum === c2Target) {
+    triggerScore(200);
+    const arena = document.getElementById('interactive-arena');
+    arena.innerHTML += `<div class="success-overlay">⚖️ Balanced! ${c2Target} = ${c2RightInitial} + ${c2Target - c2RightInitial}!</div>`;
+    setTimeout(() => {
+      c2Target = [12, 14, 15, 16, 18][Math.floor(Math.random() * 5)];
+      c2RightInitial = Math.floor(Math.random() * (c2Target - 5)) + 3;
+      c2AddedWeights = [];
+      renderClass2();
+    }, 1700);
+  } else if (rightSum > c2Target) {
+    triggerMistake();
+  }
+  renderClass2();
+}
+
+function resetClass2() {
+  sounds.playPop(0.8);
+  c2AddedWeights = [];
+  renderClass2();
+}
+
+/* CLASS 3: Blooming Array Garden */
+function renderClass3() {
+  document.getElementById('mascot-avatar').innerText = '🦒';
+  document.getElementById('mission-title').innerText = 'Class 3 • Blooming Array Farm';
+  document.getElementById('mission-prompt').innerText = `Grow ${c3TargetRows} rows of ${c3TargetCols} flowers!`;
+
+  const currentTotal = c3CurrentRows * c3CurrentCols;
+  const targetTotal = c3TargetRows * c3TargetCols;
+  document.getElementById('equation-display').innerText = `${c3CurrentRows} × ${c3CurrentCols} = ${currentTotal} / ${targetTotal}`;
+
+  let cellsHTML = '';
+  for (let r = 0; r < 6; r++) {
+    for (let c = 0; c < 6; c++) {
+      const active = r < c3CurrentRows && c < c3CurrentCols;
+      cellsHTML += `
+        <div class="array-cell ${active ? 'active' : ''}" onclick="pickArraySize(${r+1}, ${c+1})">
+          ${active ? '🌻' : ''}
+        </div>
+      `;
+    }
+  }
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div style="font-size:12px; font-weight:800; color:#78350f; margin-bottom:6px;">
+      GARDEN GRID: ${c3CurrentRows} Rows × ${c3CurrentCols} Columns (${currentTotal} Blossoms)
+    </div>
+    <div class="array-grid">${cellsHTML}</div>
+    <div style="font-size:11px; font-weight:800; color:#b45309; margin-top:6px;">
+      Tap any flower soil patch or use controls below!
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div class="control-label">Garden Size Controls</div>
+    <div class="item-buttons-row">
+      <button class="action-pill amber" onclick="adjustArrayRow(1)">+ Row (${c3CurrentRows})</button>
+      <button class="action-pill amber" onclick="adjustArrayRow(-1)">- Row</button>
+      <button class="action-pill emerald" onclick="adjustArrayCol(1)">+ Column (${c3CurrentCols})</button>
+      <button class="action-pill emerald" onclick="adjustArrayCol(-1)">- Column</button>
+    </div>
+  `;
+}
+
+function pickArraySize(r, c) {
+  c3CurrentRows = r;
+  c3CurrentCols = c;
+  checkClass3();
+}
+
+function adjustArrayRow(delta) {
+  c3CurrentRows = Math.max(1, Math.min(6, c3CurrentRows + delta));
+  checkClass3();
+}
+
+function adjustArrayCol(delta) {
+  c3CurrentCols = Math.max(1, Math.min(6, c3CurrentCols + delta));
+  checkClass3();
+}
+
+function checkClass3() {
+  sounds.playPop(1.2);
+  const total = c3CurrentRows * c3CurrentCols;
+  const target = c3TargetRows * c3TargetCols;
+  if (c3CurrentRows === c3TargetRows && c3CurrentCols === c3TargetCols) {
+    triggerScore(220);
+    const arena = document.getElementById('interactive-arena');
+    arena.innerHTML += `<div class="success-overlay">🌻 Bountiful Harvest! ${c3TargetRows} × ${c3TargetCols} = ${target}!</div>`;
+    setTimeout(() => {
+      const pairs = [{r:2,c:4},{r:3,c:3},{r:3,c:4},{r:4,c:3},{r:2,c:5},{r:4,c:4},{r:5,c:3}];
+      const p = pairs[Math.floor(Math.random() * pairs.length)];
+      c3TargetRows = p.r;
+      c3TargetCols = p.c;
+      c3CurrentRows = 1;
+      c3CurrentCols = 1;
+      renderClass3();
+    }, 1700);
+  } else if (total > target) {
+    triggerMistake();
+  }
+  renderClass3();
+}
+
+/* CLASS 4: Fraction Feast Slicer */
+function renderClass4() {
+  document.getElementById('mascot-avatar').innerText = '🦁';
+  document.getElementById('mission-title').innerText = 'Class 4 • Safari Fraction Feast';
+  document.getElementById('mission-prompt').innerText = `Serve King Leo ${c4Num}/${c4Den} of the melon!`;
+
+  const activeCount = c4SelectedSlices.filter(Boolean).length;
+  document.getElementById('equation-display').innerText = `${activeCount}/${c4TotalSlices} Slices (${c4Num}/${c4Den})`;
+
+  // Build SVG Pie slices
+  let pathsHTML = '';
+  const r = 90;
+  for (let i = 0; i < c4TotalSlices; i++) {
+    const anglePerSlice = (2 * Math.PI) / c4TotalSlices;
+    const startAngle = i * anglePerSlice - Math.PI / 2;
+    const endAngle = (i + 1) * anglePerSlice - Math.PI / 2;
+    const x1 = r * Math.cos(startAngle);
+    const y1 = r * Math.sin(startAngle);
+    const x2 = r * Math.cos(endAngle);
+    const y2 = r * Math.sin(endAngle);
+    const isSelected = !!c4SelectedSlices[i];
+    const pathD = `M 0 0 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+    pathsHTML += `
+      <path d="${pathD}" fill="${isSelected ? '#ef4444' : '#fecdd3'}"
+        class="slice-path" onclick="toggleFractionSlice(${i})" />
+    `;
+  }
+
+  const arena = document.getElementById('interactive-arena');
+  arena.innerHTML = `
+    <div style="font-size:12px; font-weight:800; color:#be123c; margin-bottom:6px;">
+      WATERMELON SLICER: ${activeCount} of ${c4TotalSlices} Parts Selected
+    </div>
+    <svg viewBox="-105 -105 210 210" class="fraction-svg">
+      <circle cx="0" cy="0" r="102" fill="#047857" stroke="#065f46" stroke-width="4"/>
+      <circle cx="0" cy="0" r="95" fill="#a7f3d0"/>
+      ${pathsHTML}
+    </svg>
+    <div style="font-size:11px; font-weight:800; color:#9f1239; margin-top:6px;">
+      Tap slices to pick them!
+    </div>
+  `;
+
+  const shelf = document.getElementById('control-shelf');
+  shelf.innerHTML = `
+    <div class="control-label">Slicer Knife: Divide into Equal Parts</div>
+    <div class="item-buttons-row">
+      <button class="action-pill red" onclick="setFractionDivisions(2)">2 Slices (1/2)</button>
+      <button class="action-pill red" onclick="setFractionDivisions(3)">3 Slices (1/3)</button>
+      <button class="action-pill red" onclick="setFractionDivisions(4)">4 Slices (1/4)</button>
+      <button class="action-pill red" onclick="setFractionDivisions(6)">6 Slices (1/6)</button>
+      <button class="action-pill red" onclick="setFractionDivisions(8)">8 Slices (1/8)</button>
+      <button class="action-pill amber" onclick="clearFractionSlices()">↺ Clear</button>
+    </div>
+  `;
+}
+
+function setFractionDivisions(n) {
+  sounds.playClunk();
+  c4TotalSlices = n;
+  c4SelectedSlices = new Array(n).fill(false);
+  renderClass4();
+}
+
+function toggleFractionSlice(idx) {
+  sounds.playPop(1.1);
+  c4SelectedSlices[idx] = !c4SelectedSlices[idx];
+  const activeCount = c4SelectedSlices.filter(Boolean).length;
+  if (activeCount * c4Den === c4Num * c4TotalSlices) {
+    triggerScore(250);
+    const arena = document.getElementById('interactive-arena');
+    arena.innerHTML += `<div class="success-overlay">🍉 Delicious! ${activeCount}/${c4TotalSlices} = ${c4Num}/${c4Den}!</div>`;
+    setTimeout(() => {
+      const fracs = [
+        {num:1, den:2}, {num:2, den:3}, {num:3, den:4},
+        {num:2, den:4}, {num:5, den:6}, {num:3, den:8}, {num:5, den:8}
+      ];
+      const f = fracs[Math.floor(Math.random() * fracs.length)];
+      c4Num = f.num;
+      c4Den = f.den;
+      c4TotalSlices = f.den;
+      c4SelectedSlices = new Array(f.den).fill(false);
+      renderClass4();
+    }, 1700);
+  }
+  renderClass4();
+}
+
+function clearFractionSlices() {
+  sounds.playPop(0.8);
+  c4SelectedSlices = new Array(c4TotalSlices).fill(false);
+  renderClass4();
+}
+
+/* Audio Toggles */
+function toggleMute() {
+  sounds.muted = !sounds.muted;
+  const btn = document.getElementById('sound-btn');
+  btn.innerText = sounds.muted ? '🔇' : '🔊';
+}
+
+function toggleBGM() {
+  const playing = sounds.toggleBGM();
+  const btn = document.getElementById('bgm-btn');
+  if (playing) btn.classList.add('active');
+  else btn.classList.remove('active');
+}
+
+// Initial Boot
+updateHeader();
+updatePhaseTabs();
+renderCurrentStage();
+</script>
+</body>
+</html>

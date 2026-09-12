@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Element Explorer – Periodic Table Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ── SCREEN: LANDING ─────────────────────────────────────── -->
+  <div id="screen-landing" class="screen active">
+    <div class="stars-bg"></div>
+    <div class="landing-center">
+      <div class="atom-logo">
+        <div class="nucleus"></div>
+        <div class="orbit orbit-1"><div class="electron e1"></div></div>
+        <div class="orbit orbit-2"><div class="electron e2"></div></div>
+        <div class="orbit orbit-3"><div class="electron e3"></div></div>
+      </div>
+      <h1 class="game-title">Element <span class="glow">Explorer</span></h1>
+      <p class="tagline">A Periodic Table Adventure</p>
+
+      <div class="player-setup">
+        <input id="player-name" type="text" placeholder="Enter your name, Scientist!" maxlength="20" />
+        <button class="btn-primary" id="btn-start">🚀 Begin Adventure</button>
+      </div>
+
+      <div class="mode-cards">
+        <div class="mode-card" data-mode="compound">
+          <div class="mode-icon">⚗️</div>
+          <h3>Compound Forge</h3>
+          <p>Combine elements to build molecules</p>
+        </div>
+        <div class="mode-card" data-mode="hunt">
+          <div class="mode-icon">🔍</div>
+          <h3>Element Hunt</h3>
+          <p>Find elements from clues &amp; properties</p>
+        </div>
+        <div class="mode-card" data-mode="sort">
+          <div class="mode-icon">🧲</div>
+          <h3>Category Sorter</h3>
+          <p>Drag elements to correct groups</p>
+        </div>
+        <div class="mode-card" data-mode="atom">
+          <div class="mode-icon">⚛️</div>
+          <h3>Atom Builder</h3>
+          <p>Construct atoms shell by shell</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN: HUB ──────────────────────────────────────────── -->
+  <div id="screen-hub" class="screen">
+    <nav class="hub-nav">
+      <div class="nav-logo">⚛ Element Explorer</div>
+      <div class="player-hud">
+        <span id="hud-name"></span>
+        <span class="hud-score">⭐ <span id="hud-score">0</span></span>
+        <span class="hud-lives">❤️ <span id="hud-lives">3</span></span>
+      </div>
+      <button class="btn-icon" id="btn-sound" title="Toggle Sound">🔊</button>
+    </nav>
+    <div class="hub-body">
+      <h2 class="hub-title">Choose Your Mission</h2>
+      <div class="mission-grid">
+        <div class="mission-card active" data-mode="compound">
+          <div class="mission-badge">MISSION 1</div>
+          <div class="mission-icon">⚗️</div>
+          <h3>Compound Forge</h3>
+          <p>Drag &amp; drop elements into the forge to synthesise real-world compounds. Build water, table salt, rust and more!</p>
+          <button class="btn-mission">Play ▶</button>
+        </div>
+        <div class="mission-card" data-mode="hunt">
+          <div class="mission-badge">MISSION 2</div>
+          <div class="mission-icon">🔍</div>
+          <h3>Element Hunt</h3>
+          <p>Read a clue and click the correct element on the periodic table. Race against the clock!</p>
+          <button class="btn-mission">Play ▶</button>
+        </div>
+        <div class="mission-card" data-mode="sort">
+          <div class="mission-badge">MISSION 3</div>
+          <div class="mission-icon">🧲</div>
+          <h3>Category Sorter</h3>
+          <p>Drag periodic elements into the right category bins – metals, non-metals, noble gases and more.</p>
+          <button class="btn-mission">Play ▶</button>
+        </div>
+        <div class="mission-card" data-mode="atom">
+          <div class="mission-badge">MISSION 4</div>
+          <div class="mission-icon">⚛️</div>
+          <h3>Atom Builder</h3>
+          <p>Add protons, neutrons and electrons to build a target atom. Get the configuration right to succeed!</p>
+          <button class="btn-mission">Play ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN: COMPOUND FORGE ─────────────────────────────── -->
+  <div id="screen-compound" class="screen">
+    <div class="game-header">
+      <button class="btn-back" id="back-compound">← Hub</button>
+      <h2>⚗️ Compound Forge</h2>
+      <div class="game-stats">
+        <span>Score: <b id="cmp-score">0</b></span>
+        <span>Level: <b id="cmp-level">1</b></span>
+        <span id="cmp-timer-wrap">⏱ <b id="cmp-timer">30</b>s</span>
+      </div>
+    </div>
+    <div class="compound-body">
+      <div class="compound-target-box">
+        <div class="target-label">🎯 Build:</div>
+        <div class="target-name" id="cmp-target-name">Water</div>
+        <div class="target-formula" id="cmp-target-formula">H₂O</div>
+        <div class="target-hint" id="cmp-target-hint">Hint: 2 Hydrogen + 1 Oxygen</div>
+      </div>
+
+      <div class="forge-area">
+        <div class="forge-drop" id="forge-drop">
+          <div class="forge-label">🔥 Drop Elements Here</div>
+          <div class="forge-elements" id="forge-elements"></div>
+          <button class="btn-combine" id="btn-combine">⚡ Synthesise!</button>
+        </div>
+        <button class="btn-clear-forge" id="btn-clear-forge">🗑 Clear</button>
+      </div>
+
+      <div class="element-palette" id="element-palette">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div class="feedback-toast" id="cmp-feedback"></div>
+  </div>
+
+  <!-- ── SCREEN: ELEMENT HUNT ───────────────────────────────── -->
+  <div id="screen-hunt" class="screen">
+    <div class="game-header">
+      <button class="btn-back" id="back-hunt">← Hub</button>
+      <h2>🔍 Element Hunt</h2>
+      <div class="game-stats">
+        <span>Score: <b id="hunt-score">0</b></span>
+        <span>Round: <b id="hunt-round">1</b>/10</span>
+        <span>⏱ <b id="hunt-timer">20</b>s</span>
+      </div>
+    </div>
+    <div class="hunt-body">
+      <div class="clue-box">
+        <div class="clue-label">🕵️ Clue:</div>
+        <p class="clue-text" id="hunt-clue"></p>
+      </div>
+      <div class="periodic-grid" id="periodic-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div class="feedback-toast" id="hunt-feedback"></div>
+  </div>
+
+  <!-- ── SCREEN: CATEGORY SORTER ────────────────────────────── -->
+  <div id="screen-sort" class="screen">
+    <div class="game-header">
+      <button class="btn-back" id="back-sort">← Hub</button>
+      <h2>🧲 Category Sorter</h2>
+      <div class="game-stats">
+        <span>Score: <b id="sort-score">0</b></span>
+        <span>Left: <b id="sort-left">0</b></span>
+      </div>
+    </div>
+    <div class="sort-body">
+      <div class="sort-source" id="sort-source"><!-- filled by JS --></div>
+      <div class="sort-bins" id="sort-bins">
+        <div class="sort-bin" data-cat="Alkali Metal">
+          <div class="bin-label">⚡ Alkali Metals</div>
+          <div class="bin-drop" id="bin-alkali"></div>
+        </div>
+        <div class="sort-bin" data-cat="Alkaline Earth Metal">
+          <div class="bin-label">🌍 Alkaline Earth</div>
+          <div class="bin-drop" id="bin-alkaline"></div>
+        </div>
+        <div class="sort-bin" data-cat="Transition Metal">
+          <div class="bin-label">🔩 Transition Metals</div>
+          <div class="bin-drop" id="bin-transition"></div>
+        </div>
+        <div class="sort-bin" data-cat="Nonmetal">
+          <div class="bin-label">🌿 Non-metals</div>
+          <div class="bin-drop" id="bin-nonmetal"></div>
+        </div>
+        <div class="sort-bin" data-cat="Noble Gas">
+          <div class="bin-label">💎 Noble Gases</div>
+          <div class="bin-drop" id="bin-noble"></div>
+        </div>
+        <div class="sort-bin" data-cat="Metalloid">
+          <div class="bin-label">🔮 Metalloids</div>
+          <div class="bin-drop" id="bin-metalloid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="feedback-toast" id="sort-feedback"></div>
+  </div>
+
+  <!-- ── SCREEN: ATOM BUILDER ───────────────────────────────── -->
+  <div id="screen-atom" class="screen">
+    <div class="game-header">
+      <button class="btn-back" id="back-atom">← Hub</button>
+      <h2>⚛️ Atom Builder</h2>
+      <div class="game-stats">
+        <span>Score: <b id="atom-score">0</b></span>
+        <span>Level: <b id="atom-level">1</b></span>
+      </div>
+    </div>
+    <div class="atom-body">
+      <div class="atom-target-info">
+        <div class="target-label">🎯 Build this Atom:</div>
+        <div class="atom-target-name" id="atom-target-name">Hydrogen</div>
+        <div class="atom-target-symbol" id="atom-target-symbol">H</div>
+        <div class="atom-target-props" id="atom-target-props"></div>
+      </div>
+
+      <div class="atom-workspace">
+        <div class="atom-canvas-wrap">
+          <canvas id="atom-canvas" width="300" height="300"></canvas>
+        </div>
+        <div class="atom-controls">
+          <div class="particle-group">
+            <div class="particle-label">⚫ Protons: <b id="atom-p-count">0</b></div>
+            <div class="particle-btns">
+              <button class="btn-particle" id="btn-p-add">+ Add</button>
+              <button class="btn-particle" id="btn-p-rem">− Remove</button>
+            </div>
+          </div>
+          <div class="particle-group">
+            <div class="particle-label">⚪ Neutrons: <b id="atom-n-count">0</b></div>
+            <div class="particle-btns">
+              <button class="btn-particle" id="btn-n-add">+ Add</button>
+              <button class="btn-particle" id="btn-n-rem">− Remove</button>
+            </div>
+          </div>
+          <div class="particle-group">
+            <div class="particle-label">🔵 Electrons: <b id="atom-e-count">0</b></div>
+            <div class="particle-btns">
+              <button class="btn-particle" id="btn-e-add">+ Add</button>
+              <button class="btn-particle" id="btn-e-rem">− Remove</button>
+            </div>
+          </div>
+          <button class="btn-check" id="btn-check-atom">✅ Check Atom</button>
+        </div>
+      </div>
+
+      <div class="atom-hint-box" id="atom-hint-box"></div>
+    </div>
+    <div class="feedback-toast" id="atom-feedback"></div>
+  </div>
+
+  <!-- ── SCREEN: RESULTS ────────────────────────────────────── -->
+  <div id="screen-results" class="screen">
+    <div class="results-center">
+      <div class="trophy">🏆</div>
+      <h2 id="results-title">Mission Complete!</h2>
+      <div class="results-score-wrap">
+        <div class="results-score-label">Your Score</div>
+        <div class="results-score" id="results-score">0</div>
+      </div>
+      <div id="results-breakdown"></div>
+      <div class="results-btns">
+        <button class="btn-primary" id="btn-play-again">🔄 Play Again</button>
+        <button class="btn-secondary" id="btn-hub-from-results">🏠 Mission Hub</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -202,7 +202,7 @@
     }
 
     if (isCorrect) {
-      showFeedback('correct', 'Brilliant!', `You accurately built ₹${formatIndianNumber(currentVal)}! (+${ch.xp} XP, +${ch.coins} Coins)`);
+      showFeedback('correct', 'Brilliant!', `You accurately built ${formatIndianNumber(currentVal)}! (+${ch.xp} XP, +${ch.coins} Coins)`);
       
       setTimeout(() => {
         if (state.currentLevelIdx + 1 < state.challenges.length) {

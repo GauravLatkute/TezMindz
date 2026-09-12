@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Place Value Blitz — TezMindz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="blitz-container">
+    <!-- Header HUD -->
+    <header class="blitz-header">
+      <div class="hud-item">
+        <span class="hud-label">LEVEL</span>
+        <span class="hud-value" id="level-display">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">SCORE</span>
+        <span class="hud-value" id="score-display">0</span>
+      </div>
+      <div class="hud-item timer">
+        <span class="hud-label">TIME</span>
+        <span class="hud-value" id="timer-display">45s</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">STREAK</span>
+        <span class="hud-value streak" id="streak-display">🔥 0</span>
+      </div>
+    </header>
+
+    <!-- Main Game Board -->
+    <main class="blitz-board" id="game-board">
+      <div class="mission-banner">
+        <span class="badge-tag" id="mode-tag">Indian Place Value Challenge</span>
+        <h2 class="question-prompt" id="question-text">Identify the place value of the highlighted digit!</h2>
+      </div>
+
+      <!-- Target Number Card -->
+      <div class="number-card" id="number-container">
+        <!-- Rendered dynamically e.g. 4, [7], 2, 0 -->
+      </div>
+
+      <div class="digit-info-pill" id="digit-info">
+        What is the exact value of <strong id="highlighted-digit">7</strong> in this number?
+      </div>
+
+      <!-- Multiple Choice Options -->
+      <div class="options-grid" id="options-container">
+        <!-- Buttons injected by game.js -->
+      </div>
+
+      <!-- Feedback Toast -->
+      <div class="feedback-banner" id="feedback-banner"></div>
+    </main>
+
+    <!-- Results Modal -->
+    <div class="results-modal" id="results-modal" style="display: none;">
+      <div class="modal-card">
+        <div class="trophy-icon">🏆</div>
+        <h2 id="modal-title">Mission Accomplished!</h2>
+        <p class="modal-subtitle" id="modal-subtitle">You have mastered Place Value!</p>
+
+        <div class="score-summary">
+          <div class="stat-box">
+            <div class="stat-num" id="final-score">0</div>
+            <div class="stat-lbl">Points</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="correct-answers">0/0</div>
+            <div class="stat-lbl">Accuracy</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="reward-xp">+50</div>
+            <div class="stat-lbl">XP Earned</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-play-again" onclick="restartGame()">🔄 Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>
