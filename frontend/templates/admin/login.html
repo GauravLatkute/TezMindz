@@ -1,0 +1,430 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal Login — TezMindz Control Center</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0B0F19;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #F8FAFC;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Glows */
+    .ambient-glow-1 {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: absolute;
+      bottom: -100px;
+      right: 10%;
+      width: 500px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .admin-login-shell {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* Brand Header */
+    .admin-brand-card {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .admin-shield-badge {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 16px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.45);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+    .admin-brand-title {
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    .admin-brand-subtitle {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #818CF8;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 4px 14px;
+      border-radius: 100px;
+    }
+
+    /* Card Box */
+    .login-box-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 26px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Security Notice Banner */
+    .security-notice-banner {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.76rem;
+      color: #94A3B8;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .security-notice-banner i {
+      font-size: 1.1rem;
+      color: #F59E0B;
+      flex-shrink: 0;
+    }
+
+    /* Error Alert */
+    .login-error-alert {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      color: #FCA5A5;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .login-error-alert i {
+      font-size: 1.1rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #CBD5E1;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-wrapper i.leading-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748B;
+      font-size: 1rem;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 13px 42px 13px 42px;
+      font-size: 0.94rem;
+      font-family: inherit;
+      color: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #6366F1;
+      background: rgba(30, 41, 59, 0.9);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+    }
+    .form-input::placeholder {
+      color: #475569;
+    }
+    .toggle-pwd-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #64748B;
+      cursor: pointer;
+      font-size: 1.05rem;
+      padding: 0;
+      transition: color 0.15s ease;
+    }
+    .toggle-pwd-btn:hover {
+      color: #CBD5E1;
+    }
+
+    /* Submit Button */
+    .btn-admin-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 0.96rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+      margin-top: 24px;
+    }
+    .btn-admin-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.55);
+    }
+    .btn-admin-submit:active {
+      transform: translateY(0);
+    }
+    .btn-admin-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* Footer & Switch */
+    .admin-login-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.84rem;
+      color: #64748B;
+    }
+    .admin-login-footer a {
+      color: #818CF8;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.15s ease;
+    }
+    .admin-login-footer a:hover {
+      color: #C7D2FE;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="admin-login-shell">
+    
+    <!-- Brand Header -->
+    <div class="admin-brand-card">
+      <div class="admin-shield-badge">🛡️</div>
+      <h1 class="admin-brand-title">TezMindz Admin Console</h1>
+      <span class="admin-brand-subtitle">
+        <i class="bi bi-lock-fill"></i> Restricted Staff Access Only
+      </span>
+    </div>
+
+    <!-- Login Box Card -->
+    <div class="login-box-card">
+
+      <div class="security-notice-banner">
+        <i class="bi bi-shield-exclamation"></i>
+        <span>This portal is strictly reserved for authorized TezMindz administrators, teachers, and curriculum staff.</span>
+      </div>
+
+      {% if error_message %}
+      <div class="login-error-alert" id="server-error-banner">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <span>{{ error_message }}</span>
+      </div>
+      {% endif %}
+
+      <div class="login-error-alert" id="client-error-banner" style="display:none;">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <span id="client-error-text"></span>
+      </div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}" />
+
+        <!-- Administrator Identifier -->
+        <div class="form-group">
+          <label class="form-label" for="admin-identifier">Staff Username or Email</label>
+          <div class="input-wrapper">
+            <i class="bi bi-person-fill leading-icon"></i>
+            <input 
+              type="text" 
+              id="admin-identifier" 
+              name="identifier" 
+              class="form-input" 
+              placeholder="e.g. admin or staff@tezmindz.com" 
+              required 
+              autocomplete="username"
+              autofocus 
+            />
+          </div>
+        </div>
+
+        <!-- Administrator Password -->
+        <div class="form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <label class="form-label" for="admin-password" style="margin-bottom:0;">Password</label>
+          </div>
+          <div class="input-wrapper">
+            <i class="bi bi-key-fill leading-icon"></i>
+            <input 
+              type="password" 
+              id="admin-password" 
+              name="password" 
+              class="form-input" 
+              placeholder="Enter your administrator password" 
+              required 
+              autocomplete="current-password"
+            />
+            <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+              <i class="bi bi-eye-fill" id="pwd-eye-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-admin-submit" id="adminSubmitBtn">
+          <span>Authenticate &amp; Open Control Center</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Switch to Student Portal -->
+    <div class="admin-login-footer">
+      Are you a student or parent? 
+      <a href="/login/">Go to Student Learning Portal 🚀</a>
+    </div>
+
+  </div>
+
+  <script>
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('admin-password');
+      const eyeIcon = document.getElementById('pwd-eye-icon');
+      if (!pwdInput) return;
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        eyeIcon.className = 'bi bi-eye-slash-fill';
+      } else {
+        pwdInput.type = 'password';
+        eyeIcon.className = 'bi bi-eye-fill';
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('admin-identifier').value.trim();
+      const password = document.getElementById('admin-password').value.trim();
+      const submitBtn = document.getElementById('adminSubmitBtn');
+      const errBanner = document.getElementById('client-error-banner');
+      const errText = document.getElementById('client-error-text');
+      const serverErr = document.getElementById('server-error-banner');
+
+      if (serverErr) serverErr.style.display = 'none';
+      errBanner.style.display = 'none';
+
+      if (!identifier || !password) {
+        errBanner.style.display = 'flex';
+        errText.textContent = 'Please enter both username/email and password.';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>Verifying Administrator Credentials...</span>';
+
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const nextUrl = document.querySelector('[name=next]')?.value || '/tezadmin/';
+
+      try {
+        const response = await fetch('/tezadmin/login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+            identifier: identifier,
+            password: password,
+            next: nextUrl
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> <span>Access Granted! Redirecting...</span>';
+          window.location.href = data.redirect_url || nextUrl;
+        } else {
+          errBanner.style.display = 'flex';
+          errText.textContent = data.message || 'Authentication failed. Please verify your credentials.';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Authenticate &amp; Open Control Center</span> <i class="bi bi-arrow-right"></i>';
+        }
+      } catch (error) {
+        errBanner.style.display = 'flex';
+        errText.textContent = 'An error occurred during authentication. Please try again.';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Authenticate &amp; Open Control Center</span> <i class="bi bi-arrow-right"></i>';
+      }
+    }
+  </script>
+
+</body>
+</html>

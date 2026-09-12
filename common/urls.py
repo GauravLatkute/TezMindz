@@ -11,6 +11,7 @@ urlpatterns = [
     path("subjects/", views.subjects_page, name="subjects"),
     path("how-it-works/", views.how_it_works_page, name="how_it_works"),
     path("login/", views.login_page, name="login"),
+    path("admin-login/", RedirectView.as_view(url="/tezadmin/login/", permanent=False), name="admin_login_alias"),
     path("register/", views.register_page, name="register"),
     path("logout/", views.logout_page, name="logout"),
     path("class/", views.class_select_page, name="class_select"),

@@ -547,6 +547,12 @@
         <p class="reg-divider">
           Don't have an account? <a href="/register/">Create one free</a>
         </p>
+
+        <div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid #EDE9FE;">
+          <a href="/tezadmin/login/" style="font-size:0.82rem;font-weight:800;color:#6366F1;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+            <i class="bi bi-shield-lock-fill"></i> Staff &amp; Administrator Portal ➔
+          </a>
+        </div>
       </div>
     </div>
 
@@ -605,7 +611,7 @@
         })
         .then(function(data) {
           if (data.success) {
-            location.href = "/dashboard/";
+            location.href = data.redirect_url || "/dashboard/";
           } else {
             btn.disabled = false;
             btn.innerHTML = 'Login <i class="bi bi-arrow-right"></i>';

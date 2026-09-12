@@ -4,6 +4,10 @@ from common import admin_views
 app_name = "tezadmin"
 
 urlpatterns = [
+    # ── Dedicated Admin Authentication ─────────────────────────────────────────
+    path("login/", admin_views.admin_login_view, name="login"),
+    path("logout/", admin_views.admin_logout_view, name="logout"),
+
     # ── Executive Dashboard ───────────────────────────────────────────────────
     path("", admin_views.admin_dashboard_view, name="dashboard"),
     path("audit-logs/", admin_views.admin_audit_logs_view, name="audit_logs"),

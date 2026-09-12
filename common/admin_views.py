@@ -1,8 +1,9 @@
 import json
 import os
+from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseForbidden
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST, require_http_methods
@@ -22,6 +23,25 @@ from common.admin_services import (
 )
 
 
+def admin_required(view_func):
+    """
+    Strict authorization decorator for TezMindz Admin Panel.
+    - If user is not authenticated: redirects to the dedicated admin login page (/tezadmin/login/).
+    - If user is authenticated but not a staff or superuser: blocks access and redirects to dashboard with an error.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(f"/tezadmin/login/?next={request.path}")
+        if not (request.user.is_staff or request.user.is_superuser):
+            if request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json":
+                return JsonResponse({"success": False, "message": "Access restricted: Administrator permissions required."}, status=403)
+            messages.error(request, "Access restricted: Staff or Administrator permissions required.")
+            return redirect("common:dashboard")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
 def is_staff_or_admin(user):
     """Permission gate: Superusers, staff members, or users with admin permissions."""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
@@ -31,7 +51,7 @@ def is_staff_or_admin(user):
 # 1. EXECUTIVE DASHBOARD & AUDIT LOGS
 # ══════════════════════════════════════════════════════════════════════════════
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_dashboard_view(request):
     """Main TezMindz Admin Panel Executive Dashboard."""
     metrics = get_admin_dashboard_metrics()
@@ -43,7 +63,7 @@ def admin_dashboard_view(request):
     return render(request, "admin/dashboard.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_audit_logs_view(request):
     """System activity trail & audit logs."""
     logs = AdminAuditLog.objects.select_related("admin_user").order_by("-created_at")[:100]
@@ -58,7 +78,7 @@ def admin_audit_logs_view(request):
 # 2. ACADEMIC HIERARCHY MANAGEMENT (Class -> Subject -> Chapter -> Topic)
 # ══════════════════════════════════════════════════════════════════════════════
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_academic_hierarchy_view(request):
     """Interactive Curriculum Tree Viewer and Hierarchy Editor."""
     classes = Class.objects.prefetch_related(
@@ -77,7 +97,7 @@ def admin_academic_hierarchy_view(request):
     return render(request, "admin/academic_hierarchy.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def api_hierarchy_cascading(request):
     """
     Dynamic Cascading JSON API for dropdown chaining:
@@ -140,7 +160,7 @@ def api_hierarchy_cascading(request):
     return JsonResponse({"success": False, "message": "Invalid level"}, status=400)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def api_class_save(request):
     """Create or update a Class."""
@@ -178,7 +198,7 @@ def api_class_save(request):
         return JsonResponse({"success": False, "message": str(e)}, status=400)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def api_chapter_save(request):
     """Create or update a Chapter."""
@@ -212,7 +232,7 @@ def api_chapter_save(request):
         return JsonResponse({"success": False, "message": str(e)}, status=400)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def api_topic_save(request):
     """Create or update a Topic (Concept)."""
@@ -252,7 +272,7 @@ def api_topic_save(request):
 # 3. GAME MANAGEMENT SYSTEM & ZIP UPLOADER
 # ══════════════════════════════════════════════════════════════════════════════
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_game_library_view(request):
     """Interactive Game Library Table with search, filters, and quick toggles."""
     games = (
@@ -292,7 +312,7 @@ def admin_game_library_view(request):
     return render(request, "admin/game_library.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_game_form_view(request, game_id=None):
     """Add new game or edit existing game with dynamic cascading and ZIP uploader."""
     game = get_object_or_404(Game, id=game_id) if game_id else None
@@ -372,7 +392,7 @@ def admin_game_form_view(request, game_id=None):
     return render(request, "admin/game_form.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def admin_game_toggle_status_view(request, game_id):
     """Toggle active status for a game."""
@@ -384,7 +404,7 @@ def admin_game_toggle_status_view(request, game_id):
     return JsonResponse({"success": True, "is_active": game.is_active})
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def admin_game_duplicate_view(request, game_id):
     """One-click duplicate of a game."""
@@ -413,7 +433,7 @@ def admin_game_duplicate_view(request, game_id):
     return JsonResponse({"success": True, "new_id": clone.id})
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_game_analytics_view(request, game_id):
     """Deep analytics view for an individual game."""
     analytics = get_game_analytics(game_id)
@@ -433,7 +453,7 @@ def admin_game_analytics_view(request, game_id):
 # 4. STUDENT, MEMBERSHIP & GAMIFICATION CONTROL
 # ══════════════════════════════════════════════════════════════════════════════
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_student_list_view(request):
     """Searchable directory of student profiles."""
     class_filter = request.GET.get("class")
@@ -458,7 +478,7 @@ def admin_student_list_view(request):
     return render(request, "admin/student_list.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_student_detail_view(request, student_id):
     """Comprehensive student profile inspector."""
     profile = get_object_or_404(StudentProfile.objects.select_related("user", "student_class"), id=student_id)
@@ -477,7 +497,7 @@ def admin_student_detail_view(request, student_id):
     return render(request, "admin/student_detail.html", context)
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 @require_POST
 def admin_student_toggle_active_view(request, student_id):
     """Toggle user active / banned status."""
@@ -489,7 +509,7 @@ def admin_student_toggle_active_view(request, student_id):
     return JsonResponse({"success": True, "is_active": user.is_active})
 
 
-@user_passes_test(is_staff_or_admin, login_url="/login/")
+@admin_required
 def admin_gamification_view(request):
     """XP/Coins rules, Level thresholds, Rewards store, and Achievements control."""
     achievements = Achievement.objects.all().order_by("id")
@@ -504,3 +524,100 @@ def admin_gamification_view(request):
         "missions": missions,
     }
     return render(request, "admin/gamification.html", context)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 5. DEDICATED ADMIN AUTHENTICATION (ISOLATED LOGIN / LOGOUT)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def admin_login_view(request):
+    """
+    Dedicated, isolated Admin Authentication Portal (/tezadmin/login/).
+    Restricted strictly to staff members and superusers.
+    """
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("tezadmin:dashboard")
+
+    error_message = None
+    next_url = request.GET.get("next") or request.POST.get("next") or "/tezadmin/"
+
+    if request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body)
+                identifier = data.get("identifier", "") or data.get("username", "") or data.get("email", "")
+                password = data.get("password", "")
+                is_json = True
+            else:
+                identifier = request.POST.get("identifier", "") or request.POST.get("username", "") or request.POST.get("email", "")
+                password = request.POST.get("password", "")
+                is_json = False
+        except Exception:
+            identifier = request.POST.get("identifier", "")
+            password = request.POST.get("password", "")
+            is_json = False
+
+        identifier = (identifier or "").strip()
+        password = (password or "").strip()
+
+        if not identifier or not password:
+            error_message = "Please enter both administrator identifier and password."
+            if is_json:
+                return JsonResponse({"success": False, "message": error_message}, status=400)
+        else:
+            user_obj = User.objects.filter(email__iexact=identifier).first()
+            if not user_obj:
+                user_obj = User.objects.filter(username__iexact=identifier).first()
+
+            if user_obj and user_obj.check_password(password):
+                # Critical Authorization Check: Account must be staff or superuser!
+                if not (user_obj.is_staff or user_obj.is_superuser):
+                    error_message = "Access Denied: This account is a student profile and does not have administrative privileges. Please log in through the Student Learning Portal."
+                    if is_json:
+                        return JsonResponse({"success": False, "message": error_message}, status=403)
+                elif not user_obj.is_active:
+                    error_message = "Administrator account is suspended. Please contact system support."
+                    if is_json:
+                        return JsonResponse({"success": False, "message": error_message}, status=403)
+                else:
+                    login(request, user_obj)
+                    log_admin_action(
+                        request,
+                        "LOGIN",
+                        "User",
+                        str(user_obj.id),
+                        details="Administrator authenticated via dedicated /tezadmin/login/ portal"
+                    )
+                    if is_json:
+                        return JsonResponse({"success": True, "redirect_url": next_url})
+                    return redirect(next_url)
+            else:
+                error_message = "Invalid administrator credentials. Please check your username/email and password."
+                if is_json:
+                    return JsonResponse({"success": False, "message": error_message}, status=400)
+
+    context = {
+        "title": "Admin Console Login",
+        "error_message": error_message,
+        "next": next_url,
+    }
+    return render(request, "admin/login.html", context)
+
+
+def admin_logout_view(request):
+    """
+    Dedicated Admin Logout handler.
+    Logs out administrator and redirects to the dedicated Admin Login portal.
+    """
+    if request.user.is_authenticated:
+        log_admin_action(
+            request,
+            "LOGOUT",
+            "User",
+            str(request.user.id),
+            details="Administrator signed out from Admin Console"
+        )
+    logout(request)
+    messages.success(request, "You have been securely signed out of the Admin Console.")
+    return redirect("tezadmin:login")

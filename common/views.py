@@ -237,24 +237,30 @@ def how_it_works_page(request):
 
 def login_page(request):
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("tezadmin:dashboard")
         return redirect("common:dashboard")
 
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            identifier = data.get("email", "")
+            identifier = data.get("email", "") or data.get("username", "")
             password = data.get("password", "")
         except Exception:
-            identifier = request.POST.get("email", "")
+            identifier = request.POST.get("email", "") or request.POST.get("username", "")
             password = request.POST.get("password", "")
 
-        user = User.objects.filter(email=identifier).first()
+        identifier = (identifier or "").strip()
+        user = User.objects.filter(email__iexact=identifier).first()
         if not user:
-            user = User.objects.filter(username=identifier).first()
+            user = User.objects.filter(username__iexact=identifier).first()
 
         if user and user.check_password(password):
             login(request, user)
-            return JsonResponse({"success": True})
+            # Route staff/admin directly to the Admin Portal, students to Dashboard
+            if user.is_staff or user.is_superuser:
+                return JsonResponse({"success": True, "redirect_url": "/tezadmin/"})
+            return JsonResponse({"success": True, "redirect_url": "/dashboard/"})
         return JsonResponse({"success": False, "message": "Invalid email or password."}, status=400)
 
     return render(request, "login.html", get_user_data_context(request))

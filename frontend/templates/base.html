@@ -576,13 +576,6 @@
             <span>Game Arena</span>
           </a>
 
-          {% if request.user.is_staff or request.user.is_superuser %}
-          <a class="tm-nav-link" href="/tezadmin/" style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: #FFFFFF !important; font-weight: 800; border-radius: 99px; padding: 6px 14px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Admin Panel 🛡️</span>
-          </a>
-          {% endif %}
-
           <!-- Explore More Dropdown -->
           <div class="tm-dropdown" id="desktop-more-dropdown">
             <a class="tm-nav-link {% block nav_explore %}{% endblock %}" href="javascript:void(0)" onclick="toggleMoreDropdown(event)">
@@ -599,7 +592,7 @@
               {% if request.user.is_staff or request.user.is_superuser %}
               <a class="tm-dropdown-item" href="/tezadmin/" style="background: rgba(99, 102, 241, 0.08); font-weight: 800; color: #4F46E5;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>Admin Control Center 🛡️</span>
+                <span>Admin Console 🛡️</span>
               </a>
               <div class="tm-dropdown-divider"></div>
               {% endif %}
@@ -650,10 +643,10 @@
       <!-- Right: Student Profile -->
       <div class="tm-student-hud">
         {% if request.user.is_authenticated %}
-          <a class="hud-profile-pill" href="{% if request.user.is_staff or request.user.is_superuser %}/tezadmin/{% else %}/profile/{% endif %}" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }} ({{ profile.student_class.class_label|default:'Class 5' }})">
+          <a class="hud-profile-pill" href="/profile/" title="{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}">
             <div class="hud-profile-meta">
               <strong>{{ profile.user.first_name|default:request.user.first_name|default:request.user.username }}</strong>
-              <small>{% if request.user.is_superuser %}Super Admin 🛡️{% elif request.user.is_staff %}Staff Admin 🛡️{% else %}{{ profile.student_class.class_label|default:"Class 5" }}{% endif %}</small>
+              <small>{{ profile.student_class.class_label|default:"Class 5" }}</small>
             </div>
             <div class="hud-avatar-circle">
               <svg viewBox="0 0 36 36" width="30" height="30">
