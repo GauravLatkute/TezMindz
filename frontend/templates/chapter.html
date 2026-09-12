@@ -249,18 +249,17 @@
       <div class="step-info-col">
         <h3>Mission {{ concept.order }}: {{ concept.name }}</h3>
         <p>{{ concept.description|truncatewords:18 }}</p>
+        {% if concept.progress.is_mastered or concept.progress.quiz_completed or concept.progress.game_completed %}
         <div class="step-badges-row">
-          <span class="badge-pill purple">{{ concept.get_difficulty_display }}</span>
           {% if concept.progress.is_mastered %}
             <span class="badge-pill" style="background:#ECFDF5;color:#047857;"><i class="bi bi-trophy-fill"></i> Mastered (100%)</span>
           {% elif concept.progress.quiz_completed %}
             <span class="badge-pill" style="background:#EFF6FF;color:#2563EB;"><i class="bi bi-patch-check-fill"></i> Quiz Complete</span>
           {% elif concept.progress.game_completed %}
             <span class="badge-pill" style="background:#FEF3C7;color:#D97706;"><i class="bi bi-controller"></i> Game Complete</span>
-          {% else %}
-            <span class="badge-pill" style="background:#DCFCE7;color:#15803D;"><i class="bi bi-unlock-fill"></i> Open</span>
           {% endif %}
         </div>
+        {% endif %}
       </div>
 
       <div class="step-action-col">
