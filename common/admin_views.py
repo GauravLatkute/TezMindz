@@ -36,8 +36,7 @@ def admin_required(view_func):
         if not (request.user.is_staff or request.user.is_superuser):
             if request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json":
                 return JsonResponse({"success": False, "message": "Access restricted: Administrator permissions required."}, status=403)
-            messages.error(request, "Access restricted: Staff or Administrator permissions required.")
-            return redirect("common:dashboard")
+            return redirect(f"/tezadmin/login/?next={request.path}")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 

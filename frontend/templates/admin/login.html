@@ -281,6 +281,13 @@
         <span>This portal is strictly reserved for authorized TezMindz administrators, teachers, and curriculum staff.</span>
       </div>
 
+      {% if request.user.is_authenticated and not request.user.is_staff and not request.user.is_superuser %}
+      <div style="background:rgba(245,158,11,0.15);border:1.5px solid rgba(245,158,11,0.4);color:#FCD34D;border-radius:14px;padding:12px 14px;margin-bottom:18px;font-size:0.82rem;font-weight:700;display:flex;align-items:center;gap:10px;">
+        <i class="bi bi-info-circle-fill" style="font-size:1.15rem;flex-shrink:0;color:#F59E0B;"></i>
+        <span>Currently signed in as student <strong>{{ request.user.first_name|default:request.user.username }}</strong>. Sign in below with your Administrator credentials to open the Admin Console.</span>
+      </div>
+      {% endif %}
+
       {% if error_message %}
       <div class="login-error-alert" id="server-error-banner">
         <i class="bi bi-exclamation-octagon-fill"></i>
